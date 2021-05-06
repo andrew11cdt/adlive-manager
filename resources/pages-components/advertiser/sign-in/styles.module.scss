@@ -1,0 +1,26 @@
+@import "../../../styles/variables.scss";
+@import "../../../styles/common.scss";
+
+.advertiserSignIn {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 300px 16px 16px;
+  background: #f5f8ff;
+  @extend .hideScrollbar;
+
+  .title {
+    margin-bottom: 37.5px;
+  }
+
+  .form {
+    width: 100%;
+
+    .errorMsg {
+      color: $errorDarkColor;
+    }
+  }
+}

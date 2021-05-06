@@ -1,0 +1,44 @@
+@import "../../../../styles/common.scss";
+
+.advertiserContent {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 100px;
+  position: relative;
+  @extend .hideScrollbar;
+
+  .advertiserContentHeader {
+    width: 100%;
+    position: sticky;
+    top: 0;
+
+    .advertiserContentHeaderTop {
+      width: 100%;
+      background: #fff;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .advertiserContentHeaderTopLeft {
+        display: flex;
+        align-items: center;
+      }
+
+      .advertiserContentHeaderTopRight {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .advertiserContentHeaderBottom {
+    }
+  }
+
+  .advertiserContentContent {
+    width: 100%;
+    background: #fff;
+    padding: 0px 16px;
+  }
+}

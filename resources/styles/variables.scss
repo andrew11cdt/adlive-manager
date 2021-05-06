@@ -1,0 +1,48 @@
+$primaryMainColor: #2475ff;
+$primaryDarkColor: #0057b2;
+$primaryLightColor: #3397ff;
+$primaryBgColor: #f5f8ff;
+$primaryBorderColor: rgba(81, 141, 244, 0.5);
+
+$secondaryMainColor: #57bde1;
+$secondaryDarkColor: #117ea6;
+$secondaryLightColor: #7adcff;
+$secondarySelectedColor: #e3f5fb;
+$secondaryBorderColor: rgba(87, 189, 225, 0.5);
+
+$successMainColor: #4caf50;
+$successDarkColor: #3b873e;
+$successLightColor: #7bc67e;
+$successLightBgColor: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.9)
+  ),
+  #4caf50;
+
+$errorMainColor: #f44336;
+$errorDarkColor: #e31b0c;
+$errorLightColor: #f88078;
+$errorLightBgColor: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.9)
+  ),
+  #f44336;
+
+$warningMainColor: #ff9800;
+$warningDarkColor: #c77700;
+$warningLightColor: #ffb547;
+$warningSelectedColor: #e3f5fb;
+$warningLightBgColor: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.9)
+  ),
+  #ff9800;
+
+$greyColor: #e6e7e9;
+$darkNeutralColor: #7f838e;
+$darkColor: #262b32;
+$greyNeutralColor: #bfc2c7;
+$whiteColor: #fff;

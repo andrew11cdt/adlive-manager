@@ -1,0 +1,89 @@
+@import "../../styles/variables.scss";
+
+.icon {
+  svg {
+    width: 100% !important;
+    height: 100% !important;
+    stroke: inherit;
+    fill: inherit;
+
+    path {
+      stroke: inherit;
+      fill: inherit;
+    }
+  }
+
+  &.primary {
+    stroke: $primaryMainColor;
+    fill: $primaryMainColor;
+  }
+
+  &.normal {
+    stroke: $darkNeutralColor;
+    fill: $darkNeutralColor;
+  }
+
+  &.extraSmall {
+    width: 16px;
+    height: 16px;
+  }
+
+  &.small {
+    width: 20px;
+    height: 20px;
+  }
+
+  &.medium {
+    width: 30px;
+    height: 30px;
+  }
+
+  &.large {
+    width: 40px;
+    height: 40px;
+  }
+
+  &.screen {
+    fill: none;
+  }
+
+  &.video {
+    stroke: none;
+  }
+
+  &.videoBold {
+    stroke: none;
+  }
+
+  &.send {
+    fill: none;
+  }
+
+  &.sendBold {
+    stroke: none;
+  }
+
+  &.alert {
+    stroke: none;
+  }
+
+  &.alertBold {
+    stroke: none;
+  }
+
+  &.aC {
+    fill: none;
+  }
+
+  &.aCBold {
+    stroke: none;
+  }
+
+  &.search {
+    fill: none;
+  }
+
+  &.circlePlusBold {
+    stroke: none;
+  }
+}

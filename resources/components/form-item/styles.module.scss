@@ -1,0 +1,24 @@
+@import "../../styles/variables.scss";
+
+.formItem {
+  width: 100%;
+  margin-bottom: 16px;
+
+  .label {
+    color: $darkColor;
+  }
+
+  .suffixLabel,
+  .prefixLabel {
+    color: $darkNeutralColor;
+  }
+
+  .prefixLabel {
+    margin-top: 8px;
+  }
+
+  .content {
+    width: 100%;
+    margin: 12px 0px;
+  }
+}
