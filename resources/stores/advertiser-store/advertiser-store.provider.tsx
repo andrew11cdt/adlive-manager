@@ -8,6 +8,7 @@ import AdvertiserStoreContext, {
   AdvertiserStoreContextDataAuth,
   AdvertiserStoreContextDataLocation,
   AdvertiserStoreContextDataLocations,
+  AdvertiserStoreContextDataScreens,
 } from "./advertiser-store.context";
 
 export default function AdvertiserStoreProvider({
@@ -28,6 +29,15 @@ export default function AdvertiserStoreProvider({
   ] = useState<AdvertiserStoreContextDataLocations>({
     loading: true,
     locations: [],
+  });
+  
+  const [
+    screens,
+    setScreens,
+  ] = useState<AdvertiserStoreContextDataScreens>({
+    loading: true,
+    areaId: null,
+    screens: [],
   });
 
   useEffect(() => {
@@ -60,6 +70,15 @@ export default function AdvertiserStoreProvider({
         ...previous,
         locations: data || [],
         loading: false,
+      }));
+    });
+    
+    AdvertiserStoreActions.getLocationScreen("reccLdLHUT5fyQfKa").then((data) => {
+      setScreens((previous) => ({
+        ...previous,
+        screens: data || [],
+        loading: false,
+        areaId: "reccLdLHUT5fyQfKa"
       }));
     });
   }, [auth?.token]);

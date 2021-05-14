@@ -13,9 +13,28 @@ export type AdvertiserStoreContextDataLocation = {
   [field: string]: any;
 };
 
+export type AdvertiserStoreContextDataScreen = {
+  id: string,
+  code: string,
+  name: string,
+  deviceCode: string,
+  deviceType: string,
+  deviceName: string,
+  deviceIp: string,
+  deviceOS: string,
+  appVersion: string,
+  createdAt: string
+};
+
 export type AdvertiserStoreContextDataLocations = {
   loading?: boolean;
   locations?: AdvertiserStoreContextDataLocation[];
+};
+
+export type AdvertiserStoreContextDataScreens = {
+  loading?: boolean;
+  areaId?: string;
+  screens: AdvertiserStoreContextDataScreen[];
 };
 
 export type AdvertiserStoreContextData = {

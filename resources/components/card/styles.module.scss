@@ -1,0 +1,9 @@
+@import "../../styles/variables.scss";
+
+.card {
+  background: $whiteColor;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0px 8px 16px rgba(110, 120, 130, 0.12);
+  border-radius: 12px;
+}

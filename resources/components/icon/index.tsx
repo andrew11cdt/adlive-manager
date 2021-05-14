@@ -23,6 +23,8 @@ import CirclePlusIcon from "../../assets/icons/circle-plus.svg";
 import CirclePlusBoldIcon from "../../assets/icons/circle-plus-bold.svg";
 import SettingIcon from "../../assets/icons/setting.svg";
 import SettingBoldIcon from "../../assets/icons/setting-bold.svg";
+import FullLeftArrow from "../../assets/icons/full-left-arrow.svg";
+import FullRightArrow from "../../assets/icons/full-right-arrow.svg";
 
 export enum ADSLIVE_ICON_COLOR {
   PRIMARY = "primary",
@@ -59,6 +61,7 @@ export enum ADSLIVE_ICON_VARIANT {
   PEN = "pen",
   TRASH = "trash",
   FULL_LEFT_ARROW = "full-left-arrow",
+  FULL_RIGHT_ARROW = "full-right-arrow",
   WIFI = "wifi",
   FILTER = "filter",
   PAUSE = "pause",
@@ -118,7 +121,11 @@ const iconComponents = {
     [ADSLIVE_ICON_TYPE.BOLD]: null,
   },
   [ADSLIVE_ICON_VARIANT.FULL_LEFT_ARROW]: {
-    [ADSLIVE_ICON_TYPE.REGULAR]: null,
+    [ADSLIVE_ICON_TYPE.REGULAR]: FullLeftArrow,
+    [ADSLIVE_ICON_TYPE.BOLD]: FullLeftArrow,
+  },
+  [ADSLIVE_ICON_VARIANT.FULL_RIGHT_ARROW]: {
+    [ADSLIVE_ICON_TYPE.REGULAR]: FullRightArrow,
     [ADSLIVE_ICON_TYPE.BOLD]: null,
   },
   [ADSLIVE_ICON_VARIANT.GO_LIVE]: {
@@ -165,6 +172,10 @@ const iconComponents = {
     [ADSLIVE_ICON_TYPE.REGULAR]: WifiIcon,
     [ADSLIVE_ICON_TYPE.BOLD]: null,
   },
+  // [ADSLIVE_ICON_VARIANT.BACK]: {
+  //   [ADSLIVE_ICON_TYPE.REGULAR]: BackIcon,
+  //   [ADSLIVE_ICON_TYPE.BOLD]: null,
+  // },
 };
 
 const getIcon = (

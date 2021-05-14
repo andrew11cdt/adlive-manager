@@ -36,6 +36,15 @@ export default class AdvertiserStoreActions {
 
   static async getLocations() {
     return AdvertiserApiClient.getLocations().then(({ code, data }) => {
+      console.log(code, data);
+      
+      return data || [];
+    });
+  }
+
+  static async getLocationScreen(areaId) {
+    return AdvertiserApiClient.getLocationScreen(areaId).then(({ code, data }) => {
+      console.log(code, data);
       return data || [];
     });
   }

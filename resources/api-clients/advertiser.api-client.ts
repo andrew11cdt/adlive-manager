@@ -34,4 +34,15 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+
+  static async getLocationScreen(areaId) {
+    return restClient
+      .asyncGet(`/advertiser/location/${areaId}/screen`)
+      .then(({ status, data }) => {
+        return standardServiceResponse(status, data);
+      })
+      .catch((err) => {
+        return standardServiceResponse(1, null, err);
+      });
+  }
 }

@@ -1,0 +1,18 @@
+@import "../../styles/variables.scss";
+@import "../../styles/common.scss";
+.subLayout {
+    .header {
+        background: $whiteColor;
+        min-height: 56px;
+        width: 100%;
+        padding: 20px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .content {
+        background: inherit;
+        height: 100%;
+        width: 100%;
+        padding: 16px;
+    }
+}

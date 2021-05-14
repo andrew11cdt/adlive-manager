@@ -12,12 +12,14 @@ export type AdvertiserAreaTabsProps = {
   areas?: any[];
   currentAreaId?: number;
   changeCurrentArea?: (area: any) => void;
+  showSetting: () => void;
 };
 
 export default function AdvertiserAreaTabs({
   areas = [],
   currentAreaId,
   changeCurrentArea,
+  showSetting
 }: AdvertiserAreaTabsProps) {
   const areasRef = useRef();
 
@@ -69,6 +71,7 @@ export default function AdvertiserAreaTabs({
         variant={ADSLIVE_ICON_VARIANT.SETTING}
         type={ADSLIVE_ICON_TYPE.BOLD}
         size={ADSLIVE_ICON_SIZE.SMALL}
+        onClick={showSetting}
       />
     </div>
   );
