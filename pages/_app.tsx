@@ -1,4 +1,5 @@
 import Head from "next/head";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function AdsliveApp({ Component, pageProps }) {
   return (

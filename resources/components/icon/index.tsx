@@ -25,6 +25,7 @@ import SettingIcon from "../../assets/icons/setting.svg";
 import SettingBoldIcon from "../../assets/icons/setting-bold.svg";
 import FullLeftArrow from "../../assets/icons/full-left-arrow.svg";
 import FullRightArrow from "../../assets/icons/full-right-arrow.svg";
+import MinusCircle from "../../assets/icons/minus_circle.svg";
 
 export enum ADSLIVE_ICON_COLOR {
   PRIMARY = "primary",
@@ -69,6 +70,8 @@ export enum ADSLIVE_ICON_VARIANT {
   CALENDAR = "calendar",
   EYE_ON = "eye-on",
   EYE_OFF = "eye-off",
+  MINUS_CIRCLE = "minus-circle",
+  InACircle = "InACircle",
 }
 
 const iconComponents = {
@@ -171,6 +174,10 @@ const iconComponents = {
   [ADSLIVE_ICON_VARIANT.WIFI]: {
     [ADSLIVE_ICON_TYPE.REGULAR]: WifiIcon,
     [ADSLIVE_ICON_TYPE.BOLD]: null,
+  },
+  [ADSLIVE_ICON_VARIANT.MINUS_CIRCLE]: {
+    [ADSLIVE_ICON_TYPE.REGULAR]: MinusCircle,
+    [ADSLIVE_ICON_TYPE.BOLD]: MinusCircle,
   },
   // [ADSLIVE_ICON_VARIANT.BACK]: {
   //   [ADSLIVE_ICON_TYPE.REGULAR]: BackIcon,
@@ -284,4 +291,14 @@ export default function AdsliveIcon({
       {Icon && <Icon className={styles.svg} viewBox="0 0 24 24" />}
     </div>
   );
+}
+
+// ---------------------------
+export function AdIcon(props) {
+  return <img
+    style={{
+      width: props.w || '24px',
+      height: props.h || '24px',
+    }}
+    src={`/${props.name}.svg`} alt="icon" />
 }

@@ -1,3 +1,5 @@
+import { Button, Container, Row } from "react-bootstrap";
+import AdCard from "../card";
 import styles from "./styles.module.scss";
 
 export enum ADSLIVE_BUTTON_SIZE {
@@ -67,6 +69,37 @@ const getSizeClassName = (
       return null;
   }
 };
+
+export function IconLinkButton({ icon, title, onClick, ...props }) {
+  return (
+    <Container style={props.style}>
+      <Row className="m-0 p-0">
+        {icon}
+        <Button
+          onClick={onClick}
+          variant="link"
+          className="p-0 ml-2"
+          style={{ fontSize: "14px" }}
+        >
+          {title}
+        </Button>
+      </Row>
+    </Container>
+  );
+}
+
+export function AdButton({ icon, title, onClick, ...props }) {
+  return (
+    <Button
+      onClick={onClick}
+      variant="light"
+      className={ `${styles.adBtn} ${props.dash ? styles.dashBtn : ''} ${props.ghost ? styles.ghostBtn : ''}`}
+    >
+      {icon}
+      {title}
+    </Button>
+  );
+}
 
 export default function ADSLIVEButton({
   size,

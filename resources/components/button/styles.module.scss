@@ -66,3 +66,27 @@
     // }
   }
 }
+
+.adBtn {
+  background: $whiteColor;
+  color: $primaryColor;
+  width: 100%;
+  font-size: 14px;
+  padding: 16px 20px !important;
+  display: flex;
+  align-items: center;
+  >:first-child {
+    margin-right: 12px;
+  }
+
+}
+.dashBtn {
+  border: 1px dashed #8f96b0 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.ghostBtn {
+  border: none;
+  box-shadow: none !important;
+}
