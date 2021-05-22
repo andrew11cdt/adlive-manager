@@ -33,7 +33,7 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
         </>
       }
       content={
-        <>
+        <div style={{ padding: "16px" }}>
           <AdCard
             header={<div>{locationData.name}</div>}
             body={
@@ -46,9 +46,9 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
                   }}
                 />
                 {locationData &&
-                  locationData.areas.map((area) => {
+                  locationData.areas.map((area, i) => {
                     return (
-                      <div key={area.recId}>
+                      <div key={i}>
                         <CardDragItem onDelete={null} onDrag={null}>
                           <div>{area.name}</div>
                         </CardDragItem>
@@ -84,7 +84,7 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
               onClick={addArea}
             />
           </div>
-        </>
+        </div>
       }
     />
   );

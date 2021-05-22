@@ -1,15 +1,83 @@
+import { useEffect, useMemo, useState } from "react";
+import { Col, Container, Row } from "react-bootstrap";
+import AdCard from "../../../../components/card";
+import StatusBadge from "../../../../components/status-badge";
+import AdvertiserStoreActions from "../../../../stores/advertiser-store/advertiser-store.actions";
 import styles from "./styles.module.scss";
 
-export type AdvertiserScreenItemsProps = {
-  screens?: any[];
-};
-
-export default function AdvertiserScreenItems({
-  screens,
-}: AdvertiserScreenItemsProps) {
+export default function AdvertiserScreenItems({ id, areaName }) {
+  const [screens, setScreens] = useState([]);
+  console.log(id);
+  
+  useEffect(() => {
+    AdvertiserStoreActions.getLocationScreen(id).then(data => {
+      setScreens(data)
+    });
+    // setScreens([
+    //   {
+    //     recId: "recQCOMt04mgePNYo",
+    //     id: 4,
+    //     code: "YDZOQNHT",
+    //     deviceCode: "12",
+    //     deviceType: "SmartTV SamSung",
+    //     deviceName: "TV SamSung H2",
+    //     deviceIp: "192.168.1.101",
+    //     deviceOS: "Android 10",
+    //     appVersion: "1.0.0",
+    //     createdAt: "2021-05-16T10:13:59.000Z",
+    //     status: "offline",
+    //   },
+    //   {
+    //     recId: "recQCOMt04mgePNYo",
+    //     id: 4,
+    //     code: "YDZOQNHT",
+    //     deviceCode: "12",
+    //     deviceType: "SmartTV SamSung",
+    //     deviceName: "TV SamSung H2",
+    //     deviceIp: "192.168.1.101",
+    //     deviceOS: "Android 10",
+    //     appVersion: "1.0.0",
+    //     createdAt: "2021-05-16T10:13:59.000Z",
+    //     status: "offline",
+    //   },
+    //   {
+    //     recId: "recQCOMt04mgePNYo",
+    //     id: 4,
+    //     code: "YDZOQNHT",
+    //     deviceCode: "12",
+    //     deviceType: "SmartTV SamSung",
+    //     deviceName: "TV SamSung H2",
+    //     deviceIp: "192.168.1.101",
+    //     deviceOS: "Android 10",
+    //     appVersion: "1.0.0",
+    //     createdAt: "2021-05-16T10:13:59.000Z",
+    //     status: "live",
+    //   },
+    // ]);
+  }, [id]);
   return (
     <div className={styles.advertiserScreens}>
-      {screens.map((screen) => null)}
+      <div className={styles.screensHeader}>
+        <span>{areaName}</span>
+        <span>- live screen</span>
+        <span>- offline</span>
+        <div className={styles.line}></div>
+      </div>
+      {screens &&
+        screens.map((screen, i) => (
+          <div key={i} className={styles.screensCard}>
+            <AdCard
+              body={
+                <div>
+                  <div>{screen.deviceName}</div>
+                  <div style={{ color: '#7F838E' }}>{screen.deviceCode}</div>
+                  <StatusBadge status={screen.status} />
+                </div>
+              }
+            />
+          </div>
+        ))}
     </div>
   );
 }
+

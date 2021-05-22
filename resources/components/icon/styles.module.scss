@@ -88,3 +88,9 @@
     stroke: none;
   }
 }
+
+.adIcon {
+  &.clickable {
+    cursor: pointer;
+  }
+}

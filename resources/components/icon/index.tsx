@@ -295,10 +295,17 @@ export default function AdsliveIcon({
 
 // ---------------------------
 export function AdIcon(props) {
-  return <img
-    style={{
-      width: props.w || '24px',
-      height: props.h || '24px',
-    }}
-    src={`/${props.name}.svg`} alt="icon" />
+  return (
+    <span className={`${styles.adIcon} ${props.onClick ? styles.clickable : null}`} {...props}>
+      <img
+        style={{
+          width: props.w || "24px",
+          height: props.h || "24px",
+          margin: props.m || 0,
+        }}
+        src={`/${props.name}.svg`}
+        alt="icon"
+      />
+    </span>
+  );
 }

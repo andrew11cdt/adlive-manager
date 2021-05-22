@@ -16,8 +16,6 @@ export function CardInput({ title, value, onIputChange, ...props }) {
 }
 
 export function CardDragItem({ onDrag, onDelete, children }) {
-  console.log(children);
-
   return (
     <div className={styles.cardDragItem}>
       {children}

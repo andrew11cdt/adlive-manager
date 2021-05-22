@@ -1,0 +1,33 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/common.scss";
+
+.screensCard{
+  width: 183px;
+  padding: 8px;
+}
+.advertiserScreens {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 16px;
+}
+.screensHeader {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  >* {
+    margin-right: 12px;
+  }
+  :first-child {
+    font-size: 16px;
+  }
+  :not(:first-child) {
+    color: $darkNeutralColor;
+  }
+  .line {
+    flex: 1;
+    width: 100%;
+    height: 3px;
+    background: $greyColor;
+  }
+}

@@ -32,7 +32,7 @@ export default function AdvertiserAreaTabs({
         >
           {areas.map((area, index) => (
             <AdsliveBody16
-              key={area?.id}
+              key={index}
               id={`area-${area.id}`}
               className={`${styles.area} ${
                 currentAreaId === area?.id ? styles.actived : ""

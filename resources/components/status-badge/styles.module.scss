@@ -1,0 +1,23 @@
+// @import "../../styles/variables.scss";
+// @import "../../styles/common.scss";
+
+span.status {
+  border-radius: 4px;
+  padding: 0px 4px;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  &.live {
+    background: #F44336;
+    color: white;
+  }
+  &.offline {
+    color: #FF9800 !important;
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), #FF9800 !important;
+  }
+}
+.icon {
+  height: 12px;
+  width: 12px;
+  margin-right: 5px;
+}

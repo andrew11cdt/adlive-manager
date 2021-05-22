@@ -73,14 +73,6 @@ export default function AdvertiserStoreProvider({
       }));
     });
     
-    AdvertiserStoreActions.getLocationScreen("reccLdLHUT5fyQfKa").then((data) => {
-      setScreens((previous) => ({
-        ...previous,
-        screens: data || [],
-        loading: false,
-        areaId: "reccLdLHUT5fyQfKa"
-      }));
-    });
   }, [auth?.token]);
 
   useEffect(() => {

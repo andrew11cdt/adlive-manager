@@ -4,7 +4,6 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding-bottom: 100px;
   position: relative;
   @extend .hideScrollbar;
 
@@ -32,8 +31,8 @@
       }
     }
 
-    .advertiserContentHeaderBottom {
-    }
+    // .advertiserContentHeaderBottom {
+    // }
   }
 
   .advertiserContentContent {

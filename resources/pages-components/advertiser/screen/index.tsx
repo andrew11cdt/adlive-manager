@@ -1,4 +1,3 @@
-import { path } from "ramda";
 import { useEffect, useMemo, useState } from "react";
 import AdsliveIcon, {
   ADSLIVE_ICON_COLOR,
@@ -13,6 +12,8 @@ import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-stor
 import AdvertiserContent from "../others/advertiser-content";
 import AdvertiserAreaTabs from "./area-tabs";
 import LocationSetting from "./location-setting";
+import ScanQR from "./scanQR";
+import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
 
 export default function AdvertiserScreen() {
@@ -20,6 +21,7 @@ export default function AdvertiserScreen() {
   const [currentLocationId, setCurrentLocationId] = useState(null);
   const [currentAreaId, setCurrentAreaId] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
+  const [showNewScreen, setShowNewScreen] = useState(false);
 
   const currentLocation = useMemo(() => {
     if (currentLocationId) {
@@ -47,52 +49,77 @@ export default function AdvertiserScreen() {
       setCurrentLocationId(locations?.locations[0]?.id || null);
     }
   }, [locations?.loading, locations?.locations]);
-  console.log(locations);
-
+  const Setting = (
+    <LocationSetting
+      returnPreLayout={() => setShowSetting(false)}
+      locationData={currentLocation}
+    />
+  );
+  const NewScreen = (
+    <ScanQR
+      returnPreLayout={() => setShowNewScreen(false)}
+      locationData={currentLocation}
+    />
+  );
   return (
-    <>
-      {!showSetting ?
-        <AdvertiserContent
-          headerTitle={locations?.loading ? "-----" : locations?.locations[0]?.name}
-          headerRightContent={
-            <div className={styles.rightControls}>
-              <AdsliveIcon
-                className={styles.searchIcon}
-                variant={ADSLIVE_ICON_VARIANT.SEARCH}
-                type={ADSLIVE_ICON_TYPE.REGULAR}
-                color={ADSLIVE_ICON_COLOR.NORMAL}
+    <div style={{ height: "100%" }}>
+      {showNewScreen ? (
+        NewScreen
+      ) : showSetting ? (
+        Setting
+      ) : (
+        <>
+          <AdvertiserContent
+            headerTitle={
+              locations?.loading ? "-----" : locations?.locations[0]?.name
+            }
+            headerRightContent={
+              <div className={styles.rightControls}>
+                <AdsliveIcon
+                  className={styles.searchIcon}
+                  variant={ADSLIVE_ICON_VARIANT.SEARCH}
+                  type={ADSLIVE_ICON_TYPE.REGULAR}
+                  color={ADSLIVE_ICON_COLOR.NORMAL}
+                />
+                <AdsliveIcon
+                  className={styles.addIcon}
+                  variant={ADSLIVE_ICON_VARIANT.CIRCLE_PLUS}
+                  type={ADSLIVE_ICON_TYPE.BOLD}
+                  color={ADSLIVE_ICON_COLOR.PRIMARY}
+                  size={ADSLIVE_ICON_SIZE.SMALL}
+                  onClick={() => {
+                    setShowNewScreen(true);
+                  }}
+                />
+              </div>
+            }
+            headerBottomContent={
+              <AdvertiserAreaTabs
+                areas={currentLocation?.areas || []}
+                currentAreaId={currentAreaId}
+                changeCurrentArea={(area) => {
+                  console.log("change current area", area);
+                  setCurrentAreaId(area?.id);
+                }}
+                showSetting={() => {
+                  setShowSetting(!showSetting);
+                }}
               />
-              <AdsliveIcon
-                className={styles.addIcon}
-                variant={ADSLIVE_ICON_VARIANT.CIRCLE_PLUS}
-                type={ADSLIVE_ICON_TYPE.BOLD}
-                color={ADSLIVE_ICON_COLOR.PRIMARY}
-                size={ADSLIVE_ICON_SIZE.SMALL}
-                onClick={locations?.loading ? null : () => { }}
-              />
-            </div>
-          }
-          headerBottomContent={
-            <AdvertiserAreaTabs
-              areas={currentLocation?.areas || []}
-              currentAreaId={currentAreaId}
-              changeCurrentArea={(area) => {
-                console.log("change current area", area);
-                setCurrentAreaId(area?.id);
-              }}
-              showSetting={() => {
-                setShowSetting(!showSetting)
-              }}
+            }
+          >
+            {locations?.loading && (
+              <AdsliveLoading size={ADSLIVE_LOADING_SIZE.EXTRA_SMALL} />
+            )}
+          </AdvertiserContent>
+          {locations?.locations.map((location, i) => (
+            <AdvertiserScreenItems
+              id={location.areas[0]?.id}
+              key={i}
+              areaName={location.areas[0].name}
             />
-          }
-        >
-          {locations?.loading && (
-            <AdsliveLoading size={ADSLIVE_LOADING_SIZE.EXTRA_SMALL} />
-          )}
-        </AdvertiserContent>
-        :
-        <LocationSetting returnPreLayout={() => setShowSetting(false)} locationData={currentLocation}/>
-      }
-    </>
+          ))}
+        </>
+      )}
+    </div>
   );
 }

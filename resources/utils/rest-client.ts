@@ -34,7 +34,7 @@ class RestClient {
     }`;
   }
 
-  asyncGet(url, query = {}, options = { contentType: "application/json" }) {
+  asyncGet(url, query = {}, options = { contentType: "application/json" }) {    
     return axios.get(this.createApi(url, query), {
       headers: this.createHeaders(options),
     });

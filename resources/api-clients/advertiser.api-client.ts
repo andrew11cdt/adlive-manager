@@ -37,7 +37,7 @@ export default class AdvertiserApiClient {
 
   static async getLocationScreen(areaId) {
     return restClient
-      .asyncGet(`/advertiser/location/${areaId}/screen`)
+      .asyncGet(`/advertiser/location/area/${areaId}/screen`)
       .then(({ status, data }) => {
         return standardServiceResponse(status, data);
       })

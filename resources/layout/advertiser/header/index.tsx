@@ -17,9 +17,9 @@ export default function AdvertiserHeader({
 }: AdvertiserHeaderProps) {
   return (
     <div className={styles.advertiserHeader}>
-      {advertiserHeaderItems.map((item) => (
+      {advertiserHeaderItems.map((item, i) => (
         <div
-          key={item?.id}
+          key={i}
           className={`${styles.advertiserHeaderItem} ${
             item?.id === activedItemId ? styles.actived : ""
           }`}

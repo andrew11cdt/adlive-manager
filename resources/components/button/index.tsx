@@ -1,5 +1,4 @@
 import { Button, Container, Row } from "react-bootstrap";
-import AdCard from "../card";
 import styles from "./styles.module.scss";
 
 export enum ADSLIVE_BUTTON_SIZE {
