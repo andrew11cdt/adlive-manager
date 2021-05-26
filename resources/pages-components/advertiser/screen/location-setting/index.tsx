@@ -41,7 +41,7 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
                 <CardInput
                   title="address"
                   value={locationData.address?.description}
-                  onIputChange={(event) => {
+                  onInputChange={(event) => {
                     console.log(event);
                   }}
                 />

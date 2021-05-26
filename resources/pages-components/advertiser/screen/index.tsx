@@ -12,6 +12,7 @@ import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-stor
 import AdvertiserContent from "../others/advertiser-content";
 import AdvertiserAreaTabs from "./area-tabs";
 import LocationSetting from "./location-setting";
+import ScreenDetails from "./screen-details";
 import ScanQR from "./scanQR";
 import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
@@ -22,6 +23,7 @@ export default function AdvertiserScreen() {
   const [currentAreaId, setCurrentAreaId] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
+  const [clickedScreen, setClickedScreen] = useState(null);
 
   const currentLocation = useMemo(() => {
     if (currentLocationId) {
@@ -55,16 +57,46 @@ export default function AdvertiserScreen() {
       locationData={currentLocation}
     />
   );
-  const NewScreen = (
-    <ScanQR
+  const NewScreenLayout = (
+    // <ScanQR
+    //   returnPreLayout={() => setShowNewScreen(false)}
+    //   locationData={currentLocation}
+    // />
+    <ScreenDetails
+      isNew
       returnPreLayout={() => setShowNewScreen(false)}
       locationData={currentLocation}
+      deleteScreen={()=> {}}
+      screenData={
+        {
+          "recId": "recnnpv9ngUpvmYzO",
+          "id": 6,
+          "code": "02OH2CZR",
+          "deviceCode": "13",
+          "deviceType": "SmartTV SamSung",
+          "deviceName": "TV SamSung H3",
+          "deviceIp": "192.168.1.101",
+          "deviceOS": "Android 10",
+          "appVersion": "1.0.0",
+          "createdAt": "2021-05-21T16:35:29.000Z"
+        }
+      }
+    />
+  );
+  const ScreenDetailsLayout = (
+    <ScreenDetails
+      returnPreLayout={() => setClickedScreen(false)}
+      locationData={currentLocation}
+      deleteScreen={()=> {}}
+      screenData={clickedScreen}
     />
   );
   return (
     <div style={{ height: "100%" }}>
-      {showNewScreen ? (
-        NewScreen
+      {clickedScreen ? (
+        ScreenDetailsLayout
+      ) : showNewScreen ? (
+        NewScreenLayout
       ) : showSetting ? (
         Setting
       ) : (
@@ -116,6 +148,7 @@ export default function AdvertiserScreen() {
               id={location.areas[0]?.id}
               key={i}
               areaName={location.areas[0].name}
+              clickScreen={(screen) => setClickedScreen(screen)}
             />
           ))}
         </>

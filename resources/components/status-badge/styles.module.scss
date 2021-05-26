@@ -1,5 +1,5 @@
-// @import "../../styles/variables.scss";
-// @import "../../styles/common.scss";
+@import "../../styles/variables.scss";
+@import "../../styles/common.scss";
 
 span.status {
   border-radius: 4px;
@@ -8,12 +8,12 @@ span.status {
   align-items: center;
   width: fit-content;
   &.live {
-    background: #F44336;
-    color: white;
+    color: $redSttColor;
+    background: $redBgColor;
   }
   &.offline {
-    color: #FF9800 !important;
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), #FF9800 !important;
+    color: $yellowSttColor;
+    background: $yellowBgColor;
   }
 }
 .icon {

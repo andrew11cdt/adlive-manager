@@ -1,4 +1,4 @@
-import { AdButton } from "../../../../components/button";
+
 import AdCard, { CardDragItem, CardInput } from "../../../../components/card";
 import Divider from "../../../../components/divider";
 import { AdIcon } from "../../../../components/icon";
@@ -6,6 +6,7 @@ import { AdsliveH4 } from "../../../../components/typography";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 import dynamic from "next/dynamic";
+import { Button, Row } from "react-bootstrap";
 
 const QrScan = dynamic(() => import("react-qr-reader"), { ssr: false });
 
@@ -13,7 +14,7 @@ export default function ScanQR({ returnPreLayout, locationData }) {
   {
     console.log({ locationData });
   }
-  const addArea = (area) => {};
+  const sendCode = () => {};
   const handleScan = (data) => {
     if (data) {
       this.setState({
@@ -39,15 +40,17 @@ export default function ScanQR({ returnPreLayout, locationData }) {
           <div className={styles.scanner}>
             <QrScan />
           </div>
-          {/* <div className="mt-4">
-            <AdButton
-              dash
-              icon={<AdIcon name="in-a-circle" />}
-              title="ADD LOCATION"
-              style={{ padding: "20px" }}
-              onClick={addArea}
-            />
-          </div> */}
+          <div className={styles.inputContainer}>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Input here"
+                className={styles.inputCode}
+              />
+              {/* <AdIcon name="code" className={styles.codeIcon} /> */}
+            </div>
+            <Button variant="outline-primary" className={styles.button} onClick={sendCode} >SEND</Button>
+          </div>
         </>
       }
     />

@@ -1,3 +1,6 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/common.scss";
+
 .icon {
   margin-right: 16px;
 }
@@ -10,7 +13,40 @@
   // background: #262b32;
   opacity: 0.9;
   section {
-    height: 90vh;
+    // height: 90vh;
     width: 100%;
+  }
+}
+.inputContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 16px 0;
+  .inputCode {
+    width: 170px;
+    height: 48px;
+    border-radius: 8px;
+    padding: 16px;
+    background: rgba(48, 48, 48, 0.3);
+    border: none;
+    color: $whiteColor;
+    outline: none;
+    &::placeholder {
+      color: $whiteColor;
+    }
+  }
+  .codeIcon {
+    height: 16px;
+    width: 20px;
+    z-index: 1;
+    left: 0;
+    position: absolute;
+    top: 12px;
+  }
+  .button {
+    height: 48px;
+    margin-left: 16px;
   }
 }

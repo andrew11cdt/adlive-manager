@@ -6,7 +6,14 @@
   box-shadow: 0px 8px 16px rgba(110, 120, 130, 0.12);
   border-radius: 12px;
   > :not(.divider) {
-    padding: 12px;
+    padding: 6px 12px;
+  }
+  .footer {
+    padding: 12px 0;
+    width: 100%;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    position: relative;
   }
 }
 .dot {
@@ -14,7 +21,17 @@
   border-radius: 8px !important;
   box-shadow: none !important;
 }
+.clickable {
+  cursor: pointer;
+  &:hover {
+    box-shadow: 1px 1px 6px gray;
+  }
+}
+.fullView {
+  padding: 0 i !important;
+}
 .cardInput {
+  position: relative;
   label {
     text-transform: uppercase;
     font-size: 12px;
@@ -27,8 +44,44 @@
     border: 1px solid #e6e7e9;
     box-sizing: border-box;
     box-shadow: 0px 2px 8px rgba(134, 152, 207, 0.08);
-    margin-top: 12px;
+    margin-top: 6px;
     font-size: 14px;
+  }
+  .icon {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+.cardSelect {
+  label {
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+  .selectBtn {
+    background: $whiteColor;
+    color: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 46px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e6e7e9;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 8px rgba(134, 152, 207, 0.08);
+    margin-top: 6px;
+    font-size: 14px;
+    &:focus, &:active {
+      background-color: $whiteColor !important;
+      color: inherit !important;
+    }
+  }
+  .menu {
+    width: 100%;
+    background: whitesmoke;
   }
 }
 .cardDragItem {

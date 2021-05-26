@@ -6,6 +6,21 @@ export const redirectTo = (url: string) => {
   typeof window !== "undefined" && ((window as any).location = url);
 };
 
+export const parseTitle = (str: string) => {
+  return str ? upFirstChar(removeCamel(removeSnake(str))) : str
+};
+
+export const upFirstChar = (str: string) => {
+  return str ? str[0].toUpperCase() + str.slice(1) : str
+};
+
+export const removeCamel = (str: string) => {
+  return str ? str.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`) : str
+};
+export const removeSnake = (str: string) => {
+  return str ? str.replace(/_/g, ' ') : str
+};
+
 export const standardServiceResponse = (
   statusCode: 200 | 201 | 301 | 400 | 401 | 403 | 500 | number,
   data: any,

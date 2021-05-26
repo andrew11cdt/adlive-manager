@@ -5,7 +5,7 @@ import StatusBadge from "../../../../components/status-badge";
 import AdvertiserStoreActions from "../../../../stores/advertiser-store/advertiser-store.actions";
 import styles from "./styles.module.scss";
 
-export default function AdvertiserScreenItems({ id, areaName }) {
+export default function AdvertiserScreenItems({ id, areaName, clickScreen }) {
   const [screens, setScreens] = useState([]);
   console.log(id);
   
@@ -65,8 +65,9 @@ export default function AdvertiserScreenItems({ id, areaName }) {
       </div>
       {screens &&
         screens.map((screen, i) => (
-          <div key={i} className={styles.screensCard}>
+          <div key={i} className={styles.screensCard} onClick={() => clickScreen(screen)}>
             <AdCard
+              clickable
               body={
                 <div>
                   <div>{screen.deviceName}</div>
