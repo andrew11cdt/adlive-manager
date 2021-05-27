@@ -45,4 +45,25 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+  
+  static async getScreen(id) {
+    return restClient
+      .asyncGet(`/advertiser/screen/${id}`)
+      .then(({ status, data }) => {
+        return standardServiceResponse(status, data);
+      })
+      .catch((err) => {
+        return standardServiceResponse(1, null, err);
+      });
+  }
+  static async updateScreen(id, body) {
+    return restClient
+      .asyncPut(`/advertiser/screen/${id}`, body)
+      .then(({ status, data }) => {
+        return standardServiceResponse(status, data);
+      })
+      .catch((err) => {
+        return standardServiceResponse(1, null, err);
+      });
+  }
 }

@@ -46,6 +46,11 @@
     box-shadow: 0px 2px 8px rgba(134, 152, 207, 0.08);
     margin-top: 6px;
     font-size: 14px;
+    &:focus {
+      box-shadow: 0 0 0 0.1rem rgb(38 143 255 / 50%);
+      border-color: #005cbf;
+      outline: none;
+    }
   }
   .icon {
     position: absolute;

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Button, Container, Row } from "react-bootstrap";
+import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton, IconLinkButton } from "../../../../components/button";
 import AdCard, {
   CardDragItem,
@@ -20,15 +22,57 @@ import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
 export default function ScreenDetails(props) {
-  const {
-    isNew,
-    returnPreLayout,
-    deleteScreen,
-    screenData,
-    locationData
-  } = props
+  const { isNew, returnPreLayout, deleteScreen, screenData, locationData } =
+    props;
+  const [screenState, setScreenState] = useState(screenData);
   const addArea = (area) => {};
   const resetDevice = (area) => {};
+  const handleInputChange = (screenKey, event) => {
+    const val = event.target.value;
+    setScreenState({ ...screenState, ...{ [screenKey]: val } });
+    console.log(screenState);
+  };
+  const handleInputFocusOut = async(key, event) => {
+    if (screenData[key] !== screenState[key]) {
+      console.log("UPDATE REQUEST"); 
+      const res = await AdvertiserApiClient.updateScreen(screenState.id, screenState)
+      if (res?.code === 0 && res.data) {
+        // screenData[key] = screenState[key];
+        setScreenState(res.data)
+        console.log(screenState, res);
+      }
+    }
+  };
+  const infoArr = [
+    {
+      title: "screen name",
+      key: "deviceName",
+    },
+    {
+      title: "location",
+      key: "location",
+    },
+    {
+      title: "type of device",
+      key: "deviceType",
+    },
+    {
+      title: "mac address",
+      key: "macAddress",
+    },
+    {
+      title: "os",
+      key: "deviceOS",
+    },
+    {
+      title: "app version",
+      key: "appVersion",
+    },
+    {
+      title: "ip address",
+      key: "deviceIp",
+    },
+  ];
   return (
     <SubLayout
       header={
@@ -61,68 +105,32 @@ export default function ScreenDetails(props) {
             }
             body={
               <>
-                <CardInput
-                  title="screen name"
-                  value={screenData.deviceName}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
-                <CardInput
-                  title="location"
-                  value={"location's address"}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
+                {infoArr.splice(0, 2).map((e, i) => (
+                  <CardInput
+                    key={i}
+                    title={e.title}
+                    value={screenState[e.key]}
+                    onInputChange={(event) => handleInputChange(e.key, event)}
+                    onFocusOut={(event) => handleInputFocusOut(e.key, event)}
+                  />
+                ))}
                 <CardSelect
                   title="area"
-                  initValue={locationData.areas[0]?.name}
+                  initValue={screenState.area?.name}
                   values={locationData.areas?.map((e) => e.name)}
                   onChange={(event) => {
                     console.log(event);
                   }}
                 />
-                <CardInput
-                  title="type of device"
-                  value={screenData.deviceType}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
-                <CardInput
-                  disabled
-                  title="mac address"
-                  value={screenData.macAddress}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
-                <CardInput
-                  disabled
-                  title="os"
-                  value={screenData.deviceOS}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
-                <CardInput
-                  disabled
-                  title="app version"
-                  value={screenData.appVersion}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
-                <CardInput
-                  disabled
-                  title="ip address"
-                  value={screenData.deviceIp}
-                  icon={<AdIcon name="wifi" />}
-                  onInputChange={(event) => {
-                    console.log(event);
-                  }}
-                />
+                {infoArr.map((e, i) => (
+                  <CardInput
+                    key={i}
+                    title={e.title}
+                    value={screenState[e.key]}
+                    onInputChange={(event) => handleInputChange(e.key, event)}
+                    onFocusOut={(event) => handleInputFocusOut(e.key, event)}
+                  />
+                ))}
                 <AdButton
                   ghost
                   icon={
@@ -140,8 +148,10 @@ export default function ScreenDetails(props) {
               </>
             }
             footer={
-              <div className={`${styles.status} ${styles[status || 'offline']}`}>
-                <StatusBadge status='offline' />
+              <div
+                className={`${styles.status} ${styles[status || "offline"]}`}
+              >
+                <StatusBadge status="offline" />
               </div>
             }
           />

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
+import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdCard from "../../../../components/card";
 import StatusBadge from "../../../../components/status-badge";
 import AdvertiserStoreActions from "../../../../stores/advertiser-store/advertiser-store.actions";
@@ -55,6 +56,11 @@ export default function AdvertiserScreenItems({ id, areaName, clickScreen }) {
     //   },
     // ]);
   }, [id]);
+  const getScreenDetails = async(screen) => {
+    // const data = await AdvertiserApiClient.getScreen(id)
+    // console.log(data);
+    clickScreen(screen)
+  }
   return (
     <div className={styles.advertiserScreens}>
       <div className={styles.screensHeader}>
@@ -65,7 +71,7 @@ export default function AdvertiserScreenItems({ id, areaName, clickScreen }) {
       </div>
       {screens &&
         screens.map((screen, i) => (
-          <div key={i} className={styles.screensCard} onClick={() => clickScreen(screen)}>
+          <div key={i} className={styles.screensCard} onClick={() => getScreenDetails(screen)}>
             <AdCard
               clickable
               body={

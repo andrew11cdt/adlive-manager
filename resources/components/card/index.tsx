@@ -4,8 +4,10 @@ import Divider from "../divider";
 import AdsliveIcon, { ADSLIVE_ICON_VARIANT } from "../icon";
 import styles from "./styles.module.scss";
 
-export function CardInput({ title, value, onInputChange, ...props }) {
+export function CardInput({ title, value, onInputChange, onFocusOut, ...props }) {
   const { icon } = props
+  console.log(value);
+  value = value || ''
   return (
     <div className={styles.cardInput}>
       <label>{title}</label>
@@ -14,6 +16,7 @@ export function CardInput({ title, value, onInputChange, ...props }) {
         value={value}
         type={props.type || "text"}
         onChange={onInputChange}
+        onBlur={onFocusOut}
       />
       <span className={styles.icon}>
       {icon}
@@ -32,8 +35,8 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
         </Dropdown.Toggle>
 
         <Dropdown.Menu className={styles.menu}>
-          {values?.map(value => {
-            return <Dropdown.Item  onClick={()=> onSelectValue(value)} >{value}</Dropdown.Item>
+          {values?.map((value, i) => {
+            return <Dropdown.Item key={i}  onClick={()=> onSelectValue(value)} >{value}</Dropdown.Item>
           })}
         </Dropdown.Menu>
       </Dropdown>
