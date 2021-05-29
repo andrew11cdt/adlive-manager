@@ -6,7 +6,6 @@ import styles from "./styles.module.scss";
 
 export function CardInput({ title, value, onInputChange, onFocusOut, ...props }) {
   const { icon } = props
-  console.log(value);
   value = value || ''
   return (
     <div className={styles.cardInput}>
@@ -30,7 +29,7 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
     <div className={styles.cardSelect}>
       <label>{title}</label>
       <Dropdown>
-        <Dropdown.Toggle id="dropdown-basic" className={styles.selectBtn}>
+        <Dropdown.Toggle id="dropdown-basic" className={styles.selectBtn} disabled={props.disabled}>
           {selectedValue}
         </Dropdown.Toggle>
 

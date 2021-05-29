@@ -1,5 +1,5 @@
 import { Button, Container, Row } from "react-bootstrap";
-import { AdButton, IconLinkButton } from "../../../../components/button";
+import { AdButton, IconButton } from "../../../../components/button";
 import AdCard, { CardDragItem, CardInput } from "../../../../components/card";
 import Divider from "../../../../components/divider";
 import AdsliveIcon, {

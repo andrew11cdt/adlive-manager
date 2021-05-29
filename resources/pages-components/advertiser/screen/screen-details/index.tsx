@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Container, Row } from "react-bootstrap";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
-import { AdButton, IconLinkButton } from "../../../../components/button";
+import { AdButton, IconButton } from "../../../../components/button";
 import AdCard, {
   CardDragItem,
   CardInput,
@@ -17,13 +17,12 @@ import AdsliveIcon, {
 } from "../../../../components/icon";
 import StatusBadge from "../../../../components/status-badge";
 import { AdsliveH4 } from "../../../../components/typography";
-import { VideoPlayer } from "../../../../components/video-player";
+import VideoPlayer from "../../../../components/video-player";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
 export default function ScreenDetails(props) {
-  const { isNew, returnPreLayout, deleteScreen, screenData, locationData } =
-    props;
+  const { isNew, returnPreLayout, deleteScreen, screenData, locationData } = props;
   const [screenState, setScreenState] = useState(screenData);
   const addArea = (area) => {};
   const resetDevice = (area) => {};
@@ -35,7 +34,8 @@ export default function ScreenDetails(props) {
   const handleInputFocusOut = async(key, event) => {
     if (screenData[key] !== screenState[key]) {
       console.log("UPDATE REQUEST"); 
-      const res = await AdvertiserApiClient.updateScreen(screenState.id, screenState)
+      const body = {[key]: screenState[key]}
+      const res = await AdvertiserApiClient.updateScreen(screenState.id, body)
       if (res?.code === 0 && res.data) {
         // screenData[key] = screenState[key];
         setScreenState(res.data)
@@ -51,26 +51,32 @@ export default function ScreenDetails(props) {
     {
       title: "location",
       key: "location",
+      disabled: true,
     },
     {
       title: "type of device",
       key: "deviceType",
+      disabled: true,
     },
     {
       title: "mac address",
       key: "macAddress",
+      disabled: true,
     },
     {
       title: "os",
       key: "deviceOS",
+      disabled: true,
     },
     {
       title: "app version",
       key: "appVersion",
+      disabled: true,
     },
     {
       title: "ip address",
       key: "deviceIp",
+      disabled: true,
     },
   ];
   return (
@@ -109,6 +115,7 @@ export default function ScreenDetails(props) {
                   <CardInput
                     key={i}
                     title={e.title}
+                    disabled={e.disabled}
                     value={screenState[e.key]}
                     onInputChange={(event) => handleInputChange(e.key, event)}
                     onFocusOut={(event) => handleInputFocusOut(e.key, event)}
@@ -116,6 +123,7 @@ export default function ScreenDetails(props) {
                 ))}
                 <CardSelect
                   title="area"
+                  disabled
                   initValue={screenState.area?.name}
                   values={locationData.areas?.map((e) => e.name)}
                   onChange={(event) => {
@@ -126,6 +134,7 @@ export default function ScreenDetails(props) {
                   <CardInput
                     key={i}
                     title={e.title}
+                    disabled={e.disabled}
                     value={screenState[e.key]}
                     onInputChange={(event) => handleInputChange(e.key, event)}
                     onFocusOut={(event) => handleInputFocusOut(e.key, event)}

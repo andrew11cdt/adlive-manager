@@ -31,15 +31,10 @@ export type AdvertiserStoreContextDataLocations = {
   locations?: AdvertiserStoreContextDataLocation[];
 };
 
-export type AdvertiserStoreContextDataScreens = {
-  loading?: boolean;
-  areaId?: string;
-  screens: AdvertiserStoreContextDataScreen[];
-};
-
 export type AdvertiserStoreContextData = {
   auth?: AdvertiserStoreContextDataAuth;
   locations?: AdvertiserStoreContextDataLocations;
+  campaigns?: any;
 };
 
 const AdvertiserStoreContext = createContext<AdvertiserStoreContextData>({});

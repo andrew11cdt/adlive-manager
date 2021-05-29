@@ -1,0 +1,18 @@
+@import "../../../../styles/variables.scss";
+.campaignContainer {
+  margin: 16px;
+  .campaign {
+    position: relative;
+    > * {
+      margin: 8px 0px;
+    }
+    .icon {
+      margin-right: 4px;
+    }
+    .statusBadge {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}

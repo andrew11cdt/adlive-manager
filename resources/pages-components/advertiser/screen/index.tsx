@@ -23,7 +23,7 @@ export default function AdvertiserScreen() {
   const [currentAreaId, setCurrentAreaId] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
-  const [clickedScreen, setClickedScreen] = useState(null);
+  const [selectedScreen, setSelectScreen] = useState(null);
 
   const currentLocation = useMemo(() => {
     if (currentLocationId) {
@@ -85,15 +85,15 @@ export default function AdvertiserScreen() {
   );
   const ScreenDetailsLayout = (
     <ScreenDetails
-      returnPreLayout={() => setClickedScreen(false)}
+      returnPreLayout={() => setSelectScreen(false)}
       locationData={currentLocation}
       deleteScreen={()=> {}}
-      screenData={clickedScreen}
+      screenData={selectedScreen}
     />
   );
   return (
     <div style={{ height: "100%" }}>
-      {clickedScreen ? (
+      {selectedScreen ? (
         ScreenDetailsLayout
       ) : showNewScreen ? (
         NewScreenLayout
@@ -148,7 +148,7 @@ export default function AdvertiserScreen() {
               id={location.areas[0]?.id}
               key={i}
               areaName={location.areas[0].name}
-              clickScreen={(screen) => setClickedScreen(screen)}
+              selectScreen={(screen) => setSelectScreen(screen)}
             />
           ))}
         </>

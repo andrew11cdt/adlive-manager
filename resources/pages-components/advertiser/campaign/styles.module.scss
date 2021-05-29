@@ -1,0 +1,8 @@
+.rightControls {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  >* {
+    margin-left: 20px;
+  }
+}

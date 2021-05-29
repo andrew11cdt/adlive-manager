@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdCard from "../../../../components/card";
+import AdsliveLoading from "../../../../components/loading";
 import StatusBadge from "../../../../components/status-badge";
 import AdvertiserStoreActions from "../../../../stores/advertiser-store/advertiser-store.actions";
 import styles from "./styles.module.scss";
 
-export default function AdvertiserScreenItems({ id, areaName, clickScreen }) {
-  const [screens, setScreens] = useState([]);
+export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
+  const [screens, setScreens] = useState(null);
   console.log(id);
   
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function AdvertiserScreenItems({ id, areaName, clickScreen }) {
   const getScreenDetails = async(screen) => {
     // const data = await AdvertiserApiClient.getScreen(id)
     // console.log(data);
-    clickScreen(screen)
+    selectScreen(screen)
   }
   return (
     <div className={styles.advertiserScreens}>
@@ -69,7 +70,7 @@ export default function AdvertiserScreenItems({ id, areaName, clickScreen }) {
         <span>- offline</span>
         <div className={styles.line}></div>
       </div>
-      {screens &&
+      {!screens ? <AdsliveLoading style={{ marginTop: '64px'}}/> :
         screens.map((screen, i) => (
           <div key={i} className={styles.screensCard} onClick={() => getScreenDetails(screen)}>
             <AdCard

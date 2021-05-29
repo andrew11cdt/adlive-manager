@@ -8,7 +8,6 @@ import AdvertiserStoreContext, {
   AdvertiserStoreContextDataAuth,
   AdvertiserStoreContextDataLocation,
   AdvertiserStoreContextDataLocations,
-  AdvertiserStoreContextDataScreens,
 } from "./advertiser-store.context";
 
 export default function AdvertiserStoreProvider({
@@ -30,15 +29,8 @@ export default function AdvertiserStoreProvider({
     loading: true,
     locations: [],
   });
-  
-  const [
-    screens,
-    setScreens,
-  ] = useState<AdvertiserStoreContextDataScreens>({
-    loading: true,
-    areaId: null,
-    screens: [],
-  });
+
+  const [campaigns, setCampaign] = useState(null);
 
   useEffect(() => {
     if (!auth?.token) {
@@ -73,6 +65,11 @@ export default function AdvertiserStoreProvider({
       }));
     });
     
+    AdvertiserApiClient.getCampaigns().then(data => {
+      console.log('campaigns', data);
+      if (data) setCampaign(data)
+    });
+    
   }, [auth?.token]);
 
   useEffect(() => {
@@ -96,7 +93,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations }}>
+    <AdvertiserStoreContext.Provider value={{ auth, locations, campaigns }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

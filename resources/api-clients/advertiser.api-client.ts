@@ -1,5 +1,6 @@
 import { standardServiceResponse } from "../utils/common.util";
 import restClient from "../utils/rest-client";
+import MockApiCampaign from "./mock-api";
 
 export default class AdvertiserApiClient {
   static async getAdvertiserInformation() {
@@ -45,7 +46,7 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
-  
+
   static async getScreen(id) {
     return restClient
       .asyncGet(`/advertiser/screen/${id}`)
@@ -59,6 +60,18 @@ export default class AdvertiserApiClient {
   static async updateScreen(id, body) {
     return restClient
       .asyncPut(`/advertiser/screen/${id}`, body)
+      .then(({ status, data }) => {
+        return standardServiceResponse(status, data);
+      })
+      .catch((err) => {
+        return standardServiceResponse(1, null, err);
+      });
+  }
+
+  static async getCampaigns() {
+    return await MockApiCampaign()
+    return restClient
+      .asyncPut(`/advertiser/campaigns/`)
       .then(({ status, data }) => {
         return standardServiceResponse(status, data);
       })

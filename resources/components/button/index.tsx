@@ -69,14 +69,14 @@ const getSizeClassName = (
   }
 };
 
-export function IconLinkButton({ icon, title, onClick, ...props }) {
+export function IconButton({ icon, title, onClick, ...props }) {
   return (
     <Container style={props.style}>
       <Row className="m-0 p-0">
         {icon}
         <Button
           onClick={onClick}
-          variant="link"
+          variant={props.variant || "link"}
           className="p-0 ml-2"
           style={{ fontSize: "14px" }}
         >
@@ -91,7 +91,7 @@ export function AdButton({ icon, title, onClick, ...props }) {
   return (
     <Button
       onClick={onClick}
-      variant="light"
+      variant={ "light"}
       className={ `${styles.adBtn} ${props.dash ? styles.dashBtn : ''} ${props.ghost ? styles.ghostBtn : ''}`}
     >
       {icon}

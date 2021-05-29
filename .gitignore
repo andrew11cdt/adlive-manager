@@ -104,3 +104,6 @@ dist
 .tern-port
 
 .next/
+.next/cache
+.next/server
+.next/static
