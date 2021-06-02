@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Container, Row } from "react-bootstrap";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
-import { AdButton, IconButton } from "../../../../components/button";
+import { AdButton } from "../../../../components/button";
 import AdCard, {
   CardDragItem,
   CardInput,
@@ -141,6 +141,7 @@ export default function ScreenDetails(props) {
                   />
                 ))}
                 <AdButton
+                  cardBtn
                   ghost
                   icon={
                     <AdsliveIcon

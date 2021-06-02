@@ -16,6 +16,28 @@
     }
   }
 }
+.campaignContainer {
+  >* {
+    margin: 16px;
+  }
+  * {
+    font-weight: 300;
+  }
+}
+.campaignHeader {
+  background: #E6E7E9;
+  border-top-left-radius : inherit;
+  border-top-right-radius : inherit;
+  display: flex;
+  justify-content: space-between;
+  height: 45px;
+  &.show {
+    background: #2475FF;
+    * {
+      color: white;
+    }
+  }
+}
 .icon {
   margin-right: 16px;
 }
@@ -24,15 +46,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  .linkBtn {
-    color: $primaryColor;
-    text-decoration: underline;
-    cursor: pointer;
+}
+.editSetting {
+  color: $darkNeutralColor;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.cardBody {
+  >* {
+    padding: 6px 12px;
   }
 }
-.status {
+.statusFooter {
   border-radius: inherit;
-  // padding-left: 8px;
   justify-content: center;
   display: flex;
   align-items: center;
@@ -51,4 +78,10 @@
 }
 .pauseBtn {
   padding: 8px;
+}
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
 }

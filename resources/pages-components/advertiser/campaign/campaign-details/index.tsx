@@ -1,10 +1,8 @@
 import { useState } from "react";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
-import { AdButton, IconButton } from "../../../../components/button";
-import AdCard, {
-  CardInput,
-  CardSelect,
-} from "../../../../components/card";
+import { AdButton } from "../../../../components/button";
+import AdCard, { CardInput, CardSelect } from "../../../../components/card";
+import Divider from "../../../../components/divider";
 import AdsliveIcon, {
   AdIcon,
   ADSLIVE_ICON_COLOR,
@@ -13,30 +11,34 @@ import AdsliveIcon, {
   ADSLIVE_ICON_VARIANT,
 } from "../../../../components/icon";
 import StatusBadge from "../../../../components/status-badge";
-import { AdsliveH4 } from "../../../../components/typography";
+import {
+  AdsliveH4,
+  MutedText,
+  InfoText,
+} from "../../../../components/typography";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
 export default function CampaignDetails(props) {
-  const { returnPreLayout, deleteScreen, campaign } = props;
+  const { returnPreLayout, campaign } = props;
+  const { videos } = campaign || {};
   const [screenState, setScreenState] = useState(campaign);
   const [isPaused, setClickPause] = useState(null);
+  const [setting, openSetting] = useState({});
   const addArea = (area) => {};
   const resetDevice = (area) => {};
   const handleInputChange = (screenKey, event) => {
     const val = event.target.value;
     setScreenState({ ...screenState, ...{ [screenKey]: val } });
-    console.log(screenState);
   };
-  const handleInputFocusOut = async(key, event) => {
+  const handleInputFocusOut = async (key, event) => {
     if (campaign[key] !== screenState[key]) {
-      console.log("UPDATE REQUEST"); 
-      const body = {[key]: screenState[key]}
-      const res = await AdvertiserApiClient.updateScreen(screenState.id, body)
+      console.log("UPDATE REQUEST");
+      const body = { [key]: screenState[key] };
+      const res = await AdvertiserApiClient.updateScreen(screenState.id, body);
       if (res?.code === 0 && res.data) {
         // screenData[key] = screenState[key];
-        setScreenState(res.data)
-        console.log(screenState, res);
+        setScreenState(res.data);
       }
     }
   };
@@ -76,6 +78,30 @@ export default function CampaignDetails(props) {
       disabled: true,
     },
   ];
+  const CampainHeader = (title) => (
+    <div
+      className={`${styles.campaignHeader} ${
+        setting[title] ? styles.show : null
+      }`}
+    >
+      <AdsliveH4>{title}</AdsliveH4>
+      {!setting[title] ? (
+        <a
+          className={styles.editSetting}
+          onClick={() => setSetting(title, true)}
+        >
+          <AdIcon name="pen" w="16px" mr="2px" />
+          Edit Setting
+        </a>
+      ) : (
+        <AdButton title={<MutedText>Done</MutedText>} onClick={() => setSetting(title, false)} />
+      )}
+    </div>
+  );
+  const setSetting = (title, value) => {
+    const s = { ...setting, ...{ [title]: value } };
+    openSetting(s);
+  }
   return (
     <SubLayout
       header={
@@ -91,22 +117,77 @@ export default function CampaignDetails(props) {
             <AdsliveH4>{campaign.title}</AdsliveH4>
             <StatusBadge status={campaign.status} />
           </div>
-          <AdButton variant="success" icon={<AdIcon name="pause" w="16px" />} title="pause" onClick={()=> setClickPause(true)}/>
+          <AdButton
+            style={{ padding: "2px 6px" }}
+            variant="success"
+            icon={<AdIcon name="pause" w="16px" mr="2px" />}
+            title="Pause"
+            onClick={() => setClickPause(true)}
+          />
         </div>
       }
       content={
-        <div style={{ padding: "16px" }}>
+        <div className={styles.campaignContainer}>
           <AdCard
+            fullView
+            header={CampainHeader("Ad set")}
             body={
-              <>
-              
-              </>
+              <div className={styles.cardBody}>
+                <div className={styles.info}>
+                  <span>
+                    <InfoText>2</InfoText> videos
+                  </span>
+                  <span>
+                    <InfoText>240</InfoText> played
+                  </span>
+                </div>
+                <Divider style={{ padding: 0 }} />
+                {setting["Ad set"] ? (
+                  <>
+                    
+                  </>
+                ) : (
+                <div>
+                  {videos.map((video) => (
+                    <span className={styles.icon}>
+                      <AdIcon url={video.photoUrl} r="2px" w="24px" h="24px" />
+                    </span>
+                  ))}
+                  <MutedText>{`${videos.length} videos`}</MutedText>
+                </div>
+                )}
+              </div>
             }
-            footer={
-              <div
-                className={`${styles.status} ${styles[status || "offline"]}`}
-              >
-                <StatusBadge status="offline" />
+          />
+          <AdCard
+            fullView
+            header={CampainHeader("Screen")}
+            body={
+              <div className={styles.cardBody}>
+                <div className={styles.info}>
+                  <span>
+                    <InfoText>2</InfoText> videos
+                  </span>
+                  <span>
+                    <InfoText>240</InfoText> played
+                  </span>
+                </div>
+              </div>
+            }
+          />
+          <AdCard
+            fullView
+            header={CampainHeader("Schedule")}
+            body={
+              <div className={styles.cardBody}>
+                <div className={styles.info}>
+                  <span>
+                    <InfoText>2</InfoText> videos
+                  </span>
+                  <span>
+                    <InfoText>240</InfoText> played
+                  </span>
+                </div>
               </div>
             }
           />

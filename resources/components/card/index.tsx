@@ -4,8 +4,8 @@ import Divider from "../divider";
 import AdsliveIcon, { ADSLIVE_ICON_VARIANT } from "../icon";
 import styles from "./styles.module.scss";
 
-export function CardInput({ title, value, onInputChange, onFocusOut, ...props }) {
-  const { icon } = props
+export function CardInput(props) {
+  let { title, value, onInputChange, onFocusOut, icon } = props
   value = value || ''
   return (
     <div className={styles.cardInput}>

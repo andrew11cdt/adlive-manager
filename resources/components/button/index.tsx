@@ -1,4 +1,5 @@
 import { Button, Container, Row } from "react-bootstrap";
+import { parseTitle } from "../../utils/common.util";
 import styles from "./styles.module.scss";
 
 export enum ADSLIVE_BUTTON_SIZE {
@@ -69,30 +70,16 @@ const getSizeClassName = (
   }
 };
 
-export function IconButton({ icon, title, onClick, ...props }) {
-  return (
-    <Container style={props.style}>
-      <Row className="m-0 p-0">
-        {icon}
-        <Button
-          onClick={onClick}
-          variant={props.variant || "link"}
-          className="p-0 ml-2"
-          style={{ fontSize: "14px" }}
-        >
-          {title}
-        </Button>
-      </Row>
-    </Container>
-  );
-}
-
-export function AdButton({ icon, title, onClick, ...props }) {
+export function AdButton(props) {
+  const { icon, title, onClick, variant, cardBtn, dash, ghost, style } = props;
   return (
     <Button
+      style={style}
       onClick={onClick}
-      variant={ "light"}
-      className={ `${styles.adBtn} ${props.dash ? styles.dashBtn : ''} ${props.ghost ? styles.ghostBtn : ''}`}
+      variant={variant || "light"}
+      className={`${styles.adBtn} ${cardBtn ? styles.cardBtn : ""} ${
+        dash ? styles.dashBtn : ""
+      } ${ghost ? styles.ghostBtn : ""}`}
     >
       {icon}
       {title}

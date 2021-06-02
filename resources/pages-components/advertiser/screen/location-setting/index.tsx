@@ -1,5 +1,5 @@
 import { Button, Container, Row } from "react-bootstrap";
-import { AdButton, IconButton } from "../../../../components/button";
+import { AdButton } from "../../../../components/button";
 import AdCard, { CardDragItem, CardInput } from "../../../../components/card";
 import Divider from "../../../../components/divider";
 import AdsliveIcon, {
@@ -59,6 +59,7 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
                     );
                   })}
                 <AdButton
+                  cardBtn
                   ghost
                   icon={
                     <AdsliveIcon
@@ -77,6 +78,7 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
           />
           <div className="mt-4">
             <AdButton
+              cardBtn
               dash
               icon={<AdIcon name="in-a-circle" />}
               title="ADD LOCATION"

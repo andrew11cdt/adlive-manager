@@ -5,11 +5,14 @@
   border-radius: 12px;
   box-shadow: 0px 8px 16px rgba(110, 120, 130, 0.12);
   border-radius: 12px;
-  > :not(.divider) {
+  >:not(.divider) {
     padding: 6px 12px;
   }
+  .fullView {
+    padding: 0;
+  } 
   .footer {
-    padding: 12px 0;
+    padding: 0;
     width: 100%;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -27,9 +30,7 @@
     box-shadow: 1px 1px 6px gray;
   }
 }
-.fullView {
 
-}
 .cardInput {
   position: relative;
   margin-bottom: 8px;

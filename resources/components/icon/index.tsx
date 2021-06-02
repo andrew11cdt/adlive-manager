@@ -295,7 +295,7 @@ export default function AdsliveIcon({
 
 // ---------------------------
 export function AdIcon(props) {
-  const { name, w, h, m, r, onClick, url } = props
+  const { name, w, h, m, mr, ml, r, onClick, url } = props
   return (
     <span className={`${styles.adIcon} ${onClick ? styles.clickable : null}`} {...props}>
       <img
@@ -303,6 +303,8 @@ export function AdIcon(props) {
           width: w || "24px",
           height: h || w || "24px",
           margin: m || 0,
+          marginRight: mr || m,
+          marginLeft: ml || m,
           borderRadius: r || 0,
         }}
         src={url || `/${name}.svg`}

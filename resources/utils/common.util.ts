@@ -15,7 +15,7 @@ export const upFirstChar = (str: string) => {
 };
 
 export const removeCamel = (str: string) => {
-  return str ? str.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`) : str
+  return str ? str.replace(/[A-Z]/g, letter => `${letter.toLowerCase()}`) : str
 };
 export const removeSnake = (str: string) => {
   return str ? str.replace(/_/g, ' ') : str

@@ -177,3 +177,21 @@ export function AdsliveSubtitle16({
     </div>
   );
 }
+
+export function MutedText(props) {
+  const { children, style } = props
+  return (
+    <span style={{ color: "#7F838E", ...style}} >
+      {children}
+    </span>
+  );
+}
+
+export function InfoText(props) {
+  const { children, style } = props
+  return (
+    <span style={{ color: "#2475FF", fontSize: "20px", ...style}} >
+      {children}
+    </span>
+  );
+}
