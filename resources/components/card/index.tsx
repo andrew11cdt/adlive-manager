@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import Divider from "../divider";
-import AdsliveIcon, { ADSLIVE_ICON_VARIANT } from "../icon";
+import AdsliveIcon, { AdIcon, ADSLIVE_ICON_VARIANT } from "../icon";
 import styles from "./styles.module.scss";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment from "moment";
+import { displayTime } from "../../utils/common.util";
 
 export function CardInput(props) {
-  let { title, value, onInputChange, onFocusOut, icon } = props
-  value = value || ''
+  let { title, value, onInputChange, onFocusOut, icon } = props;
+  value = value || "";
   return (
     <div className={styles.cardInput}>
       <label>{title}</label>
@@ -17,25 +21,31 @@ export function CardInput(props) {
         onChange={onInputChange}
         onBlur={onFocusOut}
       />
-      <span className={styles.icon}>
-      {icon}
-      </span>
+      <span className={styles.icon}>{icon}</span>
     </div>
   );
 }
 export function CardSelect({ title, initValue, values, onChange, ...props }) {
-  const [selectedValue, onSelectValue] =  useState(initValue || null)
+  const [selectedValue, onSelectValue] = useState(initValue || null);
   return (
     <div className={styles.cardSelect}>
       <label>{title}</label>
       <Dropdown>
-        <Dropdown.Toggle id="dropdown-basic" className={styles.selectBtn} disabled={props.disabled}>
+        <Dropdown.Toggle
+          id="dropdown-basic"
+          className={styles.selectBtn}
+          disabled={props.disabled}
+        >
           {selectedValue}
         </Dropdown.Toggle>
 
         <Dropdown.Menu className={styles.menu}>
           {values?.map((value, i) => {
-            return <Dropdown.Item key={i}  onClick={()=> onSelectValue(value)} >{value}</Dropdown.Item>
+            return (
+              <Dropdown.Item key={i} onClick={() => onSelectValue(value)}>
+                {value}
+              </Dropdown.Item>
+            );
           })}
         </Dropdown.Menu>
       </Dropdown>
@@ -43,10 +53,43 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
   );
 }
 
+export function CardSelectTime({ title, initValue, onChange, ...props }) {
+  const retrieveHours = (date) => moment(date).format("HH:MM")
+  const data = new Date(initValue)
+  const [date, setDate] = useState(data);
+  return (
+    <div className={styles.cardSelect}>
+      <label>{title}</label>
+      <div className={`${styles.selectBtn} ${styles.datePickerContainer}`}>
+        <DatePicker
+          className={styles.datePicker}
+          selected={date}
+          showTimeSelect
+          timeFormat="HH:mm"
+          timeIntervals={15}
+          timeCaption="time"
+          dateFormat="MMMM d, yyyy h:mm aa"
+          disabledKeyboardNavigation
+          shouldCloseOnSelect={false}
+          onChange={(change) => {
+            console.log(change);
+            setDate(change);
+            onChange(moment(change).format());
+          }}
+        />
+        <AdIcon name="Calendar" w="20px" />
+      </div>
+    </div>
+  );
+}
+
 export function CardDragItem({ onDrag, onDelete, children }) {
   return (
     <div className={styles.cardDragItem}>
-      {children}
+      <span>
+        <AdIcon name="drag" mr="20px" h="48px" w="12px" />
+        {children}
+      </span>
       <AdsliveIcon
         className={styles.icon}
         variant={ADSLIVE_ICON_VARIANT.MINUS_CIRCLE}
@@ -56,17 +99,34 @@ export function CardDragItem({ onDrag, onDelete, children }) {
 }
 
 export default function AdCard(props) {
-  const { header, body, footer, dot, fullView, clickable } = props;
+  const {
+    header,
+    body,
+    footer,
+    dot,
+    fullView,
+    toggle,
+    toggled,
+    clickable,
+  } = props;
   return (
-    <div className={`${styles.card} ${dot ? styles.dot : null} ${clickable ? styles.clickable : null}`}>
-      {header}
-      <div className={styles.divider}>{header && <Divider />}</div>
-      <div className={`${fullView ? styles.fullView : null}`}>
+    <div
+      className={`
+        ${styles.card}
+        ${dot ? styles.dot : null}
+        ${clickable ? styles.clickable : null}
+        ${toggle ? styles.toggle : null}
+        ${toggled ? styles.toggled : null}
+      `}
+    >
+      <div className={styles.header}>{header}</div>
+      {!toggled && (
+        <div className={styles.divider}>{header && <Divider />}</div>
+      )}
+      <div className={`${styles.body} ${fullView ? styles.fullView : null}`}>
         {body}
       </div>
-      <div className={styles.footer}>
-        {footer}
-      </div>
+      <div className={styles.footer}>{footer}</div>
     </div>
   );
 }

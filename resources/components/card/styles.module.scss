@@ -5,12 +5,12 @@
   border-radius: 12px;
   box-shadow: 0px 8px 16px rgba(110, 120, 130, 0.12);
   border-radius: 12px;
-  >:not(.divider) {
+  > :not(.divider) {
     padding: 6px 12px;
   }
   .fullView {
     padding: 0;
-  } 
+  }
   .footer {
     padding: 0;
     width: 100%;
@@ -18,11 +18,33 @@
     border-bottom-right-radius: 12px;
     position: relative;
   }
-}
-.dot {
-  border: 1px dashed #8f96b0 !important;
-  border-radius: 8px !important;
-  box-shadow: none !important;
+  &.dot {
+    border: 1px dashed #8f96b0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+  &.toggle {
+    .header {
+      background: #e6e7e9;
+      border-top-left-radius: inherit;
+      border-top-right-radius: inherit;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+  &.toggled {
+    .header {
+      background: #2475ff;
+      * {
+        color: white;
+      }
+    }
+    .body {
+      border: 1px solid #2475FF;
+      border-bottom-left-radius: inherit;
+      border-bottom-right-radius: inherit;
+    }
+  }
 }
 .clickable {
   cursor: pointer;
@@ -81,7 +103,8 @@
     box-shadow: 0px 2px 8px rgba(134, 152, 207, 0.08);
     margin-top: 6px;
     font-size: 14px;
-    &:focus, &:active {
+    &:focus,
+    &:active {
       background-color: $whiteColor !important;
       color: inherit !important;
     }
@@ -93,7 +116,19 @@
 }
 .cardDragItem {
   display: inline-flex;
+  align-items: center;
   width: 100%;
   justify-content: space-between;
   padding: 0 25px;
+}
+.datePickerContainer {
+  display: flex;
+  justify-content: space-between;
+  .datePicker {
+    border: none;
+    width: 100%;
+  }
+  .timeInput {
+    
+  }
 }

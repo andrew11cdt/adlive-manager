@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { API_CODE } from "../definitions/enums";
 import { ResponseErrorData } from "../definitions/types";
+import moment from 'moment';
 
 export const redirectTo = (url: string) => {
   typeof window !== "undefined" && ((window as any).location = url);
@@ -19,6 +20,13 @@ export const removeCamel = (str: string) => {
 };
 export const removeSnake = (str: string) => {
   return str ? str.replace(/_/g, ' ') : str
+};
+interface TimeOptions {
+  showHours: boolean
+}
+export const displayTime = (time: string, opt?: TimeOptions) => {
+  const { showHours } = opt || {}
+  return moment(time).format(`DD/MMM/YYYY ${showHours ? "HH:MM": ""}`)
 };
 
 export const standardServiceResponse = (

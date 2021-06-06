@@ -1,6 +1,7 @@
 import AdCard from "../../../../components/card";
 import { AdIcon } from "../../../../components/icon";
 import StatusBadge from "../../../../components/status-badge";
+import { displayTime } from "../../../../utils/common.util";
 import styles from "./styles.module.scss";
 
 export default function CampaignItem(props) {
@@ -15,10 +16,10 @@ export default function CampaignItem(props) {
         body={
           <div className={styles.campaign}>
             <div>{title}</div>
-            <div style={{ color: "#7F838E" }}>{from} - {to}</div>
+            <div style={{ color: "#7F838E" }}>{displayTime(from)} - {displayTime(to)}</div>
             <div>
               {videos.map(video => (
-                <span className={styles.icon}>
+                <span key={video.name} className={styles.icon}>
                   <AdIcon url={video.photoUrl} r="2px" w="24px" h="24px" /> 
                 </span>
               ))}

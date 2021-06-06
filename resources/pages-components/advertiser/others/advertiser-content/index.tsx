@@ -3,7 +3,7 @@ import { AdsliveComponentProps } from "../../../../definitions/types";
 import styles from "./styles.module.scss";
 
 export type AdvertiserContentProps = {
-  headerTitle?: string;
+  headerTitle?: any;
   headerLeftContent?: any;
   headerRightContent?: any;
   headerBottomContent?: any;
@@ -24,11 +24,7 @@ export default function AdvertiserContent({
       <div className={styles.advertiserContentHeader}>
         <div className={styles.advertiserContentHeaderTop}>
           <div className={styles.advertiserContentHeaderTopLeft}>
-            {headerTitle && (
-              <AdsliveH4 className={styles.headerTitle}>
-                {headerTitle}
-              </AdsliveH4>
-            )}
+            {headerTitle}
             {headerLeftContent}
           </div>
           <div className={styles.advertiserContentHeaderTopRight}>

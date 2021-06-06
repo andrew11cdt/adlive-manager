@@ -25,18 +25,9 @@
   }
 }
 .campaignHeader {
-  background: #E6E7E9;
-  border-top-left-radius : inherit;
-  border-top-right-radius : inherit;
   display: flex;
   justify-content: space-between;
-  height: 45px;
-  &.show {
-    background: #2475FF;
-    * {
-      color: white;
-    }
-  }
+  width: 100%;
 }
 .icon {
   margin-right: 16px;
@@ -64,8 +55,6 @@
   display: flex;
   align-items: center;
   width: 100%;
-  position: absolute;
-  bottom: 0;
   height: 36px;
   &.live {
     color: $redSttColor;

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton } from "../../../../components/button";
-import AdCard, { CardInput, CardSelect } from "../../../../components/card";
+import AdCard, {
+  CardDragItem,
+  CardInput,
+  CardSelect,
+  CardSelectTime,
+} from "../../../../components/card";
 import Divider from "../../../../components/divider";
 import AdsliveIcon, {
   AdIcon,
@@ -18,13 +23,15 @@ import {
 } from "../../../../components/typography";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
+import { displayTime } from "../../../../utils/common.util";
 
 export default function CampaignDetails(props) {
   const { returnPreLayout, campaign } = props;
-  const { videos } = campaign || {};
+  const { videos, screens, from, to } = campaign || {};
   const [screenState, setScreenState] = useState(campaign);
   const [isPaused, setClickPause] = useState(null);
   const [setting, openSetting] = useState({});
+  const [schedule, setSchedule] = useState({from, to});
   const addArea = (area) => {};
   const resetDevice = (area) => {};
   const handleInputChange = (screenKey, event) => {
@@ -79,11 +86,7 @@ export default function CampaignDetails(props) {
     },
   ];
   const CampainHeader = (title) => (
-    <div
-      className={`${styles.campaignHeader} ${
-        setting[title] ? styles.show : null
-      }`}
-    >
+    <div className={styles.campaignHeader}>
       <AdsliveH4>{title}</AdsliveH4>
       {!setting[title] ? (
         <a
@@ -94,14 +97,24 @@ export default function CampaignDetails(props) {
           Edit Setting
         </a>
       ) : (
-        <AdButton title={<MutedText>Done</MutedText>} onClick={() => setSetting(title, false)} />
+        <AdButton
+          style={{ padding: "0 4px" }}
+          title={<MutedText>Done</MutedText>}
+          onClick={() => handleUpdate(title)}
+        />
       )}
     </div>
   );
+  const handleUpdate = (title) => {
+    setSetting(title, false)
+    if (title === 'Schedule') {
+      console.log('updated: ', schedule);
+    }
+  }
   const setSetting = (title, value) => {
     const s = { ...setting, ...{ [title]: value } };
     openSetting(s);
-  }
+  };
   return (
     <SubLayout
       header={
@@ -130,64 +143,163 @@ export default function CampaignDetails(props) {
         <div className={styles.campaignContainer}>
           <AdCard
             fullView
+            toggle
+            toggled={setting["Ad set"]}
             header={CampainHeader("Ad set")}
             body={
-              <div className={styles.cardBody}>
+              <div className={`${styles.cardBody}`}>
                 <div className={styles.info}>
                   <span>
-                    <InfoText>2</InfoText> videos
+                    <InfoText size="lg">2</InfoText> videos
                   </span>
                   <span>
-                    <InfoText>240</InfoText> played
+                    <InfoText size="lg">240</InfoText> played
                   </span>
                 </div>
                 <Divider style={{ padding: 0 }} />
                 {setting["Ad set"] ? (
                   <>
-                    
+                    {videos &&
+                      videos.map((video, i) => {
+                        return (
+                          <div key={i}>
+                            <CardDragItem onDelete={null} onDrag={null}>
+                              <AdIcon
+                                url={video.photoUrl}
+                                r="2px"
+                                w="24px"
+                                mr="8px"
+                              />
+                              <span>{video.name}</span>
+                            </CardDragItem>
+                            <Divider />
+                          </div>
+                        );
+                      })}
+                    <AdButton
+                      cardBtn
+                      ghost
+                      icon={<AdIcon name="circle-bold" w="24px" />}
+                      title="ADD MORE VIDEOS"
+                      style={{ padding: "20px" }}
+                      onClick={addArea}
+                    />
                   </>
                 ) : (
-                <div>
-                  {videos.map((video) => (
-                    <span className={styles.icon}>
-                      <AdIcon url={video.photoUrl} r="2px" w="24px" h="24px" />
-                    </span>
-                  ))}
-                  <MutedText>{`${videos.length} videos`}</MutedText>
-                </div>
+                  <div>
+                    {videos.map((video) => (
+                      <span key={video.name} className={styles.icon}>
+                        <AdIcon url={video.photoUrl} r="2px" w="24px" />
+                      </span>
+                    ))}
+                    <MutedText>{`${videos.length} videos`}</MutedText>
+                  </div>
                 )}
               </div>
             }
           />
           <AdCard
             fullView
+            toggle
+            toggled={setting["Screen"]}
             header={CampainHeader("Screen")}
             body={
               <div className={styles.cardBody}>
                 <div className={styles.info}>
                   <span>
-                    <InfoText>2</InfoText> videos
+                    <InfoText size="lg">13</InfoText> Screens
                   </span>
                   <span>
-                    <InfoText>240</InfoText> played
+                    <InfoText size="lg">1</InfoText> Location
                   </span>
                 </div>
+                {setting["Screen"] && (
+                  <>
+                    <Divider />
+                    <CardSelect
+                      title="Choose SCREEN enters the campaign"
+                      initValue="All screen matching all of these rules"
+                      values={[]}
+                      onChange={(event) => {
+                        console.log(event);
+                      }}
+                    />
+                    <CardSelect
+                      title="Location"
+                      initValue="Multi choice"
+                      values={[]}
+                      onChange={(event) => {
+                        console.log(event);
+                      }}
+                    />
+                    <CardSelect
+                      title="Area"
+                      initValue="Muti choice"
+                      values={[]}
+                      onChange={(event) => {
+                        console.log(event);
+                      }}
+                    />
+                    <CardSelect
+                      title="Free time"
+                      initValue="has any value"
+                      values={[]}
+                      onChange={(event) => {
+                        console.log(event);
+                      }}
+                    />
+                    <AdButton
+                      cardBtn
+                      ghost
+                      icon={<AdIcon name="circle-bold" w="24px" />}
+                      title="ADD MORE RULES"
+                      style={{ padding: "20px" }}
+                      onClick={addArea}
+                    />
+                  </>
+                )}
               </div>
             }
           />
           <AdCard
             fullView
+            toggle
+            toggled={setting["Schedule"]}
             header={CampainHeader("Schedule")}
             body={
               <div className={styles.cardBody}>
                 <div className={styles.info}>
                   <span>
-                    <InfoText>2</InfoText> videos
+                    Start <InfoText>{displayTime(schedule.from)}</InfoText>
                   </span>
                   <span>
-                    <InfoText>240</InfoText> played
+                    End <InfoText>{displayTime(schedule.to)}</InfoText>
                   </span>
                 </div>
+              {setting["Schedule"] && (
+                <>
+                <Divider />
+                <CardSelectTime
+                  title="Start at"
+                  initValue={schedule.from}
+                  values={[]}
+                  onChange={(change) => {
+                    setSchedule({from: change, to})
+                    console.log({schedule});
+                    
+                  }}
+                />
+                <CardSelectTime
+                  title="End at"
+                  initValue={schedule.to}
+                  values={[]}
+                  onChange={(change) => {
+                    setSchedule({from, to: change})
+                    console.log({schedule});
+                  }}
+                />
+                </>
+              )}
               </div>
             }
           />

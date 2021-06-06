@@ -39,10 +39,4 @@ export default class AdvertiserStoreActions {
       return data || [];
     });
   }
-
-  static async getLocationScreen(id) {
-    return AdvertiserApiClient.getLocationScreen(id).then(({ code, data }) => {
-      return data || [];
-    });
-  }
 }

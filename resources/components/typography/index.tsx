@@ -188,9 +188,10 @@ export function MutedText(props) {
 }
 
 export function InfoText(props) {
-  const { children, style } = props
+  const { children, style, size } = props
+  const sizeLvl = {lg: "20px", md: "14px", sm: "12px"}
   return (
-    <span style={{ color: "#2475FF", fontSize: "20px", ...style}} >
+    <span style={{ color: "#2475FF", fontSize: sizeLvl[size], ...style}} >
       {children}
     </span>
   );

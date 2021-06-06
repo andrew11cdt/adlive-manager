@@ -36,7 +36,7 @@ export default class AdvertiserApiClient {
       });
   }
 
-  static async getLocationScreen(areaId) {
+  static async getAreaScreen(areaId) {
     return restClient
       .asyncGet(`/advertiser/location/area/${areaId}/screen`)
       .then(({ status, data }) => {

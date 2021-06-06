@@ -8,19 +8,12 @@ import AdsliveIcon, {
 import { AdsliveBody16 } from "../../../../components/typography";
 import styles from "./styles.module.scss";
 
-export type AdvertiserAreaTabsProps = {
-  areas?: any[];
-  currentAreaId?: number;
-  changeCurrentArea?: (area: any) => void;
-  showSetting: () => void;
-};
-
 export default function AdvertiserAreaTabs({
   areas = [],
-  currentAreaId,
+  currentArea,
   changeCurrentArea,
   showSetting
-}: AdvertiserAreaTabsProps) {
+}) {
   const areasRef = useRef();
 
   return (
@@ -35,10 +28,10 @@ export default function AdvertiserAreaTabs({
               key={index}
               id={`area-${area.id}`}
               className={`${styles.area} ${
-                currentAreaId === area?.id ? styles.actived : ""
+                currentArea?.id === area?.id ? styles.actived : ""
               }`}
               onClick={
-                currentAreaId === area?.id
+                currentArea?.id === area?.id
                   ? null
                   : () => {
                       const areaLeftPos =
@@ -50,13 +43,6 @@ export default function AdvertiserAreaTabs({
                           { scrollLeft: areaLeftPos - 16 },
                           150
                         );
-                      // ((areasRef as any).current.scroll = {
-                      //   // top: 0,
-                      //   // left: areaLeftPos - 16,
-                      //   left:
-                      //     index * ((areasRef as any).current.clientWidth / 2),
-                      //   behavior: "smooth",
-                      // });
                       changeCurrentArea && changeCurrentArea(area);
                     }
               }

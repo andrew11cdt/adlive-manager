@@ -95,9 +95,8 @@ export default function AdvertiserCampaign() {
             )}
           </AdvertiserContent>
           {campaigns?.map((campaign, i) => (
-            <div onClick={()=> setSelectCampaign(campaign)}>
+            <div key={i} onClick={()=> setSelectCampaign(campaign)}>
               <CampaignItem
-                key={i}
                 campaign={campaign}
               />
             </div>
