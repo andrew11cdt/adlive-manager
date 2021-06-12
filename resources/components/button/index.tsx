@@ -77,9 +77,12 @@ export function AdButton(props) {
       style={style}
       onClick={onClick}
       variant={variant || "light"}
-      className={`${styles.adBtn} ${cardBtn ? styles.cardBtn : ""} ${
-        dash ? styles.dashBtn : ""
-      } ${ghost ? styles.ghostBtn : ""}`}
+      className={`
+        ${styles.adBtn}
+        ${cardBtn ? styles.cardBtn : ""}
+        ${dash ? styles.dashBtn : ""}
+        ${ghost ? styles.ghostBtn : ""}
+      `}
     >
       {icon}
       {title}

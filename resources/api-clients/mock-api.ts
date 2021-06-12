@@ -128,3 +128,28 @@ export function MockCloudinaryVideo() {
     )
   )
 }
+
+export function MockCVideos() {
+  return new Promise((res, rej) =>
+    res([
+      {
+        "recId": "rec123456",
+        "id": 1,
+        "name": "yt1s.com - Post Malone  Circles Lyrics",
+        "url": "https://res.cloudinary.com/dngez6bhp/video/upload/v1623145133/adlive/fss6oxr5idazpdjx4gih.mp4"
+      },
+      {
+        "recId": "rec232352",
+        "id": 2,
+        "name": "Yeu em qua dong tin nhan",
+        "url": "https://res.cloudinary.com/dngez6bhp/video/upload/v1623145868/adlive/vb8ehfuvxtg8h6owkpoy.mp4"
+      },
+      {
+        "recId": "rec24384dfd",
+        "id": 3,
+        "name": "yt1s.com - Post Malone  Circles Lyrics",
+        "url": "https://res.cloudinary.com/dngez6bhp/video/upload/v1623145133/adlive/fss6oxr5idazpdjx4gih.mp4"
+      },
+    ])
+  )
+}

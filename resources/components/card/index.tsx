@@ -113,17 +113,17 @@ export default function AdCard(props) {
     <div
       className={`
         ${styles.card}
-        ${dot ? styles.dot : null}
-        ${clickable ? styles.clickable : null}
-        ${toggle ? styles.toggle : null}
-        ${toggled ? styles.toggled : null}
+        ${dot ? styles.dot : ''}
+        ${clickable ? styles.clickable : ''}
+        ${toggle ? styles.toggle : ''}
+        ${toggled ? styles.toggled : ''}
       `}
     >
       <div className={styles.header}>{header}</div>
       {!toggled && (
         <div className={styles.divider}>{header && <Divider />}</div>
       )}
-      <div className={`${styles.body} ${fullView ? styles.fullView : null}`}>
+      <div className={`${styles.body} ${fullView ? styles.fullView : ''}`}>
         {body}
       </div>
       <div className={styles.footer}>{footer}</div>

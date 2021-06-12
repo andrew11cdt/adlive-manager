@@ -9,9 +9,10 @@ import CloudConfig from "@cloudinary/base/config/CloudConfig";
 import { AdIcon } from "../icon";
 import CloudinaryApi from "../../api-clients/cloudinary-api";
 import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
-import { Alert, Button } from "react-bootstrap";
+import { Alert, Button, Toast } from "react-bootstrap";
 import { AdButton } from "../button";
 import { VideoResponseData } from "../../api-clients/types/cloudinary-response";
+import { MockCloudinaryVideo } from "../../api-clients/mock-api";
 
 const Cloudinary = () => {
   // Set the Cloud configuration and URL configuration
@@ -27,35 +28,24 @@ const Cloudinary = () => {
   return <div>{/* <AdvancedImage cldImg={myImage} /> */}</div>;
 };
 
-export default function VideoPlayer(props) {
-  const { data, onChange } = props;
+export default function VideoUploader(props) {
+  const { onChange } = props;
   const [videoFile, setVideoFile] = useState<VideoResponseData>(null);
   const [uploading, setUploading] = useState(null);
   const [error, setError] = useState(null);
 
   const [playing, setPlaying] = useState(false);
-  const videoData = data || {
-    url: "https://www.youtube.com/watch?v=SNES5Y-tYxM",
-    name: "Ok - Binz",
-    type: "mp4",
-    length: "5p12",
-  };
   const [showInfo, setShowInfo] = useState(true);
-  useEffect(() => {
-    // setVideoFile(videoData)
-    handleUpload(null);
-    console.log(videoFile);
-  }, []);
-  console.log(process.env.NEXT_PUBLIC_CLOUDINARY_NAME);
   const handleUpload = async (file) => {
-    console.log(file);
     setUploading(true);
     try {
       const data = await CloudinaryApi.uploadVideo(file);
+      // const data:any = await MockCloudinaryVideo()
       console.log(data);
       if (data) {
         setUploading(false);
         setVideoFile(data);
+        onChange(data)
       }
     } catch (error) {
       console.log({ error });

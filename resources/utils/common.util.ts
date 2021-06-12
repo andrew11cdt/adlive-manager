@@ -49,8 +49,8 @@ export const standardServiceResponse = (
       code: API_CODE.ERROR,
       data: {
         errorCode: error?.response?.data?.error?.code,
-        errorStatus: error?.response?.data?.error?.status,
-        errorMessage: error?.response?.data?.error?.message,
+        errorStatus: error?.response?.data?.error?.status || statusCode,
+        errorMessage: error?.response?.data?.error?.message || error,
       },
     };
   }

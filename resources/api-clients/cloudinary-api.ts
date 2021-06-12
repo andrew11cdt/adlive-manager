@@ -10,8 +10,8 @@ function createFormData(file) {
 }
 export default class CloudinaryApi {
   static async uploadVideo(data): Promise<VideoResponseData> {
-    const mock: any = MockCloudinaryVideo()
-    return mock
+    // const mock: any = MockCloudinaryVideo()
+    // return mock
     const res = await axios.post(UPLOAD_URL, createFormData(data))
     if (res && res.status == 200) return res.data
   }

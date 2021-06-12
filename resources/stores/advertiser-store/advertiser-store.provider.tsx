@@ -30,6 +30,11 @@ export default function AdvertiserStoreProvider({
     locations: [],
   });
 
+  const [
+    videos,
+    setVideos,
+  ] = useState([]);
+
   const [campaigns, setCampaign] = useState(null);
 
   useEffect(() => {
@@ -66,8 +71,12 @@ export default function AdvertiserStoreProvider({
     });
     
     AdvertiserApiClient.getCampaigns().then(data => {
-      console.log('campaigns', data);
       if (data) setCampaign(data)
+    });
+    
+    AdvertiserApiClient.getVideos().then((res: any) => {
+      console.log(res);
+      if (res && res.data) setVideos(res.data)
     });
     
   }, [auth?.token]);
@@ -93,7 +102,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations, campaigns }}>
+    <AdvertiserStoreContext.Provider value={{ auth, locations, campaigns, videos }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

@@ -17,7 +17,6 @@ import AdsliveIcon, {
 } from "../../../../components/icon";
 import StatusBadge from "../../../../components/status-badge";
 import { AdsliveH4 } from "../../../../components/typography";
-import VideoPlayer from "../../../../components/video-player";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
@@ -99,7 +98,7 @@ export default function ScreenDetails(props) {
       }
       content={
         <div style={{ padding: "16px" }}>
-          <VideoPlayer data={null} />
+          {/* <VideoPlayer data={null} /> */}
           <AdCard
             header={
               <div className={styles.infoHeader}>

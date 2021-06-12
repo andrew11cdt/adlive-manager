@@ -1,6 +1,6 @@
 import { standardServiceResponse } from "../utils/common.util";
 import restClient from "../utils/rest-client";
-import MockApiCampaign from "./mock-api";
+import MockApiCampaign, { MockCVideos } from "./mock-api";
 
 export default class AdvertiserApiClient {
   static async getAdvertiserInformation() {
@@ -78,5 +78,16 @@ export default class AdvertiserApiClient {
       .catch((err) => {
         return standardServiceResponse(1, null, err);
       });
+  }
+
+  static async postVideo(body) {
+    return restClient.asyncPost(`/advertiser/video/`, body).catch(err => ({error: err.response}))
+  }
+  static async getVideos() {
+    // return await MockCVideos()
+    return restClient.asyncGet(`/advertiser/video/`).catch(err => ({error: err.response}))
+  }
+  static async updateVideo(id, body) {
+    return restClient.asyncPut(`/advertiser/video/${id}`, body).catch(err => ({error: err.response}))
   }
 }

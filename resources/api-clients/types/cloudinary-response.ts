@@ -64,3 +64,9 @@ export interface VideoResponseData {
     level: number
   }
 }
+export interface AdVideo {
+  id: string,
+  name: string,
+  recId: string,
+  url: string,
+}

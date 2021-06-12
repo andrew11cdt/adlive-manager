@@ -1,0 +1,55 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/common.scss";
+
+.newScreenHeader {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  .headerItems {
+    display: inline-flex;
+    align-items: center;
+    >* {
+      margin-right: 8px;
+    }
+  }
+}
+.icon {
+  margin-right: 16px;
+}
+.infoHeader {
+  color: $darkNeutralColor;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  align-items: center;
+  .linkBtn {
+    color: $primaryColor;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+.status {
+  border-radius: inherit;
+  // padding-left: 8px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 36px;
+  &.live {
+    color: $redSttColor;
+    background: $redBgColor;
+  }
+  &.offline {
+    color: $yellowSttColor;
+    background: $yellowBgColor;
+  }
+}
+.uploadBtn {
+  > * {
+    justify-content: 'center';
+    background-color: $primaryColor;
+  }
+}

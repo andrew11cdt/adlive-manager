@@ -70,23 +70,9 @@ export default function AdvertiserCampaign() {
             headerTitle="Campaigns"
             headerRightContent={
               <div className={styles.rightControls}>
-                <AdsliveIcon
-                  className={styles.searchIcon}
-                  variant={ADSLIVE_ICON_VARIANT.SEARCH}
-                  type={ADSLIVE_ICON_TYPE.REGULAR}
-                  color={ADSLIVE_ICON_COLOR.NORMAL}
-                />
-                <AdIcon name="filters-vertical" onClick={() => setShowFilter(true)}/>
-                <AdsliveIcon
-                  className={styles.addIcon}
-                  variant={ADSLIVE_ICON_VARIANT.CIRCLE_PLUS}
-                  type={ADSLIVE_ICON_TYPE.BOLD}
-                  color={ADSLIVE_ICON_COLOR.PRIMARY}
-                  size={ADSLIVE_ICON_SIZE.SMALL}
-                  onClick={() => {
-                    setShowNewCampaign(true);
-                  }}
-                />
+                <AdIcon name="search" onClick={() => null} />
+                <AdIcon name="filters-vertical" onClick={() => setShowFilter(true)} />
+                <AdIcon name="circle-bold" onClick={() => setShowNewCampaign(true)} />
               </div>
             }
           >
