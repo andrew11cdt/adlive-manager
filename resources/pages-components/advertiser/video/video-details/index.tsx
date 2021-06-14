@@ -1,45 +1,44 @@
 import { useState } from "react";
-import { Button, Container, Row } from "react-bootstrap";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton } from "../../../../components/button";
 import AdCard, {
-  CardDragItem,
   CardInput,
-  CardSelect,
 } from "../../../../components/card";
-import Divider from "../../../../components/divider";
 import AdsliveIcon, {
   AdIcon,
-  ADSLIVE_ICON_COLOR,
   ADSLIVE_ICON_SIZE,
   ADSLIVE_ICON_TYPE,
   ADSLIVE_ICON_VARIANT,
 } from "../../../../components/icon";
-import StatusBadge from "../../../../components/status-badge";
+import { Toaster } from "../../../../components/toaster";
 import { AdsliveH4 } from "../../../../components/typography";
 import VideoUploader from "../../../../components/video-uploader";
 import VideosPlayer from "../../../../components/videos-player";
+import { timeout } from "../../../../utils/common.util";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
 export default function VideoDetails(props) {
-  const { isNew, returnPreLayout, deleteData, videoData = {} } = props;
+  let { isNew, returnPreLayout, deleteData, videoData = {} } = props;
   const [dataState, setDataState] = useState(videoData);
+  const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
   const addArea = (area) => {};
   const handleInputChange = (key, event) => {
     const val = event.target.value;
     setDataState({ ...dataState, ...{ [key]: val } });
   };
   const handleInputFocusOut = async (key, event) => {
-    if ( videoData[key] !== dataState[key]) {
+    if (dataState) {
       const body = { [key]: dataState[key] };
       if (isNew) return
       console.log("UPDATE REQUEST");
       const res:any = await AdvertiserApiClient.updateVideo(dataState.id, body);
       console.log(res);
       if (res.data) {
-        setDataState(res.data);
-      }
+        setDataState(res.data)
+        setSuccessMsg('Updated successful')
+      } else if (res.error) setError(res.error)
     }
   };
   const handleNewData = (data) => {
@@ -55,10 +54,14 @@ export default function VideoDetails(props) {
       const res:any = await AdvertiserApiClient.postVideo(body);
       if (res.data) {
         setDataState(res.data);
+        await timeout(500)
+        returnPreLayout()
       }
     }
   }
   return (
+    <div style={{ position: 'relative' }}>
+    <Toaster type='success' isShow={!!successMsg} setShow={setSuccessMsg} message={successMsg} />
     <SubLayout
       header={
         <div className={styles.newScreenHeader}>
@@ -72,7 +75,7 @@ export default function VideoDetails(props) {
             />
             <AdsliveH4>{videoData.name || 'Upload video'}</AdsliveH4>
           </div>
-          <AdIcon name="Delete" onClick={deleteData} />
+          {!isNew && <AdIcon name="Delete" onClick={deleteData} />}
         </div>
       }
       content={
@@ -108,7 +111,7 @@ export default function VideoDetails(props) {
             }
             footer={
               <>
-                {isNew && 
+                {isNew && !dataState.id &&
                   <AdButton style={{ justifyContent: 'center' }} cardBtn title="Upload" onClick={() => handleUploadVideo()} />
                 }
               </>
@@ -117,5 +120,6 @@ export default function VideoDetails(props) {
         </div>
       }
     />
+    </div>
   );
 }

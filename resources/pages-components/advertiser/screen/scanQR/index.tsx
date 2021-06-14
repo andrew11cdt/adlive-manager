@@ -1,6 +1,4 @@
 
-import AdCard, { CardDragItem, CardInput } from "../../../../components/card";
-import Divider from "../../../../components/divider";
 import { AdIcon } from "../../../../components/icon";
 import { AdsliveH4 } from "../../../../components/typography";
 import SubLayout from "../../../sub-layout";
@@ -29,7 +27,7 @@ export default function ScanQR({ returnPreLayout, locationData }) {
     <SubLayout
       header={
         <>
-          <AdIcon name="X in a Circle" onClick={returnPreLayout} />
+          <AdIcon name="x-in-a-circle" onClick={returnPreLayout} />
           <div className={styles.title}>
             <AdsliveH4>Scan QR code to add</AdsliveH4>
           </div>

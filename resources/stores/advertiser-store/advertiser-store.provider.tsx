@@ -102,7 +102,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations, campaigns, videos }}>
+    <AdvertiserStoreContext.Provider value={{ auth, locations, campaigns, videos, setVideos }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

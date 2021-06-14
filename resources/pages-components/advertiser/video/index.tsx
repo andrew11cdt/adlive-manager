@@ -1,41 +1,57 @@
 import { useEffect, useState } from "react";
 import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
-import AdCard from "../../../components/card";
 import { AdIcon } from "../../../components/icon";
 import { MutedText } from "../../../components/typography";
 import VideosPlayer from "../../../components/videos-player";
 import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
+import { timeout } from "../../../utils/common.util";
 import AdvertiserContent from "../others/advertiser-content";
 import styles from "./styles.module.scss";
 import VideoDetails from "./video-details";
 
 export default function AdvertiserVideo() {
-  const { videos } = useAdvertiserStore();
-  let [videoList, setVideoList] = useState(videos)
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const { videos, setVideos } = useAdvertiserStore();
+  // let [videoList, setVideoList] = useState(videos);
+  const [detailsVideo, setDetailsVideo] = useState(null);
   const [showNew, setShowNew] = useState(null);
   const [showDetails, setShowDetails] = useState(null);
-  console.log({ videos });
-  const handleDelete = () => {
-
-  }
-  useEffect(() => {
-    if (showNew === false) {
-      AdvertiserApiClient.getVideos().then((res: any) => {
-        if (res?.data) setVideoList(res.data)
-      })
+  const handleDelete = async () => {
+    const res = AdvertiserApiClient.deleteVideo(detailsVideo.id);
+    if (res) {
+      await loadVideos()
+      await timeout(1000)
+      setShowDetails(false)
     }
-  }, [showNew])
+  };
+  const handleSelectVideo = async (video) => {
+    if (video) {
+      setDetailsVideo(video);
+      setShowDetails(true);
+    }
+  };
+  useEffect(() => {
+    console.log('loadUseEffect =======');
+    console.log(showNew, showDetails);
+    
+    if (!showNew && !showDetails) loadVideos()
+  }, [showNew, showDetails]);
+  const loadVideos = async () => {
+    const res: any = await AdvertiserApiClient.getVideos()
+    if (res?.data) setVideos(res.data);
+  }
   return (
     <>
       {showDetails ? (
         <>
-          <VideoDetails videoData={selectedVideo}  returnPreLayout={() => setShowDetails(false)} deleteData={() => handleDelete()}/>
+          <VideoDetails
+            videoData={detailsVideo}
+            returnPreLayout={() => setShowDetails(false)}
+            deleteData={() => handleDelete()}
+          />
         </>
-      ) : 
-      showNew ? (
+      ) : showNew ? (
         <>
-          <VideoDetails isNew returnPreLayout={() => setShowNew(false)} deleteData={() => handleDelete()}/>
+          <VideoDetails isNew returnPreLayout={() => setShowNew(false)} />
         </>
       ) : (
         <>
@@ -54,16 +70,13 @@ export default function AdvertiserVideo() {
             }
           />
           <div className={styles.videosContainer}>
-            {!!videoList?.length && (
+            {!!videos?.length && (
               <>
-                {videoList.map((video, i) => (
+                {videos.map((video, i) => (
                   <span
                     key={i}
                     className={styles.videoWrapper}
-                    onClick={() => {
-                      setSelectedVideo(video)
-                      setShowDetails(true)
-                    }}
+                    onClick={() => handleSelectVideo(video)}
                   >
                     <VideosPlayer isPreview key={i} data={video} />
                     <span className={styles.info}>{video.name}</span>

@@ -35,8 +35,9 @@ export type AdvertiserStoreContextData = {
   auth?: AdvertiserStoreContextDataAuth;
   locations?: AdvertiserStoreContextDataLocations;
   campaigns?: any;
-  videos?: any;
+  videos: any;
+  setVideos: any;
 };
 
-const AdvertiserStoreContext = createContext<AdvertiserStoreContextData>({});
+const AdvertiserStoreContext = createContext<AdvertiserStoreContextData>(null);
 export default AdvertiserStoreContext;

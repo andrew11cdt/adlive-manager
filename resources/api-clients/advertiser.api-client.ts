@@ -87,7 +87,13 @@ export default class AdvertiserApiClient {
     // return await MockCVideos()
     return restClient.asyncGet(`/advertiser/video/`).catch(err => ({error: err.response}))
   }
+  // static async getVideo(id) {
+  //   return restClient.asyncGet(`/advertiser/video/${id}`).catch(err => ({error: err.response}))
+  // }
   static async updateVideo(id, body) {
     return restClient.asyncPut(`/advertiser/video/${id}`, body).catch(err => ({error: err.response}))
+  }
+  static async deleteVideo(id) {
+    return restClient.asyncDelete(`/advertiser/video/${id}`).catch(err => ({error: err.response}))
   }
 }
