@@ -34,7 +34,9 @@ export type AdvertiserStoreContextDataLocations = {
 export type AdvertiserStoreContextData = {
   auth?: AdvertiserStoreContextDataAuth;
   locations?: AdvertiserStoreContextDataLocations;
-  campaigns?: any;
+  campaigns: any;
+  setCampaigns: any;
+  loadCampaigns: any;
   videos: any;
   setVideos: any;
 };

@@ -27,7 +27,6 @@ const getSizeClassName = (size: ADSLIVE_LOADING_SIZE) => {
       return null;
   }
 };
-
 export default function AdsliveLoading({
   className,
   style,

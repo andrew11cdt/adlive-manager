@@ -7,9 +7,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import { displayTime } from "../../utils/common.util";
+import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
 
 export function CardInput(props) {
   let { title, value, onInputChange, onFocusOut, icon } = props;
+  console.log({ value });
+
   value = value || "";
   return (
     <div className={styles.cardInput}>
@@ -54,8 +57,8 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
 }
 
 export function CardSelectTime({ title, initValue, onChange, ...props }) {
-  const retrieveHours = (date) => moment(date).format("HH:MM")
-  const data = new Date(initValue)
+  const retrieveHours = (date) => moment(date).format("HH:MM");
+  const data = new Date(initValue);
   const [date, setDate] = useState(data);
   return (
     <div className={styles.cardSelect}>
@@ -108,25 +111,34 @@ export default function AdCard(props) {
     toggle,
     toggled,
     clickable,
+    loading,
   } = props;
   return (
     <div
       className={`
         ${styles.card}
-        ${dot ? styles.dot : ''}
-        ${clickable ? styles.clickable : ''}
-        ${toggle ? styles.toggle : ''}
-        ${toggled ? styles.toggled : ''}
+        ${dot ? styles.dot : ""}
+        ${clickable ? styles.clickable : ""}
+        ${toggle ? styles.toggle : ""}
+        ${toggled ? styles.toggled : ""}
       `}
     >
-      <div className={styles.header}>{header}</div>
-      {!toggled && (
-        <div className={styles.divider}>{header && <Divider />}</div>
+      {loading ? (
+        <div className={styles.loadingCard}>
+          <AdsliveLoading size={ADSLIVE_LOADING_SIZE.EXTRA_SMALL} />
+        </div>
+      ) : (
+        <>
+          <div className={styles.header}>{header}</div>
+          {!toggled && (
+            <div className={styles.divider}>{header && <Divider />}</div>
+          )}
+          <div className={`${styles.body} ${fullView ? styles.fullView : ""}`}>
+            {body}
+          </div>
+          <div className={styles.footer}>{footer}</div>
+        </>
       )}
-      <div className={`${styles.body} ${fullView ? styles.fullView : ''}`}>
-        {body}
-      </div>
-      <div className={styles.footer}>{footer}</div>
     </div>
   );
 }

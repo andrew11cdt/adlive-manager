@@ -4,7 +4,10 @@
   margin: auto;
   display: block;
   shape-rendering: "auto";
-
+  position: absolute;
+  top: 40%;
+  right: 50%;
+  
   &.large {
     width: 100px;
     height: 100px;

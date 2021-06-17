@@ -5,6 +5,13 @@
   border-radius: 12px;
   box-shadow: 0px 8px 16px rgba(110, 120, 130, 0.12);
   border-radius: 12px;
+  min-height: 100px;
+  .loadingCard {
+    position: relative;
+    background: inherit;
+    border-radius: 12px;
+    min-height: 100px;
+  }
   > :not(.divider) {
     padding: 6px 12px;
   }

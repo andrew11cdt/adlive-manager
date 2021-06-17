@@ -67,11 +67,12 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+// -------------------------------- CAMPAIGNS API -----------------------------------------------
 
   static async getCampaigns() {
-    return await MockApiCampaign()
+    // return await MockApiCampaign()
     return restClient
-      .asyncPut(`/advertiser/campaigns/`)
+      .asyncGet(`/advertiser/campaign/`)
       .then(({ status, data }) => {
         return standardServiceResponse(status, data);
       })
@@ -79,7 +80,30 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+  static async createCampaign(body) {
+    return restClient.asyncPost(`/advertiser/campaign/`, body).catch(err => ({error: err.response}))
+  }
+  static async updateCampaign(id, body) {
+    return restClient.asyncPut(`/advertiser/campaign/${id}`, body).catch(err => ({error: err.response}))
+  }
+  static async getCampaign(id) {
+    return restClient.asyncGet(`/advertiser/campaign/${id}`).catch(err => ({error: err.response}))
+  }
+// --------------------------------------- CAMPAIGNS ADS-SET API ----------------------------------------
 
+  static async getCampaignAdsSet(id) {
+    return restClient.asyncGet(`/advertiser/campaign/${id}/ads-set`).catch(err => ({error: err.response}))
+  }
+  static async getCampaignSchedule(id) {
+    return restClient.asyncGet(`/advertiser/campaign/${id}/schedule`).catch(err => ({error: err.response}))
+  }
+  static async getCampaignTargetScreenConditions(id) {
+    return restClient.asyncGet(`/advertiser/campaign/${id}/target-screen-conditions`).catch(err => ({error: err.response}))
+  }
+  static async updateAdsSetMedia(ads_set_id, body) {
+    return restClient.asyncPut(`/advertiser/ads-set/${ads_set_id}/media`, body).catch(err => ({error: err.response}))
+  }
+// ------------------------------------------- VIDEOS API ------------------------------------
   static async postVideo(body) {
     return restClient.asyncPost(`/advertiser/video/`, body).catch(err => ({error: err.response}))
   }

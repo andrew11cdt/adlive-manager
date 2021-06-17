@@ -1,8 +1,17 @@
+@import "../../../styles/variables.scss";
+@import "../../../styles/common.scss";
+
 .rightControls {
   display: flex;
   flex-direction: row;
   align-items: center;
   >* {
     margin-left: 20px;
+  }
+}
+.createCampainModal {
+  top: 10%;
+  .title {
+    font-size: 18px;
   }
 }

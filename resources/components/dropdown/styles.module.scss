@@ -70,10 +70,6 @@
 .adBtn {
   display: flex;
   align-items: center;
-  padding: 2px 4px;
-  >:first-child {
-    margin-right: 4px;
-  }
 }
 .cardBtn {
   background: $whiteColor;

@@ -71,12 +71,13 @@ const getSizeClassName = (
 };
 
 export function AdButton(props) {
-  const { icon, title, onClick, variant, cardBtn, dash, ghost, style } = props;
+  const { icon, title, onClick, variant, cardBtn, dash, ghost, style, isLoading } = props;
   return (
     <Button
       style={style}
       onClick={onClick}
       variant={variant || "light"}
+      disabled={isLoading}
       className={`
         ${styles.adBtn}
         ${cardBtn ? styles.cardBtn : ""}
@@ -85,7 +86,7 @@ export function AdButton(props) {
       `}
     >
       {icon}
-      {title}
+      {isLoading ? 'Loading...' : title}
     </Button>
   );
 }
