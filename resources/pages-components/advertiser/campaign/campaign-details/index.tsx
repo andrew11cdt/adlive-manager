@@ -3,6 +3,7 @@ import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton } from "../../../../components/button";
 import AdCard, {
   CardDragItem,
+  CardDragWrapper,
   CardSelect,
   CardSelectTime,
 } from "../../../../components/card";
@@ -24,43 +25,54 @@ import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 import { displayTime, parseTitle } from "../../../../utils/common.util";
 import SelectVideosModal from "../selectVideosModal";
+import { VideoType } from "../../video";
+import AdsliveLoading from "../../../../components/loading";
 export const CAMPAIGN_STATUSES = ["live", "pause"];
-enum SETTING_ITEMS {
+enum LOAD_KEYS {
   adsSet = "ads-set",
   screen = "screen",
   schedule = "schedule",
+}
+
+export interface AdsSetMedia {
+  id: string;
+  order: number;
+  recId: string;
+  withMedia: VideoType;
+}
+export interface AdsSetType {
+  adsSetMediaList: AdsSetMedia[];
+  id: string;
+  name: string;
+  recId: string;
 }
 export default function CampaignDetails(props) {
   const { returnPreLayout, campaign } = props;
   const { videos, name, beginTime, endTime } = campaign || {};
   const [status, setStatus] = useState(campaign?.status);
-  const [adsSet, setAdsSet] = useState(null);
+  const [adsSet, setAdsSet] = useState<AdsSetType>(null);
   const [setting, openSetting] = useState({});
+  const [loading, setLoading] = useState({});
   const [openVideoLib, setOpenVideoLib] = useState(null);
   const [isChangingStatus, setChangeStatus] = useState(null);
   const [schedule, setSchedule] = useState({ beginTime, endTime });
-  const handleUpdateCampaignStatus = async (status) => {
-    setChangeStatus(true);
-    const res: any = await AdvertiserApiClient.updateCampaign(campaign?.id, {
-      status,
-    });
-    if (res.status) setStatus(status);
-    setChangeStatus(false);
-  };
+
   const CampainHeader = (title, settingKey) => (
     <div className={styles.campaignHeader}>
       <AdsliveH4>{title}</AdsliveH4>
       {!setting[settingKey] ? (
-        <a
+        <AdButton
           className={styles.editSetting}
-          onClick={() => setSetting(settingKey, true)}
-        >
-          <AdIcon name="pen" w="16px" mr="2px" />
-          Edit Setting
-        </a>
+          style={{ padding: "0 4px" }}
+          isLoading={loading[settingKey]}
+          icon={<AdIcon name="pen" w="16px" mr="2px" />}
+          title={<MutedText>Edit Setting</MutedText>}
+          onClick={() => toggleSetting(settingKey, true)}
+        />
       ) : (
         <AdButton
           style={{ padding: "0 4px" }}
+          isLoading={loading[settingKey]}
           title={<MutedText>Done</MutedText>}
           onClick={() => handleUpdate(settingKey)}
         />
@@ -68,15 +80,24 @@ export default function CampaignDetails(props) {
     </div>
   );
   const handleUpdate = (settingKey) => {
-    setSetting(settingKey, false);
+    toggleSetting(settingKey, false);
   };
-  const setSetting = (title, value) => {
+  const toggleSetting = (title, value) => {
     const s = { ...setting, ...{ [title]: value } };
     openSetting(s);
   };
-  const updateAdsSet = () => {
-    setOpenVideoLib(false)
+  const handleSetLoading = (title, value) => {
+    const s = { ...loading, ...{ [title]: value } };
+    setLoading(s);
   };
+
+  const formatMediaRequest = (list) =>
+    list.map(({ recId, id, withMedia, withMediaRecId }, i) => ({
+      recId,
+      id,
+      withMediaRecId: withMediaRecId || withMedia?.recId,
+      order: i,
+    }));
   const actionOnStatus = () => {
     let action;
     switch (status) {
@@ -98,10 +119,56 @@ export default function CampaignDetails(props) {
   useEffect(() => {
     fetchAds();
   }, [campaign]);
+  // ---------------------- API funct --------------------
   const fetchAds = async () => {
     if (!campaign) return;
+    handleSetLoading(LOAD_KEYS.adsSet, true);
     const res: any = await AdvertiserApiClient.getCampaignAdsSet(campaign.id);
     if (res && res.data) setAdsSet(res.data[0]);
+    handleSetLoading(LOAD_KEYS.adsSet, false);
+  };
+
+  const handleUpdateCampaignStatus = async (status) => {
+    setChangeStatus(true);
+    const res: any = await AdvertiserApiClient.updateCampaign(campaign?.id, {
+      status,
+    });
+    if (res.status) setStatus(status);
+    setChangeStatus(false);
+  };
+
+  const updateAdsSet = async (newVideos) => {
+    if (!newVideos?.length) return;
+    let mergeData = [...adsSet.adsSetMediaList, ...newVideos];
+    setOpenVideoLib(false);
+    await updateMediaReq(mergeData);
+  };
+  const updateMediaReq = async (newMediaList) => {
+    handleSetLoading(LOAD_KEYS.adsSet, true);
+    newMediaList = formatMediaRequest(newMediaList);
+    const res: any = await AdvertiserApiClient.updateAdsSetMedia(adsSet.id, {
+      adsSetMediaList: newMediaList,
+    });
+    if (res?.data) setAdsSet({ ...adsSet, adsSetMediaList: res.data });
+    handleSetLoading(LOAD_KEYS.adsSet, false);
+  };
+  const handleDeleteMedia = async (recId) => {
+    if (!adsSet?.adsSetMediaList?.length) return;
+    const filteredData = adsSet.adsSetMediaList.filter(
+      (e) => e.recId !== recId
+    );
+    await updateMediaReq(filteredData);
+  };
+  const handleChangeOrder = async (changeData) => {
+    const arrangeIds = changeData.map((e) => e.id);
+    const newOrderMedia = arrangeIds.map((recId, i) => {
+      const refMedia = adsSet.adsSetMediaList.find((e) => e.recId === recId);
+      return {
+        ...refMedia,
+        order: i,
+      };
+    });
+    await updateMediaReq(formatMediaRequest(newOrderMedia));
   };
   return (
     <>
@@ -131,16 +198,17 @@ export default function CampaignDetails(props) {
         content={
           <div className={styles.campaignContainer}>
             <AdCard
-              loading={!adsSet}
               fullView
               toggle
-              toggled={setting[SETTING_ITEMS.adsSet]}
-              header={CampainHeader(adsSet?.name, SETTING_ITEMS.adsSet)}
+              toggled={setting[LOAD_KEYS.adsSet]}
+              header={CampainHeader(adsSet?.name, LOAD_KEYS.adsSet)}
               body={
                 <div className={`${styles.cardBody}`}>
                   <div className={styles.info}>
                     <span>
-                      <InfoText size="lg">{adsSet?.adsSetMediaList.length || '-'}</InfoText>{" "}
+                      <InfoText size="lg">
+                        {adsSet?.adsSetMediaList.length || "-"}
+                      </InfoText>{" "}
                       videos
                     </span>
                     <span>
@@ -148,24 +216,33 @@ export default function CampaignDetails(props) {
                     </span>
                   </div>
                   <Divider style={{ padding: 0 }} />
-                  {setting[SETTING_ITEMS.adsSet] ? (
+                  {setting[LOAD_KEYS.adsSet] ? (
                     <>
-                      {adsSet?.adsSetMediaList.map(({withMedia, order, recId}, i) => {
-                        return (
-                          <div key={i}>
-                            <CardDragItem onDelete={null} onDrag={null}>
-                              {/* <AdIcon
+                      <CardDragWrapper
+                        items={adsSet?.adsSetMediaList.map((e) => ({
+                          id: e.recId.toString(),
+                          content: (
+                            <div key={e.id}>
+                              <CardDragItem
+                                onDelete={(event) => {
+                                  event.stopPropagation();
+                                  handleDeleteMedia(e.recId);
+                                }}
+                              >
+                                {/* <AdIcon
                                 url={withMedia.url}
                                 r="2px"
                                 w="24px"
                                 mr="8px"
                               /> */}
-                              <span>{withMedia.name}</span>
-                            </CardDragItem>
-                            <Divider />
-                          </div>
-                        );
-                      })}
+                                <span>{e.withMedia.name}</span>
+                              </CardDragItem>
+                              <Divider />
+                            </div>
+                          ),
+                        }))}
+                        onChange={(change) => handleChangeOrder(change)}
+                      />
                       <AdButton
                         cardBtn
                         ghost
@@ -191,8 +268,8 @@ export default function CampaignDetails(props) {
             <AdCard
               fullView
               toggle
-              toggled={setting[SETTING_ITEMS.screen]}
-              header={CampainHeader("Screen", SETTING_ITEMS.screen)}
+              toggled={setting[LOAD_KEYS.screen]}
+              header={CampainHeader("Screen", LOAD_KEYS.screen)}
               body={
                 <div className={styles.cardBody}>
                   <div className={styles.info}>
@@ -203,7 +280,7 @@ export default function CampaignDetails(props) {
                       <InfoText size="lg">1</InfoText> Location
                     </span>
                   </div>
-                  {setting[SETTING_ITEMS.screen] && (
+                  {setting[LOAD_KEYS.screen] && (
                     <>
                       <Divider />
                       <CardSelect
@@ -254,8 +331,8 @@ export default function CampaignDetails(props) {
             <AdCard
               fullView
               toggle
-              toggled={setting[SETTING_ITEMS.schedule]}
-              header={CampainHeader("Schedule", SETTING_ITEMS.schedule)}
+              toggled={setting[LOAD_KEYS.schedule]}
+              header={CampainHeader("Schedule", LOAD_KEYS.schedule)}
               body={
                 <div className={styles.cardBody}>
                   <div className={styles.info}>
@@ -267,7 +344,7 @@ export default function CampaignDetails(props) {
                       End <InfoText>{displayTime(schedule?.endTime)}</InfoText>
                     </span>
                   </div>
-                  {setting[SETTING_ITEMS.schedule] && (
+                  {setting[LOAD_KEYS.schedule] && (
                     <>
                       <Divider />
                       <CardSelectTime
@@ -296,7 +373,13 @@ export default function CampaignDetails(props) {
           </div>
         }
       />
-      <SelectVideosModal handleShow={{openVideoLib, setOpenVideoLib}} adsSet={adsSet} onChange={fetchAds()}/>
+      {adsSet && (
+        <SelectVideosModal
+          handleShow={{ openVideoLib, setOpenVideoLib }}
+          adsSet={adsSet}
+          onChange={updateAdsSet}
+        />
+      )}
     </>
   );
 }

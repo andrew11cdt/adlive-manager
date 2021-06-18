@@ -8,11 +8,16 @@ import { timeout } from "../../../utils/common.util";
 import AdvertiserContent from "../others/advertiser-content";
 import styles from "./styles.module.scss";
 import VideoDetails from "./video-details";
-
+export interface VideoType {
+  id: string,
+  name: string,
+  recId: string,
+  url: string,
+}
 export default function AdvertiserVideo() {
   const { videos, setVideos } = useAdvertiserStore();
   // let [videoList, setVideoList] = useState(videos);
-  const [detailsVideo, setDetailsVideo] = useState(null);
+  const [detailsVideo, setDetailsVideo] = useState<VideoType>(null);
   const [showNew, setShowNew] = useState(null);
   const [showDetails, setShowDetails] = useState(null);
   const handleDelete = async () => {

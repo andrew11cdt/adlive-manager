@@ -72,7 +72,6 @@ export default function AdvertiserStoreProvider({
     loadCampaigns()
     
     AdvertiserApiClient.getVideos().then((res: any) => {
-      console.log(res);
       if (res && res.data) setVideos(res.data)
     });
     

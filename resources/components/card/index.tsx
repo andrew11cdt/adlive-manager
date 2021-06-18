@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import Divider from "../divider";
 import AdsliveIcon, { AdIcon, ADSLIVE_ICON_VARIANT } from "../icon";
@@ -8,6 +8,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import { displayTime } from "../../utils/common.util";
 import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 
 export function CardInput(props) {
   let { title, value, onInputChange, onFocusOut, icon } = props;
@@ -86,7 +88,7 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
   );
 }
 
-export function CardDragItem({ onDrag, onDelete, children }) {
+export function CardDragItem({ onDelete, children }) {
   return (
     <div className={styles.cardDragItem}>
       <span>
@@ -96,9 +98,77 @@ export function CardDragItem({ onDrag, onDelete, children }) {
       <AdsliveIcon
         className={styles.icon}
         variant={ADSLIVE_ICON_VARIANT.MINUS_CIRCLE}
+        onClick={onDelete}
       />
     </div>
   );
+}
+
+export function CardDragWrapper({items, onChange}) {
+  const [itemsStatus, setItemsStatus] = useState(items)
+  useEffect(() => {
+    setItemsStatus(items)
+  }, [items])
+  const getListStyle = isDraggingOver => ({
+    // background: isDraggingOver ? "inherit" : "lightgrey",
+  });
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    userSelect: "none",
+    ...draggableStyle
+  });
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+  
+    return result;
+  };
+  function onDragEnd(result) {
+    // dropped outside the list 
+    if (!result.destination) return
+
+    const items:any = reorder(
+      itemsStatus,
+      result.source.index,
+      result.destination.index
+    );
+    console.log(items, itemsStatus);
+    setItemsStatus(items)
+    onChange(items)
+  }
+  
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided, snapshot) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+            >
+              {itemsStatus?.map((item, index) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
+                    >
+                      {item.content}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+  )
 }
 
 export default function AdCard(props) {

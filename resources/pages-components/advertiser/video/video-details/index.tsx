@@ -34,7 +34,6 @@ export default function VideoDetails(props) {
       if (isNew) return
       console.log("UPDATE REQUEST");
       const res:any = await AdvertiserApiClient.updateVideo(dataState.id, body);
-      console.log(res);
       if (res.data) {
         setDataState(res.data)
         setSuccessMsg('Updated successful')

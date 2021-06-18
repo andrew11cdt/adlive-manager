@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Button, Container, Row } from "react-bootstrap";
 import { parseTitle } from "../../utils/common.util";
 import styles from "./styles.module.scss";
@@ -71,7 +72,17 @@ const getSizeClassName = (
 };
 
 export function AdButton(props) {
-  const { icon, title, onClick, variant, cardBtn, dash, ghost, style, isLoading } = props;
+  const {
+    icon,
+    title,
+    onClick,
+    variant,
+    cardBtn,
+    dash,
+    ghost,
+    style,
+    isLoading,
+  } = props;
   return (
     <Button
       style={style}
@@ -86,7 +97,7 @@ export function AdButton(props) {
       `}
     >
       {icon}
-      {isLoading ? 'Loading...' : title}
+      {isLoading ? <span className={styles.loading}>Loading<Dots /></span> : title}
     </Button>
   );
 }
@@ -117,3 +128,16 @@ export default function ADSLIVEButton({
     </div>
   );
 }
+export const Dots = () => {
+  const [dots, setDots] = useState(1);
+  let interval;
+  useEffect(() => {
+    interval = setInterval(() => {
+      setDots(dots === 3 ? 0 : dots + 1);
+    }, 400);
+    return () => {
+      clearInterval(interval);
+    };
+  });
+  return <span>{dots === 0 ? "" : ".".repeat(dots)}</span>
+};

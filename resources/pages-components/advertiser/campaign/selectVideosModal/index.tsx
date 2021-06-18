@@ -6,16 +6,23 @@ import VideosPlayer from "../../../../components/videos-player";
 import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { AdIcon } from "../../../../components/icon";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
+export interface NewMedia {
+  withMediaRecId: string,
+  order: number
+}
 export default function SelectVideosModal(props) {
-  const { handleShow, onChange, adsSet } = props;
+  const { handleShow, adsSet, onChange } = props;
   const { videos: allVideos } = useAdvertiserStore();
   const [videoLib, setVideoLib] = useState([]);
   const [selectedVideos, setSelectVideo] = useState([]);
   useEffect(()=> {
     const addedMediaVideos = adsSet?.adsSetMediaList.map(e => e.withMedia) || []
     setVideoLib(allVideos.filter(v => !addedMediaVideos.find(data => data.id == v.id)))
+    return ()=> {
+      setSelectVideo([])
+      console.log(this);
+    }
   }, [adsSet])
-  const [submitting, setSubmiting] = useState(null);
   const handleSelectVideo = (video) => {
     checkSelected(video)
       ? setSelectVideo(selectedVideos.filter((e) => e.id !== video.id))
@@ -23,20 +30,13 @@ export default function SelectVideosModal(props) {
   };
   const handleAddVideos = async () => {
     if (!selectedVideos.length) return;
-    setSubmiting(true)
-    const newMedia = selectedVideos.map((video, i) => ({
+    const newMedia: NewMedia[] = selectedVideos.map((video, i) => ({
       withMediaRecId: video.recId,
       order: i,
     }));
-    const res: any = await AdvertiserApiClient.updateAdsSetMedia(
-      adsSet.id,
-      { adsSetMediaList: newMedia }
-    );
-    setSubmiting(false)
-    if (res?.data) {
-      handleShow.setOpenVideoLib(false)
-      onChange(res.data)
-    }
+    console.log('OnChange');
+    
+    onChange(newMedia)
   };
   const checkSelected = (video) =>
     selectedVideos.find((v) => v.id === video.id);
@@ -64,7 +64,7 @@ export default function SelectVideosModal(props) {
                   name="check-in-a-circle-highlight"
                 />
                 <VideosPlayer isPreview key={i} data={video} />
-                <span className={styles.info}>{video.name}</span>
+                <div className={styles.info}>{video.name}</div>
               </span>
             ))}
           </div>
@@ -78,8 +78,8 @@ export default function SelectVideosModal(props) {
         >
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleAddVideos}  disabled={submitting}>
-          {submitting ? 'updating...': 'Add Videos'}
+        <Button variant="primary" onClick={handleAddVideos} disabled={!selectedVideos.length}>
+          Add Videos
         </Button>
       </Modal.Footer>
     </Modal>
