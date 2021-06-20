@@ -9,33 +9,31 @@ interface ToasterProps {
   delay?: number;
   message: string;
 
-  isShow: boolean;
-  setShow: Function;
+  handleSetToast: Function;
 }
 export const TYPE_TO_ICON = {
-  success: "check-in-a-circle",
+  success: "success",
   warning: "attention",
-  error: "x-in-a-circle",
+  error: "error",
 };
 export function Toaster({
-  isShow,
-  setShow,
+  handleSetToast,
   type,
   message,
   title = type,
-  delay = 3000,
+  delay = 6000,
 }: ToasterProps) {
   return (
     <Toast
       className={`${styles.toaster} ${styles[type]}`}
-      onClose={() => setShow(false)}
-      show={isShow}
+      onClose={() => handleSetToast(null)}
+      show={!!message}
       delay={delay}
-      autohide={false}
+      autohide={true}
     >
       <Toast.Header className={styles.header}>
         <span className={styles.leftHead}>
-          <AdIcon name={TYPE_TO_ICON[type]} />
+          <AdIcon className={`${styles.icon} ${styles[type]}`} name={TYPE_TO_ICON[type]} />
           <strong className={styles.title}>{title?.toUpperCase()}</strong>
         </span>
       </Toast.Header>

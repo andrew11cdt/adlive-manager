@@ -9,6 +9,16 @@
   &.success {
     background-color: #c2e4c2;
     color: #077507;
+    .title {
+      color: #077507;
+    }
+  }
+  &.error {
+    background-color: #ffe7e9;
+    color: #dc3545;
+    .title {
+      color: #dc3545;
+    }
   }
   .header{
     display: flex;

@@ -59,8 +59,9 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
 }
 
 export function CardSelectTime({ title, initValue, onChange, ...props }) {
-  const retrieveHours = (date) => moment(date).format("HH:MM");
-  const data = new Date(initValue);
+  
+  const retrieveHours = (date) => date ? moment(date).format("HH:MM") : null
+  const data = initValue ? new Date(initValue) : null;
   const [date, setDate] = useState(data);
   return (
     <div className={styles.cardSelect}>
@@ -77,12 +78,11 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
           disabledKeyboardNavigation
           shouldCloseOnSelect={false}
           onChange={(change) => {
-            console.log(change);
             setDate(change);
             onChange(moment(change).format());
           }}
         />
-        <AdIcon name="Calendar" w="20px" />
+        <AdIcon className={styles.calendarIcon} name="Calendar" w="20px" />
       </div>
     </div>
   );

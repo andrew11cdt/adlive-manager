@@ -97,8 +97,14 @@ export default class AdvertiserApiClient {
   static async getCampaignSchedule(id) {
     return restClient.asyncGet(`/advertiser/campaign/${id}/schedule`).catch(err => ({error: err.response}))
   }
+  static async updateCampaignSchedule(id, body) {
+    return restClient.asyncPut(`/advertiser/campaign/${id}/schedule`, body).catch(err => ({error: err.response}))
+  }
   static async getCampaignTargetScreenConditions(id) {
     return restClient.asyncGet(`/advertiser/campaign/${id}/target-screen-conditions`).catch(err => ({error: err.response}))
+  }
+  static async updateCampaignTargetScreenConditions(id, body) {
+    return restClient.asyncPut(`/advertiser/campaign/${id}/target-screen-conditions`, body).catch(err => ({error: err.response}))
   }
   static async updateAdsSetMedia(ads_set_id, body) {
     return restClient.asyncPut(`/advertiser/ads-set/${ads_set_id}/media`, body).catch(err => ({error: err.response}))

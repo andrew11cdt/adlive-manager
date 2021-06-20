@@ -60,7 +60,7 @@ export default function VideoDetails(props) {
   }
   return (
     <div style={{ position: 'relative' }}>
-    <Toaster type='success' isShow={!!successMsg} setShow={setSuccessMsg} message={successMsg} />
+    <Toaster type='success' handleSetToast={setSuccessMsg} message={successMsg} />
     <SubLayout
       header={
         <div className={styles.newScreenHeader}>

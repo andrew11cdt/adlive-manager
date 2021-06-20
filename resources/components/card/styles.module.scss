@@ -131,9 +131,15 @@
 .datePickerContainer {
   .datePicker {
     border: none;
-    width: 300px;
+    width: 320px;
   }
   .timeInput {
     
+  }
+  position: relative;
+  .calendarIcon {
+    position: absolute;
+    right: 10px;
+    top: 25%;
   }
 }

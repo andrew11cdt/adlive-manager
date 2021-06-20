@@ -49,7 +49,7 @@ export default function LocationSetting({ returnPreLayout, locationData }) {
                   locationData.areas.map((area, i) => {
                     return (
                       <div key={i}>
-                        <CardDragItem onDelete={null} onDrag={null}>
+                        <CardDragItem onDelete={null}>
                           <div>{area.name}</div>
                         </CardDragItem>
                         <div className="pt-4">

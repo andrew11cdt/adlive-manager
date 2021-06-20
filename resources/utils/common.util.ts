@@ -26,6 +26,7 @@ interface TimeOptions {
 }
 export const displayTime = (time: string, opt?: TimeOptions) => {
   const { showHours } = opt || {}
+  if (!time) return '-'
   return moment(time).format(`DD/MMM/YYYY ${showHours ? "HH:MM": ""}`)
 };
 

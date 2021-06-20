@@ -27,13 +27,17 @@ import { displayTime, parseTitle } from "../../../../utils/common.util";
 import SelectVideosModal from "../selectVideosModal";
 import { VideoType } from "../../video";
 import AdsliveLoading from "../../../../components/loading";
+import { Toaster } from "../../../../components/toaster";
+import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 export const CAMPAIGN_STATUSES = ["live", "pause"];
 enum LOAD_KEYS {
   adsSet = "ads-set",
   screen = "screen",
   schedule = "schedule",
 }
-
+const STRATEGIES = [
+  { key: 'SCREEN_MATCH_ALL_RULES', desc: 'All screen matching all of these rules' }
+]
 export interface AdsSetMedia {
   id: string;
   order: number;
@@ -47,16 +51,22 @@ export interface AdsSetType {
   recId: string;
 }
 export default function CampaignDetails(props) {
+  const { locations } = useAdvertiserStore()
   const { returnPreLayout, campaign } = props;
   const { videos, name, beginTime, endTime } = campaign || {};
   const [status, setStatus] = useState(campaign?.status);
   const [adsSet, setAdsSet] = useState<AdsSetType>(null);
+  const [schedule, setSchedule] = useState({ beginTime, endTime });
+  const [screenConditions, setScreenConditions] = useState(null);
+  
+  // loading handler
   const [setting, openSetting] = useState({});
   const [loading, setLoading] = useState({});
   const [openVideoLib, setOpenVideoLib] = useState(null);
   const [isChangingStatus, setChangeStatus] = useState(null);
-  const [schedule, setSchedule] = useState({ beginTime, endTime });
-
+  
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
   const CampainHeader = (title, settingKey) => (
     <div className={styles.campaignHeader}>
       <AdsliveH4>{title}</AdsliveH4>
@@ -115,10 +125,22 @@ export default function CampaignDetails(props) {
     }
     return action;
   };
+  const handleChangeStrategy = (event) => {
+    console.log(event);
+  }
   const STATUS_COLOR = { paused: "success", draft: "success", live: "primary" };
+  // ----------------- Load Effect Data -------------------
+  
   useEffect(() => {
     fetchAds();
   }, [campaign]);
+  
+  useEffect(() => {
+    const conditions:any = {}
+    conditions.strategy = STRATEGIES[0].key
+    conditions.detail = {rules : []}
+    setScreenConditions(conditions)
+  }, [locations])
   // ---------------------- API funct --------------------
   const fetchAds = async () => {
     if (!campaign) return;
@@ -149,7 +171,10 @@ export default function CampaignDetails(props) {
     const res: any = await AdvertiserApiClient.updateAdsSetMedia(adsSet.id, {
       adsSetMediaList: newMediaList,
     });
-    if (res?.data) setAdsSet({ ...adsSet, adsSetMediaList: res.data });
+    if (res?.data) {
+      setAdsSet({ ...adsSet, adsSetMediaList: res.data });
+      setSuccessMsg('Updated')
+    }
     handleSetLoading(LOAD_KEYS.adsSet, false);
   };
   const handleDeleteMedia = async (recId) => {
@@ -170,8 +195,22 @@ export default function CampaignDetails(props) {
     });
     await updateMediaReq(formatMediaRequest(newOrderMedia));
   };
+  const handleChangeSchedule = async (changeData) => {
+    setSchedule({...schedule, ...changeData });
+    handleSetLoading(LOAD_KEYS.schedule, true)
+    const res:any = await AdvertiserApiClient.updateCampaignSchedule(adsSet?.id, schedule)
+    if (res['error']) {
+      setErrorMsg(res['error']['data']['error']['message'])
+    }
+    if (res?.data) {
+      setSuccessMsg('Updated Schedule')
+    }
+    handleSetLoading(LOAD_KEYS.schedule, false)
+  };
   return (
     <>
+      <Toaster type='error' handleSetToast={setErrorMsg} message={errorMsg} />
+      <Toaster type='success' handleSetToast={setSuccessMsg} message={successMsg} />
       <SubLayout
         header={
           <div className={styles.header}>
@@ -259,7 +298,7 @@ export default function CampaignDetails(props) {
                           <AdIcon url={video.photoUrl} r="2px" w="24px" />
                         </span>
                       ))}
-                      <MutedText>{`${videos?.length || 0} videos`}</MutedText>
+                      <MutedText>{`${adsSet?.adsSetMediaList?.length || 0} videos`}</MutedText>
                     </div>
                   )}
                 </div>
@@ -285,11 +324,9 @@ export default function CampaignDetails(props) {
                       <Divider />
                       <CardSelect
                         title="Choose SCREEN enters the campaign"
-                        initValue="All screen matching all of these rules"
-                        values={[]}
-                        onChange={(event) => {
-                          console.log(event);
-                        }}
+                        initValue={STRATEGIES[0].desc}
+                        values={[STRATEGIES[0].desc]}
+                        onChange={(event) => handleChangeStrategy(event)}
                       />
                       <CardSelect
                         title="Location"
@@ -351,19 +388,13 @@ export default function CampaignDetails(props) {
                         title="Start at"
                         initValue={schedule?.beginTime}
                         values={[]}
-                        onChange={(change) => {
-                          setSchedule({ beginTime: change, endTime });
-                          console.log({ schedule });
-                        }}
+                        onChange={(change) => handleChangeSchedule({beginTime: change})}
                       />
                       <CardSelectTime
                         title="End at"
                         initValue={schedule?.endTime}
                         values={[]}
-                        onChange={(change) => {
-                          setSchedule({ beginTime, endTime: change });
-                          console.log({ schedule });
-                        }}
+                        onChange={(change) => handleChangeSchedule({endTime: change})}
                       />
                     </>
                   )}
