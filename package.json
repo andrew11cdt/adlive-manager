@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "env-cmd -e development next dev -p 8000",
     "build:stg": "env-cmd -e staging next build",
-    "build:prod": "env-cmd -e production next build"
+    "build:prod": "env-cmd -e production next build",
+    "export": "next export"
   },
   "dependencies": {
     "@cloudinary/base": "^1.0.0-beta.3",
