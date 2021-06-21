@@ -1,1 +1,14 @@
-{}
+{
+  "../node_modules/next/dist/client/next-dev.js -> ./dev/noop": {
+    "id": "./node_modules/next/dist/client/dev/noop.js",
+    "files": [
+      "static/chunks/node_modules_next_dist_client_dev_noop_js.js"
+    ]
+  },
+  "../resources/pages-components/advertiser/screen/scanQR/index.tsx -> react-qr-reader": {
+    "id": "./node_modules/react-qr-reader/lib/index.js",
+    "files": [
+      "static/chunks/vendors-node_modules_react-qr-reader_lib_index_js.js"
+    ]
+  }
+}

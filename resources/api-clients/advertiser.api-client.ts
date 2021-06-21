@@ -46,6 +46,12 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+  // ---------------------------- Sreen API --------------------------
+
+  static async createScreen(areaId, body) {
+    console.log({areaId});
+    return restClient.asyncPost(`/advertiser/location/area/${areaId}/screen`, body).catch(err => ({error: err.response}))
+  }
 
   static async getScreen(id) {
     return restClient

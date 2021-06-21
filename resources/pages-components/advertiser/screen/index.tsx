@@ -17,6 +17,7 @@ import ScanQR from "./scanQR";
 import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
 import { Dropdown } from "react-bootstrap";
+import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
 
 export default function AdvertiserScreen() {
   const { locations: StoredLocation } = useAdvertiserStore();
@@ -26,6 +27,9 @@ export default function AdvertiserScreen() {
   const [showSetting, setShowSetting] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
   const [selectedScreen, setSelectScreen] = useState(null);
+  
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   
   const handleChangeLocation = (location) => {
     if (!location) return;
@@ -45,27 +49,10 @@ export default function AdvertiserScreen() {
     />
   );
   const NewScreenLayout = (
-    // <ScanQR
-    //   returnPreLayout={() => setShowNewScreen(false)}
-    //   locationData={currentLocation}
-    // />
-    <ScreenDetails
-      isNew
+    <ScanQR
       returnPreLayout={() => setShowNewScreen(false)}
-      locationData={currentLocation}
-      deleteScreen={() => {}}
-      screenData={{
-        recId: "recnnpv9ngUpvmYzO",
-        id: 6,
-        code: "02OH2CZR",
-        deviceCode: "13",
-        deviceType: "SmartTV SamSung",
-        deviceName: "TV SamSung H3",
-        deviceIp: "192.168.1.101",
-        deviceOS: "Android 10",
-        appVersion: "1.0.0",
-        createdAt: "2021-05-21T16:35:29.000Z",
-      }}
+      currentArea={currentArea}
+      currentLocation={currentLocation}
     />
   );
   const ScreenDetailsLayout = (
@@ -76,8 +63,9 @@ export default function AdvertiserScreen() {
       screenData={selectedScreen}
     />
   );
+
   return (
-    <div style={{ height: "100%" }}>
+    <div style={{ height: "100%", position: 'relative' }}>
       {selectedScreen ? (
         ScreenDetailsLayout
       ) : showNewScreen ? (
@@ -86,6 +74,7 @@ export default function AdvertiserScreen() {
         Setting
       ) : (
         <>
+          
           <AdvertiserContent
             headerTitle={
               // locations?.loading ? "-----" : locations?.locations[0]?.name
@@ -140,9 +129,6 @@ export default function AdvertiserScreen() {
               />
             }
           >
-            {!currentLocation && (
-              <AdsliveLoading size={ADSLIVE_LOADING_SIZE.EXTRA_SMALL} />
-            )}
           </AdvertiserContent>
           {currentArea && (
             <AdvertiserScreenItems

@@ -33,7 +33,7 @@ export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
               body={
                 <div>
                   <div>{screen.deviceName}</div>
-                  <div style={{ color: '#7F838E' }}>{screen.deviceCode}</div>
+                  <div style={{ color: '#7F838E' }}>{screen?.deviceCode.slice(0,6)}</div>
                   <StatusBadge status={screen.status} />
                 </div>
               }
