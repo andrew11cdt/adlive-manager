@@ -47,7 +47,7 @@
       }
     }
     .body {
-      border: 1px solid #2475FF;
+      border: 1px solid #2475ff;
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
     }
@@ -131,10 +131,17 @@
 .datePickerContainer {
   .datePicker {
     border: none;
-    width: 320px;
+    width: 130%;
+    background-color: rgba(238, 238, 238, 0.616);
+    padding: 0 5px;
+    border-radius: 5px;
+    font-weight: 400;
+    color: rgb(59, 59, 59);
   }
-  .timeInput {
-    
+  .calendar {
+    display: flex !important;
+    left: -10px;
+    margin: 5px 0;
   }
   position: relative;
   .calendarIcon {

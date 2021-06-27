@@ -69,6 +69,7 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
       <div className={`${styles.selectBtn} ${styles.datePickerContainer}`}>
         <DatePicker
           className={styles.datePicker}
+          calendarClassName={styles.calendar}
           selected={date}
           showTimeSelect
           timeFormat="HH:mm"

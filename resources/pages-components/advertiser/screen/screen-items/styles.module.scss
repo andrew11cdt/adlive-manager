@@ -11,6 +11,12 @@
   flex-wrap: wrap;
   padding: 16px;
 }
+.loader {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+}
 .screensHeader {
   display: flex;
   flex-direction: row;

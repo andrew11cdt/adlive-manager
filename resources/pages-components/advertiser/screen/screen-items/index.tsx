@@ -15,7 +15,7 @@ export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
     });
   }, [id]);
   const getScreenDetails = async(screen) => {
-    selectScreen(screen) 
+    selectScreen(screen)
   }
   return (
     <div className={styles.advertiserScreens}>
@@ -25,7 +25,7 @@ export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
         <span>- offline</span>
         <div className={styles.line}></div>
       </div>
-      {!screens ? <AdsliveLoading style={{ marginTop: '64px'}}/> :
+      {!screens ? <AdsliveLoading className={styles.loader}/> :
         screens?.map((screen, i) => (
           <div key={i} className={styles.screensCard} onClick={() => getScreenDetails(screen)}>
             <AdCard

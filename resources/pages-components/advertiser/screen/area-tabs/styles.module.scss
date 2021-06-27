@@ -20,7 +20,6 @@
       .area {
         width: 50%;
         text-align: center;
-        padding: 12.5px 0px 0px 0px;
         color: $darkNeutralColor;
         @extend .hiddenTextOverflow;
 
@@ -30,7 +29,6 @@
           content: "";
           display: block;
           background: transparent;
-          margin-top: 12.5px;
         }
 
         &.actived {

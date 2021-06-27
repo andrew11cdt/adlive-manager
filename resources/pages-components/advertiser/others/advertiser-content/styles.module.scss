@@ -1,21 +1,26 @@
 @import "../../../../styles/common.scss";
 
 .advertiserContent {
-  position: relative;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1;
   @extend .hideScrollbar;
 
   .advertiserContentHeader {
     width: 100%;
     position: relative;
     top: 0;
+    box-shadow: 2px 2px 8px rgba(224, 224, 224, 0.466);
 
     .advertiserContentHeaderTop {
       width: 100%;
       background: #fff;
-      padding: 16px;
+      padding: 16px 16px 8px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 2px 2px 8px rgba(224, 224, 224, 0.466);
 
       .advertiserContentHeaderTopLeft {
         display: flex;
