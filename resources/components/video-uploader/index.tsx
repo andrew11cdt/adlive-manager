@@ -105,9 +105,8 @@ export default function VideoUploader(props) {
                   </Button>
                 </div>
               ) : (
-                <div className={styles.loading}>
-                  <AdsliveLoading size={ADSLIVE_LOADING_SIZE.LARGE} />
-                  <span style={{ marginLeft: "20px" }}>Uploading...</span>
+                <div className={styles.loadingWrapper}>
+                  <AdsliveLoading className={styles.loading} size={ADSLIVE_LOADING_SIZE.LARGE} />
                 </div>
               )}
             </>

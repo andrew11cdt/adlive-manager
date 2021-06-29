@@ -1,5 +1,5 @@
 import Head from "next/head";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function AdsliveApp({ Component, pageProps }) {
   return (
@@ -11,6 +11,10 @@ function AdsliveApp({ Component, pageProps }) {
         <link
           href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
           rel="stylesheet"
+        />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
         />
       </Head>
       <div

@@ -1,15 +1,13 @@
 .videosContainer {
-  padding: 16px;
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
+  padding: 12px;
   > * {
+    flex: 1;
     margin: 8px;
   }
 }
 .videoWrapper {
-  width: 45%;
+  margin-bottom: 12px;
   background-color: white;
   cursor: pointer;
   &:hover {

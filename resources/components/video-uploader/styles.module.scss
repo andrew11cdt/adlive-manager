@@ -77,12 +77,13 @@
       opacity: 0;
     }
   }
-  > .loading {
-    > * {
-      position: relative;
-    }
+  > .loadingWrapper {
+    position: relative;
     filter: opacity(0.5);
     z-index: 1;
+    .loading {
+      transform: translateY(-70%) translateX(50%);
+    }
   }
 }
 .errorContainer {

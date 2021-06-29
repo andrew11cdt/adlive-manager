@@ -3,13 +3,14 @@ import { Col, Container, Row } from "react-bootstrap";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdCard from "../../../../components/card";
 import AdsliveLoading from "../../../../components/loading";
+import NoData from "../../../../components/no-data";
 import StatusBadge from "../../../../components/status-badge";
-import AdvertiserStoreActions from "../../../../stores/advertiser-store/advertiser-store.actions";
 import styles from "./styles.module.scss";
 
 export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
   const [screens, setScreens] = useState(null);
   useEffect(() => {
+    setScreens(null)
     if (id) AdvertiserApiClient.getAreaScreen(id).then(res => {
       if (res && res.data) setScreens(res.data)
     });
@@ -40,6 +41,7 @@ export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
             />
           </div>
         ))}
+      {screens?.length == 0 && <NoData />}
     </div>
   );
 }

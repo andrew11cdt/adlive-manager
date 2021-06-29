@@ -49,7 +49,6 @@ export default function ScreenDetails(props) {
         setScreenState(res.data);
         setSuccessMsg('Updated')
       } else {
-        console.log(res);
         setErrorMsg('Updated')
       }
     }

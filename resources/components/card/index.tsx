@@ -13,8 +13,6 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export function CardInput(props) {
   let { title, value, onInputChange, onFocusOut, icon } = props;
-  console.log({ value });
-
   value = value || "";
   return (
     <div className={styles.cardInput}>

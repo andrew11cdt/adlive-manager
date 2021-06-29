@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
+import ConfirmModal from "../../../components/confirmModal";
 import { AdIcon } from "../../../components/icon";
+import AdsliveLoading from "../../../components/loading";
+import NoData from "../../../components/no-data";
 import { MutedText } from "../../../components/typography";
 import VideosPlayer from "../../../components/videos-player";
 import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
@@ -9,10 +12,10 @@ import AdvertiserContent from "../others/advertiser-content";
 import styles from "./styles.module.scss";
 import VideoDetails from "./video-details";
 export interface VideoType {
-  id: string,
-  name: string,
-  recId: string,
-  url: string,
+  id: string;
+  name: string;
+  recId: string;
+  url: string;
 }
 export default function AdvertiserVideo() {
   const { videos, setVideos } = useAdvertiserStore();
@@ -20,12 +23,16 @@ export default function AdvertiserVideo() {
   const [detailsVideo, setDetailsVideo] = useState<VideoType>(null);
   const [showNew, setShowNew] = useState(null);
   const [showDetails, setShowDetails] = useState(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(null);
+  const [loading, setLoading] = useState(null);
+  
   const handleDelete = async () => {
+    setShowConfirmDelete(false)
     const res = AdvertiserApiClient.deleteVideo(detailsVideo.id);
     if (res) {
-      await loadVideos()
-      await timeout(1000)
-      setShowDetails(false)
+      await loadVideos();
+      await timeout(1000);
+      setShowDetails(false);
     }
   };
   const handleSelectVideo = async (video) => {
@@ -35,23 +42,24 @@ export default function AdvertiserVideo() {
     }
   };
   useEffect(() => {
-    console.log('loadUseEffect =======');
-    console.log(showNew, showDetails);
-    
-    if (!showNew && !showDetails) loadVideos()
+    if (!showNew && !showDetails) loadVideos();
   }, [showNew, showDetails]);
   const loadVideos = async () => {
-    const res: any = await AdvertiserApiClient.getVideos()
+    setLoading(true)
+    setVideos(null)
+    const res: any = await AdvertiserApiClient.getVideos();
     if (res?.data) setVideos(res.data);
-  }
+    setLoading(false)
+  };
   return (
     <>
+      {showConfirmDelete && <ConfirmModal title="delete" onExecute={handleDelete} show={showConfirmDelete} setShow={setShowConfirmDelete}/>}
       {showDetails ? (
         <>
           <VideoDetails
             videoData={detailsVideo}
             returnPreLayout={() => setShowDetails(false)}
-            deleteData={() => handleDelete()}
+            deleteData={() => setShowConfirmDelete(true)}
           />
         </>
       ) : showNew ? (
@@ -74,23 +82,29 @@ export default function AdvertiserVideo() {
               </div>
             }
           />
-          <div className={styles.videosContainer}>
-            {!!videos?.length && (
-              <>
-                {videos.map((video, i) => (
-                  <span
-                    key={i}
-                    className={styles.videoWrapper}
-                    onClick={() => handleSelectVideo(video)}
-                  >
-                    <VideosPlayer isPreview key={i} data={video} />
-                    <span className={styles.info}>{video.name}</span>
-                  </span>
-                ))}
-              </>
-            )}
-            {videos?.error?.status == 404 && <MutedText>Not Found</MutedText>}
-          </div>
+          {!!videos?.length && (
+            <div className={styles.videosContainer}>
+              {[0, 1].map((remainer) => (
+                <div>
+                  {videos
+                    .filter((e, i) => i % 2 === remainer)
+                    .map((video, i) => (
+                      <div
+                        key={i}
+                        className={styles.videoWrapper}
+                        onClick={() => handleSelectVideo(video)}
+                      >
+                        <VideosPlayer isPreview key={i} data={video} />
+                        <span className={styles.info}>{video.name}</span>
+                      </div>
+                    ))}
+                </div>
+              ))}
+            </div>
+          )}
+          {videos?.error?.status == 404 && <MutedText>Not Found</MutedText>}
+          {!loading && videos?.length === 0 && <NoData />}
+          {loading && <AdsliveLoading />}
         </>
       )}
     </>

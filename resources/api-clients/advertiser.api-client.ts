@@ -24,6 +24,7 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+  // ---------------------------- Location & Area API --------------------------
 
   static async getLocations() {
     return restClient
@@ -34,6 +35,10 @@ export default class AdvertiserApiClient {
       .catch((err) => {
         return standardServiceResponse(1, null, err);
       });
+  }
+
+  static async createArea(locationId, body) {
+    return restClient.asyncPost(`/advertiser/location/${locationId}/area`, body).catch(err => ({error: err.response}))
   }
 
   static async getAreaScreen(areaId) {

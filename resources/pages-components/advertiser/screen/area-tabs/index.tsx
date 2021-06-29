@@ -7,6 +7,7 @@ import AdsliveIcon, {
 } from "../../../../components/icon";
 import { AdsliveBody16 } from "../../../../components/typography";
 import styles from "./styles.module.scss";
+import { parseTitle } from "../../../../utils/common.util";
 
 export default function AdvertiserAreaTabs({
   areas = [],
@@ -47,7 +48,7 @@ export default function AdvertiserAreaTabs({
                     }
               }
             >
-              {area?.name}
+              {parseTitle(area?.name)}
             </AdsliveBody16>
           ))}
         </div>

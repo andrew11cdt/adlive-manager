@@ -81,6 +81,11 @@ export default function AdvertiserStoreProvider({
     if (res?.data) setCampaigns(res.data)
     return res.data
   }
+  const loadLocations = async() => {
+    const res:any = await AdvertiserApiClient.getLocations()
+    if (res?.data) setCampaigns(res.data)
+    return res.data
+  }
   useEffect(() => {
     const authToken = cookieUtil.getCookie("adsl-adver-at") || null;
 
@@ -102,7 +107,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
+    <AdvertiserStoreContext.Provider value={{ auth, locations, loadLocations, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );
