@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dropdown } from "react-bootstrap";
+import { Button, Dropdown } from "react-bootstrap";
 import Divider from "../divider";
 import AdsliveIcon, { AdIcon, ADSLIVE_ICON_VARIANT } from "../icon";
 import styles from "./styles.module.scss";
@@ -9,7 +9,6 @@ import moment from "moment";
 import { displayTime } from "../../utils/common.util";
 import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-
 
 export function CardInput(props) {
   let { title, value, onInputChange, onFocusOut, icon } = props;
@@ -28,8 +27,20 @@ export function CardInput(props) {
     </div>
   );
 }
-export function CardSelect({ title, initValue, values, onChange, ...props }) {
+interface CardSelectInput {
+  title?: string;
+  initValue?: string[];
+  values: string[];
+  onChange?: Function;
+  disabled?: boolean;
+}
+export function CardSelect(props: CardSelectInput) {
+  const { title, initValue, values, onChange } = props
   const [selectedValue, onSelectValue] = useState(initValue || null);
+  function handleSelect(item) {
+    onSelectValue(item)
+    onChange(item)
+  }
   return (
     <div className={styles.cardSelect}>
       <label>{title}</label>
@@ -39,13 +50,13 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
           className={styles.selectBtn}
           disabled={props.disabled}
         >
-          {selectedValue}
+          {selectedValue || `Select ${title}`}
         </Dropdown.Toggle>
 
         <Dropdown.Menu className={styles.menu}>
           {values?.map((value, i) => {
             return (
-              <Dropdown.Item key={i} onClick={() => onSelectValue(value)}>
+              <Dropdown.Item key={i} onClick={() => handleSelect(value)}>
                 {value}
               </Dropdown.Item>
             );
@@ -55,10 +66,91 @@ export function CardSelect({ title, initValue, values, onChange, ...props }) {
     </div>
   );
 }
-
-export function CardSelectTime({ title, initValue, onChange, ...props }) {
+export function CardMultiSelect(props: CardSelectInput) {
+  const { title, initValue, values, onChange, disabled } = props;
+  const [selectedValue, setSelectValue] = useState<any[]>(initValue || []);
+  console.log(selectedValue, values);
   
-  const retrieveHours = (date) => date ? moment(date).format("HH:MM") : null
+  const [showDrop, setShowDrop] = useState(false);
+  const [isSelectAll, setSelectAll] = useState(false);
+  const config = { show: showDrop };
+  const handleSelectItem = (item) => {
+    setShowDrop(true);
+    if (checkInclude(item)) removeItem(item);
+    else addItem(item);
+  };
+  function removeItem(item) {
+    setSelectValue(selectedValue.filter((e) => e !== item));
+  }
+  function addItem(item) {
+    setSelectValue([...selectedValue, item]);
+  }
+  function displaySelect() {
+    if (selectedValue?.length) return "Multi choices";
+    else return "Select";
+  }
+  function checkInclude(item) {
+    return selectedValue?.includes(item);
+  }
+  
+  function handleDone() {
+    setShowDrop(false)
+    onChange(selectedValue)
+  }
+  
+  function handleSelectAll(value) {
+    setSelectAll(value)
+    setSelectValue(value ? values : [])
+  }
+  return (
+    <div className={styles.cardSelect}>
+      <label>{title}</label>
+      <Dropdown
+        {...config}
+      >
+        <Dropdown.Toggle
+          id="dropdown-basic"
+          className={styles.selectBtn}
+          disabled={disabled}
+          onClick={() => setShowDrop(!showDrop)}
+        >
+          {displaySelect()}
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu id="dropdown-menu" className={styles.menu}>
+          {
+            values?.length > 2 && <Button style={{ width: '100%' }} variant={isSelectAll ? 'outline-secondary' : 'secondary'} onClick={() => handleSelectAll(!isSelectAll)}>{isSelectAll ? 'Unselect' : 'Select'} All</Button>
+          }
+          {values?.map((value, i) => {
+            return (
+              <Dropdown.Item
+                id="dropdown-item"
+                key={i.toString()}
+                className={`${styles.menuItem} ${
+                  checkInclude(value) ? styles.selected : ""
+                }`}
+                onClick={() => {
+                  handleSelectItem(value)
+                }}
+              >
+                {value}
+                <input
+                  readOnly
+                  style={{ marginLeft: "6px" }}
+                  type="checkbox"
+                  checked={checkInclude(value)}
+                />
+              </Dropdown.Item>
+            );
+          })}
+          <Button style={{ width: '100%' }} variant="primary" onClick={handleDone}>Done</Button>
+        </Dropdown.Menu>
+      </Dropdown>
+    </div>
+  );
+}
+export function CardSelectTime({ title, initValue, onChange, ...props }) {
+  const retrieveHours = (date) => (date ? moment(date).format("HH:MM") : null);
   const data = initValue ? new Date(initValue) : null;
   const [date, setDate] = useState(data);
   return (
@@ -103,71 +195,71 @@ export function CardDragItem({ onDelete, children }) {
   );
 }
 
-export function CardDragWrapper({items, onChange}) {
-  const [itemsStatus, setItemsStatus] = useState(items)
+export function CardDragWrapper({ items, onChange }) {
+  const [itemsStatus, setItemsStatus] = useState(items);
   useEffect(() => {
-    setItemsStatus(items)
-  }, [items])
-  const getListStyle = isDraggingOver => ({
+    setItemsStatus(items);
+  }, [items]);
+  const getListStyle = (isDraggingOver) => ({
     // background: isDraggingOver ? "inherit" : "lightgrey",
   });
   const getItemStyle = (isDragging, draggableStyle) => ({
     userSelect: "none",
-    ...draggableStyle
+    ...draggableStyle,
   });
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
-  
+
     return result;
   };
   function onDragEnd(result) {
-    // dropped outside the list 
-    if (!result.destination) return
+    // dropped outside the list
+    if (!result.destination) return;
 
-    const items:any = reorder(
+    const items: any = reorder(
       itemsStatus,
       result.source.index,
       result.destination.index
     );
     console.log(items, itemsStatus);
-    setItemsStatus(items)
-    onChange(items)
+    setItemsStatus(items);
+    onChange(items);
   }
-  
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable">
-          {(provided, snapshot) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              style={getListStyle(snapshot.isDraggingOver)}
-            >
-              {itemsStatus?.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={getItemStyle(
-                        snapshot.isDragging,
-                        provided.draggableProps.style
-                      )}
-                    >
-                      {item.content}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-  )
+      <Droppable droppableId="droppable">
+        {(provided, snapshot) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={getListStyle(snapshot.isDraggingOver)}
+          >
+            {itemsStatus?.map((item, index) => (
+              <Draggable key={item.id} draggableId={item.id} index={index}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={getItemStyle(
+                      snapshot.isDragging,
+                      provided.draggableProps.style
+                    )}
+                  >
+                    {item.content}
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
 }
 
 export default function AdCard(props) {

@@ -9,10 +9,17 @@ export type AdvertiserStoreContextDataAuth = {
 };
 
 export type AdvertiserStoreContextDataLocation = {
-  areas?: any[];
-  [field: string]: any;
+  areas?: Area[];
+  id: string,
+  name: string,
+  recId: string,
 };
-
+export type Area = {
+  id: string,
+  name: string,
+  recId: string,
+  order: number
+}
 export type AdvertiserStoreContextDataScreen = {
   id: string,
   code: string,
@@ -26,20 +33,21 @@ export type AdvertiserStoreContextDataScreen = {
   createdAt: string
 };
 
-export type AdvertiserStoreContextDataLocations = {
-  loading?: boolean;
-  locations?: AdvertiserStoreContextDataLocation[];
-};
+// export type AdvertiserStoreContextDataLocations = {
+//   loading?: boolean;
+//   locations?: ;
+// };
 
 export type AdvertiserStoreContextData = {
   auth?: AdvertiserStoreContextDataAuth;
-  locations?: AdvertiserStoreContextDataLocations;
+  locations?: AdvertiserStoreContextDataLocation[];
   loadLocations?: any;
   campaigns: any;
   setCampaigns: any;
   loadCampaigns: any;
   videos: any;
   setVideos: any;
+  loadAllScreen?: any;
 };
 
 const AdvertiserStoreContext = createContext<AdvertiserStoreContextData>(null);

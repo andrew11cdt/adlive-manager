@@ -42,8 +42,8 @@ export default function VideoDetails(props) {
   };
   const handleNewData = (data) => {
     console.log(data);
-    const url = data?.secure_url
-    if (url) setDataState({ ...dataState, url});
+    const url = data?.secure_url, name = data?.original_filename
+    if (url) setDataState({ ...dataState, ...{url, name}});
   }
   const handleUploadVideo = async() => {
     if (isNew) {

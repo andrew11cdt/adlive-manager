@@ -41,7 +41,6 @@ export default function VideoUploader(props) {
     try {
       const data = await CloudinaryApi.uploadVideo(file);
       // const data:any = await MockCloudinaryVideo()
-      console.log(data);
       if (data) {
         setUploading(false);
         setVideoFile(data);

@@ -118,7 +118,29 @@
   }
   .menu {
     width: 100%;
-    background: whitesmoke;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(134, 147, 207, 0.8);
+    .selectAllBtn {
+      
+    }
+    .menuItem {
+      background: white;
+      padding: 12px;
+      &:hover {
+        background: whitesmoke;
+      }
+      &:active {
+        color: #005cbf;
+      }
+      &.selected {
+        color: #005cbf;
+        font-weight: 500;
+      }
+    }
+    > *:not(:last-child) {
+      border-bottom:1px solid #e6e7e9;
+    }
   }
 }
 .cardDragItem {

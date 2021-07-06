@@ -7,7 +7,6 @@ import AdvertiserStoreActions from "./advertiser-store.actions";
 import AdvertiserStoreContext, {
   AdvertiserStoreContextDataAuth,
   AdvertiserStoreContextDataLocation,
-  AdvertiserStoreContextDataLocations,
 } from "./advertiser-store.context";
 
 export default function AdvertiserStoreProvider({
@@ -25,10 +24,7 @@ export default function AdvertiserStoreProvider({
   const [
     locations,
     setLocations,
-  ] = useState<AdvertiserStoreContextDataLocations>({
-    loading: true,
-    locations: [],
-  });
+  ] = useState(null);
 
   const [
     videos,
@@ -62,13 +58,7 @@ export default function AdvertiserStoreProvider({
       }
     });
 
-    AdvertiserStoreActions.getLocations().then((data) => {
-      setLocations((previous) => ({
-        ...previous,
-        locations: data || [],
-        loading: false,
-      }));
-    });
+    loadLocations()
     loadCampaigns()
     
     AdvertiserApiClient.getVideos().then((res: any) => {
@@ -76,15 +66,29 @@ export default function AdvertiserStoreProvider({
     });
     
   }, [auth?.token]);
-  const loadCampaigns = async() => {
+  async function loadCampaigns() {
     const res:any = await AdvertiserApiClient.getCampaigns()
     if (res?.data) setCampaigns(res.data)
     return res.data
   }
-  const loadLocations = async() => {
+  async function loadLocations() {
     const res:any = await AdvertiserApiClient.getLocations()
-    if (res?.data) setCampaigns(res.data)
+    if (res?.data) {
+      setLocations(res.data)
+    }
     return res.data
+  }
+  async function loadAllScreen(areaIds) {
+    return new Promise(async (resolve, reject) => {
+      let allScreensData = [] // [areaId] : screen[]
+      // const allAreaData = locations?.reduce((res, e) => res = [...res, ...(e.areas || [])], [])
+      areaIds.map(async (id, index) => {
+        const res = await AdvertiserApiClient.getAreaScreen(id)
+        if (res.code == 0) allScreensData = [...allScreensData,...res.data]
+        else reject(false)
+        if (index + 1 === areaIds.length) resolve(allScreensData)
+      })
+    })
   }
   useEffect(() => {
     const authToken = cookieUtil.getCookie("adsl-adver-at") || null;
@@ -107,7 +111,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations, loadLocations, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
+    <AdvertiserStoreContext.Provider value={{ auth, locations, loadLocations, campaigns, setCampaigns, loadCampaigns, videos, setVideos, loadAllScreen }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

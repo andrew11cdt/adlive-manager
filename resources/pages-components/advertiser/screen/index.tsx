@@ -20,8 +20,7 @@ import { Dropdown } from "react-bootstrap";
 import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
 
 export default function AdvertiserScreen() {
-  const { locations: StoredLocation, loadLocations } = useAdvertiserStore();
-  const { locations } = StoredLocation;
+  const { locations, loadLocations } = useAdvertiserStore();
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentArea, setCurrentArea] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
@@ -37,8 +36,8 @@ export default function AdvertiserScreen() {
     const areas = location.areas;
     setCurrentArea(areas ? areas[0] : null);
   };
+
   useEffect(() => {
-    console.log({locations});
     if (locations && locations.length) handleChangeLocation(locations[1]);
   }, [locations]);
  
@@ -46,9 +45,7 @@ export default function AdvertiserScreen() {
     <LocationSetting
       returnPreLayout={() => setShowSetting(false)}
       location={currentLocation}
-      onChange={() => {
-        loadLocations
-      }}
+      onChange={() => loadLocations()}
     />
   );
   const NewScreenLayout = (
@@ -79,7 +76,6 @@ export default function AdvertiserScreen() {
         <>
           <AdvertiserContent
             headerTitle={
-              // locations?.loading ? "-----" : locations?.locations[0]?.name
               <Dropdown>
                 <Dropdown.Toggle id="dropdown-basic">
                   {currentLocation?.name || "Select Location"}

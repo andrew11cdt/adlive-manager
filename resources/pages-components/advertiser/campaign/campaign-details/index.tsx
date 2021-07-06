@@ -4,6 +4,7 @@ import { AdButton } from "../../../../components/button";
 import AdCard, {
   CardDragItem,
   CardDragWrapper,
+  CardMultiSelect,
   CardSelect,
   CardSelectTime,
 } from "../../../../components/card";
@@ -29,6 +30,7 @@ import { VideoType } from "../../video";
 import AdsliveLoading from "../../../../components/loading";
 import { Toaster } from "../../../../components/toaster";
 import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
+import { Area } from "../../../../stores/advertiser-store/advertiser-store.context";
 export const CAMPAIGN_STATUSES = ["live", "pause"];
 enum LOAD_KEYS {
   adsSet = "ads-set",
@@ -36,8 +38,11 @@ enum LOAD_KEYS {
   schedule = "schedule",
 }
 const STRATEGIES = [
-  { key: 'SCREEN_MATCH_ALL_RULES', desc: 'All screen matching all of these rules' }
-]
+  {
+    key: "SCREEN_MATCH_ALL_RULES",
+    desc: "All screen matching all of these rules",
+  },
+];
 export interface AdsSetMedia {
   id: string;
   order: number;
@@ -51,20 +56,34 @@ export interface AdsSetType {
   recId: string;
 }
 export default function CampaignDetails(props) {
-  const { locations } = useAdvertiserStore()
+  const { locations, loadAllScreen } = useAdvertiserStore();
   const { returnPreLayout, campaign } = props;
-  const { videos, name, beginTime, endTime } = campaign || {};
+  const {
+    videos,
+    name,
+    beginTime,
+    endTime,
+    targetScreenConditions: { detail: { rules = [] } = {} } = {},
+    targetScreenConditions,
+  } = campaign || {};
+  
+  const initLocationIds = rules?.find((e) => e.ruleTypes === "LOCATION")?.value?.locationIds
+  const initAreaIds = rules?.find((e) => e.ruleTypes === "AREA")?.value?.areaIds
+  const collectAllAreas = locations?.reduce((res, cur) => (res = [...res, ...cur.areas]),[])
+
   const [status, setStatus] = useState(campaign?.status);
   const [adsSet, setAdsSet] = useState<AdsSetType>(null);
   const [schedule, setSchedule] = useState({ beginTime, endTime });
-  const [screenConditions, setScreenConditions] = useState(null);
-  
+  const [screenConditions, setScreenConditions] = useState<any>(
+    targetScreenConditions || {strategy: STRATEGIES[0].key}
+  );
+  const [areaOptions, setAreaOptions] = useState<Area[]>(collectAllAreas);
   // loading handler
   const [setting, openSetting] = useState({});
   const [loading, setLoading] = useState({});
   const [openVideoLib, setOpenVideoLib] = useState(null);
   const [isChangingStatus, setChangeStatus] = useState(null);
-  
+
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const CampainHeader = (title, settingKey) => (
@@ -89,9 +108,17 @@ export default function CampaignDetails(props) {
       )}
     </div>
   );
-  const handleUpdate = (settingKey) => {
+  async function handleUpdate(settingKey) {
     toggleSetting(settingKey, false);
-  };
+    if (settingKey === LOAD_KEYS.screen && screenConditions?.detail) {
+      handleSetLoading(LOAD_KEYS.screen, true);
+      const res: any = await AdvertiserApiClient.updateCampaignTargetScreenConditions(
+        campaign.id,
+        screenConditions
+      );
+      handleSetLoading(LOAD_KEYS.screen, false);
+    }
+  }
   const toggleSetting = (title, value) => {
     const s = { ...setting, ...{ [title]: value } };
     openSetting(s);
@@ -125,28 +152,25 @@ export default function CampaignDetails(props) {
     }
     return action;
   };
-  const handleChangeStrategy = (event) => {
-    console.log(event);
-  }
+
   const STATUS_COLOR = { paused: "success", draft: "success", live: "primary" };
   // ----------------- Load Effect Data -------------------
-  
+
   useEffect(() => {
     fetchAds();
   }, [campaign]);
-  
-  useEffect(() => {
-    const conditions:any = {}
-    conditions.strategy = STRATEGIES[0].key
-    conditions.detail = {rules : []}
-    setScreenConditions(conditions)
-  }, [locations])
+
   // ---------------------- API funct --------------------
   const fetchAds = async () => {
     if (!campaign) return;
     handleSetLoading(LOAD_KEYS.adsSet, true);
     const res: any = await AdvertiserApiClient.getCampaignAdsSet(campaign.id);
-    if (res && res.data) setAdsSet(res.data[0]);
+    if (res && res.data) {
+      res.data[0].adsSetMediaList = res.data[0].adsSetMediaList?.filter(
+        (e) => !!e.withMedia
+      );
+      setAdsSet(res.data[0]);
+    }
     handleSetLoading(LOAD_KEYS.adsSet, false);
   };
 
@@ -173,7 +197,7 @@ export default function CampaignDetails(props) {
     });
     if (res?.data) {
       setAdsSet({ ...adsSet, adsSetMediaList: res.data });
-      setSuccessMsg('Updated')
+      setSuccessMsg("Updated");
     }
     handleSetLoading(LOAD_KEYS.adsSet, false);
   };
@@ -196,220 +220,322 @@ export default function CampaignDetails(props) {
     await updateMediaReq(formatMediaRequest(newOrderMedia));
   };
   const handleChangeSchedule = async (changeData) => {
-    setSchedule({...schedule, ...changeData });
-    handleSetLoading(LOAD_KEYS.schedule, true)
-    const res:any = await AdvertiserApiClient.updateCampaignSchedule(adsSet?.id, schedule)
-    if (res['error']) {
-      setErrorMsg(res['error']['data']['error']['message'])
+    setSchedule({ ...schedule, ...changeData });
+    handleSetLoading(LOAD_KEYS.schedule, true);
+    const res: any = await AdvertiserApiClient.updateCampaignSchedule(
+      adsSet?.id,
+      schedule
+    );
+    if (res["error"]) {
+      setErrorMsg(res["error"]["data"]["error"]["message"]);
     }
     if (res?.data) {
-      setSuccessMsg('Updated Schedule')
+      setSuccessMsg("Updated Schedule");
     }
-    handleSetLoading(LOAD_KEYS.schedule, false)
+    handleSetLoading(LOAD_KEYS.schedule, false);
   };
+  // ----------------- handle Conditions Setting --------------
+  function handleChangeConditions(changeData) {
+    setScreenConditions({ ...screenConditions, ...changeData });
+  }
+
+  function handleChangeStrategy(event) {
+    handleChangeConditions({ strategy: STRATEGIES[0].key });
+  }
+  function handleLocationSelect(selectData) {
+    const choseLocations = locations?.filter((e) =>
+      selectData.includes(e.name)
+    );
+    //
+    if (choseLocations?.length) {
+      let collectAreas = [];
+      choseLocations.map(
+        (location) =>
+          (collectAreas = [...collectAreas, ...location.areas].filter(
+            (e) => !collectAreas.includes(e)
+          ))
+      );
+      console.log({ collectAreas });
+      setAreaOptions(collectAreas);
+    }
+    //
+    const conditions = screenConditions || {};
+    if (!conditions.detail) conditions.detail = { rules: [] };
+    conditions.detail.rules[0] = {
+      ruleTypes: "LOCATION",
+      value: {
+        locationRecIds: choseLocations.map((e) => e.recId),
+        locationIds: choseLocations.map((e) => e.id),
+      },
+    };
+    handleChangeConditions(conditions);
+  }
+  async function handleAreaSelect(selectAreas) {
+    const choseAreas = areaOptions?.filter((a) => selectAreas.includes(a.name));
+    const conditions = screenConditions || {};
+    if (!conditions.detail) conditions.detail = { rules: [] };
+    conditions.detail.rules[1] = {
+      ruleTypes: "AREA",
+      value: {
+        areaRecIds: choseAreas.map((e) => e.recId),
+        areaIds: choseAreas.map((e) => e.id),
+      },
+    };
+    const areaIds = choseAreas.map((a) => a.id);
+    if (!areaIds?.length) {
+      handleChangeConditions(conditions);
+      return
+    }
+    handleSetLoading(LOAD_KEYS.screen, true);
+    const screenData = await loadAllScreen(areaIds);
+    conditions.detail.rules[2] = {
+      ruleTypes: "SCREENS",
+      value: {
+        screenRecIds: screenData.map((e) => e.recId),
+        screenIds: screenData.map((e) => e.id),
+      },
+    };
+    handleChangeConditions(conditions);
+    handleSetLoading(LOAD_KEYS.screen, false);
+  }
+  useEffect(() => {
+    console.log({ screenConditions });
+  }, [screenConditions]);
+  function handleInitValue(ids, storedValues) {
+    return (
+      (storedValues &&
+        ids &&
+        storedValues?.filter((e) => ids?.includes(e.id))) ||
+      null
+    );
+  }
+  // const initScreenIds = rules?.find(e => e.ruleTypes === "SCREENS")?.value?.screenIds
+  const initLocations = handleInitValue(initLocationIds, locations);
+  const initAreas = handleInitValue(initAreaIds, collectAllAreas);
   return (
     <>
-      <Toaster type='error' handleSetToast={setErrorMsg} message={errorMsg} />
-      <Toaster type='success' handleSetToast={setSuccessMsg} message={successMsg} />
-      <SubLayout
-        header={
-          <div className={styles.header}>
-            <div className={styles.headerItems}>
-              <AdsliveIcon
-                variant={ADSLIVE_ICON_VARIANT.FULL_LEFT_ARROW}
-                className={styles.icon}
-                type={ADSLIVE_ICON_TYPE.BOLD}
-                size={ADSLIVE_ICON_SIZE.SMALL}
-                onClick={returnPreLayout}
-              />
-              <AdsliveH4>{campaign?.name}</AdsliveH4>
-              <StatusBadge status={status} />
-            </div>
-            <AdButton
-              icon={<AdIcon name={actionOnStatus()} />}
-              title={parseTitle(actionOnStatus())}
-              onClick={() => handleUpdateCampaignStatus(actionOnStatus())}
-              variant={STATUS_COLOR[status]}
-              isLoading={isChangingStatus}
-            />
-          </div>
-        }
-        content={
-          <div className={styles.campaignContainer}>
-            <AdCard
-              fullView
-              toggle
-              toggled={setting[LOAD_KEYS.adsSet]}
-              header={CampainHeader(adsSet?.name, LOAD_KEYS.adsSet)}
-              body={
-                <div className={`${styles.cardBody}`}>
-                  <div className={styles.info}>
-                    <span>
-                      <InfoText size="lg">
-                        {adsSet?.adsSetMediaList.length || "-"}
-                      </InfoText>{" "}
-                      videos
-                    </span>
-                    <span>
-                      <InfoText size="lg">-</InfoText> played
-                    </span>
-                  </div>
-                  <Divider style={{ padding: 0 }} />
-                  {setting[LOAD_KEYS.adsSet] ? (
-                    <>
-                      <CardDragWrapper
-                        items={adsSet?.adsSetMediaList.map((e) => ({
-                          id: e.recId.toString(),
-                          content: (
-                            <div key={e.id}>
-                              <CardDragItem
-                                onDelete={(event) => {
-                                  event.stopPropagation();
-                                  handleDeleteMedia(e.recId);
-                                }}
-                              >
-                                {/* <AdIcon
+      {!locations ? (
+        <AdsliveLoading />
+      ) : (
+        <>
+          <Toaster
+            type="error"
+            handleSetToast={setErrorMsg}
+            message={errorMsg}
+          />
+          <Toaster
+            type="success"
+            handleSetToast={setSuccessMsg}
+            message={successMsg}
+          />
+          <SubLayout
+            header={
+              <div className={styles.header}>
+                <div className={styles.headerItems}>
+                  <AdsliveIcon
+                    variant={ADSLIVE_ICON_VARIANT.FULL_LEFT_ARROW}
+                    className={styles.icon}
+                    type={ADSLIVE_ICON_TYPE.BOLD}
+                    size={ADSLIVE_ICON_SIZE.SMALL}
+                    onClick={returnPreLayout}
+                  />
+                  <AdsliveH4>{campaign?.name}</AdsliveH4>
+                  <StatusBadge status={status} />
+                </div>
+                <AdButton
+                  icon={<AdIcon name={actionOnStatus()} />}
+                  title={parseTitle(actionOnStatus())}
+                  onClick={() => handleUpdateCampaignStatus(actionOnStatus())}
+                  variant={STATUS_COLOR[status]}
+                  isLoading={isChangingStatus}
+                />
+              </div>
+            }
+            content={
+              <div className={styles.campaignContainer}>
+                <AdCard
+                  fullView
+                  toggle
+                  toggled={setting[LOAD_KEYS.adsSet]}
+                  header={CampainHeader(adsSet?.name, LOAD_KEYS.adsSet)}
+                  body={
+                    <div className={`${styles.cardBody}`}>
+                      <div className={styles.info}>
+                        <span>
+                          <InfoText size="lg">
+                            {adsSet?.adsSetMediaList.length || "-"}
+                          </InfoText>{" "}
+                          videos
+                        </span>
+                        <span>
+                          <InfoText size="lg">-</InfoText> played
+                        </span>
+                      </div>
+                      <Divider style={{ padding: 0 }} />
+                      {setting[LOAD_KEYS.adsSet] ? (
+                        <>
+                          <CardDragWrapper
+                            items={adsSet?.adsSetMediaList.map((e) => ({
+                              id: e.recId.toString(),
+                              content: (
+                                <div key={e.id}>
+                                  <CardDragItem
+                                    onDelete={(event) => {
+                                      event.stopPropagation();
+                                      handleDeleteMedia(e.recId);
+                                    }}
+                                  >
+                                    {/* <AdIcon
                                 url={withMedia.url}
                                 r="2px"
                                 w="24px"
                                 mr="8px"
                               /> */}
-                                <span>{e.withMedia.name}</span>
-                              </CardDragItem>
-                              <Divider />
-                            </div>
-                          ),
-                        }))}
-                        onChange={(change) => handleChangeOrder(change)}
-                      />
-                      <AdButton
-                        cardBtn
-                        ghost
-                        icon={<AdIcon name="circle-bold" w="24px" />}
-                        title="ADD MORE VIDEOS"
-                        style={{ padding: "20px" }}
-                        onClick={() => setOpenVideoLib(true)}
-                      />
-                    </>
-                  ) : (
-                    <div>
-                      {videos?.map((video) => (
-                        <span key={video.name} className={styles.icon}>
-                          <AdIcon url={video.photoUrl} r="2px" w="24px" />
-                        </span>
-                      ))}
-                      <MutedText>{`${adsSet?.adsSetMediaList?.length || 0} videos`}</MutedText>
+                                    <span>{e.withMedia?.name}</span>
+                                  </CardDragItem>
+                                  <Divider />
+                                </div>
+                              ),
+                            }))}
+                            onChange={(change) => handleChangeOrder(change)}
+                          />
+                          <AdButton
+                            cardBtn
+                            ghost
+                            icon={<AdIcon name="circle-bold" w="24px" />}
+                            title="ADD MORE VIDEOS"
+                            style={{ padding: "20px" }}
+                            onClick={() => setOpenVideoLib(true)}
+                          />
+                        </>
+                      ) : (
+                        <div>
+                          {videos?.map((video) => (
+                            <span key={video.name} className={styles.icon}>
+                              <AdIcon url={video.photoUrl} r="2px" w="24px" />
+                            </span>
+                          ))}
+                          <MutedText>{`${
+                            adsSet?.adsSetMediaList?.length || 0
+                          } videos`}</MutedText>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              }
+                  }
+                />
+                <AdCard
+                  fullView
+                  toggle
+                  toggled={setting[LOAD_KEYS.screen]}
+                  header={CampainHeader("Screen", LOAD_KEYS.screen)}
+                  body={
+                    <div className={styles.cardBody}>
+                      <div className={styles.info}>
+                        <span>
+                          <InfoText size="lg">13</InfoText> Screens
+                        </span>
+                        <span>
+                          <InfoText size="lg">1</InfoText> Location
+                        </span>
+                      </div>
+                      {setting[LOAD_KEYS.screen] && (
+                        <>
+                          <Divider />
+                          <CardSelect
+                            title="Choose strategy"
+                            initValue={[STRATEGIES[0].desc]}
+                            values={[STRATEGIES[0].desc]}
+                            onChange={(event) => handleChangeStrategy(event)}
+                          />
+                          <CardMultiSelect
+                            title="Location"
+                            initValue={initLocations?.map((e) => e.name)}
+                            values={locations?.map((e) => e.name)}
+                            onChange={handleLocationSelect}
+                          />
+                          <CardMultiSelect
+                            title="Area"
+                            initValue={initAreas?.map((e) => e.name)}
+                            values={(areaOptions || initAreas)?.map(
+                              (area) => area.name
+                            )}
+                            onChange={handleAreaSelect}
+                          />
+                          <CardSelect
+                            title="Free time"
+                            initValue={["has any value"]}
+                            values={[]}
+                            onChange={(event) => {
+                              console.log(event);
+                            }}
+                          />
+                          <AdButton
+                            cardBtn
+                            ghost
+                            icon={<AdIcon name="circle-bold" w="24px" />}
+                            title="ADD MORE RULES"
+                            style={{ padding: "20px" }}
+                            onClick={() => null}
+                          />
+                        </>
+                      )}
+                    </div>
+                  }
+                />
+                <AdCard
+                  fullView
+                  toggle
+                  toggled={setting[LOAD_KEYS.schedule]}
+                  header={CampainHeader("Schedule", LOAD_KEYS.schedule)}
+                  body={
+                    <div className={styles.cardBody}>
+                      <div className={styles.info}>
+                        <span>
+                          Start{" "}
+                          <InfoText>
+                            {displayTime(schedule?.beginTime)}
+                          </InfoText>
+                        </span>
+                        <span>
+                          End{" "}
+                          <InfoText>{displayTime(schedule?.endTime)}</InfoText>
+                        </span>
+                      </div>
+                      {setting[LOAD_KEYS.schedule] && (
+                        <>
+                          <Divider />
+                          <CardSelectTime
+                            title="Start at"
+                            initValue={schedule?.beginTime}
+                            values={[]}
+                            onChange={(change) =>
+                              handleChangeSchedule({ beginTime: change })
+                            }
+                          />
+                          <CardSelectTime
+                            title="End at"
+                            initValue={schedule?.endTime}
+                            values={[]}
+                            onChange={(change) =>
+                              handleChangeSchedule({ endTime: change })
+                            }
+                          />
+                        </>
+                      )}
+                    </div>
+                  }
+                />
+              </div>
+            }
+          />
+          {adsSet && (
+            <SelectVideosModal
+              handleShow={{ openVideoLib, setOpenVideoLib }}
+              adsSet={adsSet}
+              onChange={updateAdsSet}
             />
-            <AdCard
-              fullView
-              toggle
-              toggled={setting[LOAD_KEYS.screen]}
-              header={CampainHeader("Screen", LOAD_KEYS.screen)}
-              body={
-                <div className={styles.cardBody}>
-                  <div className={styles.info}>
-                    <span>
-                      <InfoText size="lg">13</InfoText> Screens
-                    </span>
-                    <span>
-                      <InfoText size="lg">1</InfoText> Location
-                    </span>
-                  </div>
-                  {setting[LOAD_KEYS.screen] && (
-                    <>
-                      <Divider />
-                      <CardSelect
-                        title="Choose SCREEN enters the campaign"
-                        initValue={STRATEGIES[0].desc}
-                        values={[STRATEGIES[0].desc]}
-                        onChange={(event) => handleChangeStrategy(event)}
-                      />
-                      <CardSelect
-                        title="Location"
-                        initValue="Multi choice"
-                        values={[]}
-                        onChange={(event) => {
-                          console.log(event);
-                        }}
-                      />
-                      <CardSelect
-                        title="Area"
-                        initValue="Muti choice"
-                        values={[]}
-                        onChange={(event) => {
-                          console.log(event);
-                        }}
-                      />
-                      <CardSelect
-                        title="Free time"
-                        initValue="has any value"
-                        values={[]}
-                        onChange={(event) => {
-                          console.log(event);
-                        }}
-                      />
-                      <AdButton
-                        cardBtn
-                        ghost
-                        icon={<AdIcon name="circle-bold" w="24px" />}
-                        title="ADD MORE RULES"
-                        style={{ padding: "20px" }}
-                        onClick={() => null}
-                      />
-                    </>
-                  )}
-                </div>
-              }
-            />
-            <AdCard
-              fullView
-              toggle
-              toggled={setting[LOAD_KEYS.schedule]}
-              header={CampainHeader("Schedule", LOAD_KEYS.schedule)}
-              body={
-                <div className={styles.cardBody}>
-                  <div className={styles.info}>
-                    <span>
-                      Start{" "}
-                      <InfoText>{displayTime(schedule?.beginTime)}</InfoText>
-                    </span>
-                    <span>
-                      End <InfoText>{displayTime(schedule?.endTime)}</InfoText>
-                    </span>
-                  </div>
-                  {setting[LOAD_KEYS.schedule] && (
-                    <>
-                      <Divider />
-                      <CardSelectTime
-                        title="Start at"
-                        initValue={schedule?.beginTime}
-                        values={[]}
-                        onChange={(change) => handleChangeSchedule({beginTime: change})}
-                      />
-                      <CardSelectTime
-                        title="End at"
-                        initValue={schedule?.endTime}
-                        values={[]}
-                        onChange={(change) => handleChangeSchedule({endTime: change})}
-                      />
-                    </>
-                  )}
-                </div>
-              }
-            />
-          </div>
-        }
-      />
-      {adsSet && (
-        <SelectVideosModal
-          handleShow={{ openVideoLib, setOpenVideoLib }}
-          adsSet={adsSet}
-          onChange={updateAdsSet}
-        />
+          )}
+        </>
       )}
     </>
   );
