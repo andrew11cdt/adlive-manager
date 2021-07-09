@@ -23,12 +23,13 @@ export default function VideoDetails(props) {
   const [dataState, setDataState] = useState(videoData);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [dataChanged, setDataChanged] = useState(null);
   const addArea = (area) => {};
-  const handleInputChange = (key, event) => {
+  function handleInputChange(key, event) {
     const val = event.target.value;
     setDataState({ ...dataState, ...{ [key]: val } });
   };
-  const handleInputFocusOut = async (key, event) => {
+  async function handleInputFocusOut(key, event) {
     if (dataState) {
       const body = { [key]: dataState[key] };
       if (isNew) return
@@ -37,24 +38,28 @@ export default function VideoDetails(props) {
       if (res.data) {
         setDataState(res.data)
         setSuccessMsg('Updated successful')
+        setDataChanged(true)
       } else if (res.error) setError(res.error)
     }
   };
-  const handleNewData = (data) => {
-    console.log(data);
+  function handleNewData(data) {
     const url = data?.secure_url, name = data?.original_filename
-    if (url) setDataState({ ...dataState, ...{url, name}});
+    if (url) {
+      setDataState({ ...dataState, ...{url, name}})
+      handleUploadVideo({url, name})
+    }
   }
-  const handleUploadVideo = async() => {
+  async function handleUploadVideo(data?) {
     if (isNew) {
-      const body = dataState;
+      const body = data || dataState;
       console.log("create new", body);
       if (!body['name'] || !body['url']) return
       const res:any = await AdvertiserApiClient.postVideo(body);
       if (res.data) {
         setDataState(res.data);
         await timeout(500)
-        returnPreLayout()
+        setDataChanged(true)
+        returnPreLayout({ changed: dataChanged })
       }
     }
   }
@@ -70,7 +75,7 @@ export default function VideoDetails(props) {
               className={styles.icon}
               type={ADSLIVE_ICON_TYPE.BOLD}
               size={ADSLIVE_ICON_SIZE.SMALL}
-              onClick={returnPreLayout}
+              onClick={() => returnPreLayout({ changed: dataChanged })}
             />
             <AdsliveH4>{videoData.name || 'Upload video'}</AdsliveH4>
           </div>
@@ -108,13 +113,13 @@ export default function VideoDetails(props) {
                 />
               </>
             }
-            footer={
-              <>
-                {isNew && !dataState.id &&
-                  <AdButton style={{ justifyContent: 'center' }} cardBtn title="Upload" onClick={() => handleUploadVideo()} />
-                }
-              </>
-            }
+            // footer={
+            //   <>
+            //     {isNew && !dataState.id &&
+            //       <AdButton style={{ justifyContent: 'center' }} cardBtn title="Upload" onClick={() => handleUploadVideo()} />
+            //     }
+            //   </>
+            // }
           />
         </div>
       }

@@ -149,6 +149,12 @@
   width: 100%;
   justify-content: space-between;
   padding: 0 25px;
+  .leftItem {
+    display: flex;
+    align-items: center;
+    max-width: 255px;
+    margin: 6px 0;
+  }
 }
 .datePickerContainer {
   .datePicker {

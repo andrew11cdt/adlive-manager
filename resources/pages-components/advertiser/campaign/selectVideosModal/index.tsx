@@ -5,9 +5,9 @@ import { MutedText } from "../../../../components/typography";
 import VideosPlayer from "../../../../components/videos-player";
 import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { AdIcon } from "../../../../components/icon";
-import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
+import { VideoType } from "../../video";
 export interface NewMedia {
-  withMediaRecId: string,
+  withMedia: VideoType,
   order: number
 }
 export default function SelectVideosModal(props) {
@@ -16,11 +16,13 @@ export default function SelectVideosModal(props) {
   const [videoLib, setVideoLib] = useState([]);
   const [selectedVideos, setSelectVideo] = useState([]);
   useEffect(()=> {
-    const addedMediaVideos = adsSet?.adsSetMediaList.map(e => e.withMedia) || []
-    setVideoLib(allVideos.filter(v => !addedMediaVideos.find(data => data.id == v.id)))
+    console.log(adsSet);
+    
+    const addedMediaVideos = adsSet?.adsSetMediaList?.map(e => e.withMedia).filter(e => e) || []
+    const lib = allVideos.filter(v => !addedMediaVideos?.find(data => data.id == v.id))
+    if(lib?.length) setVideoLib(lib)
     return ()=> {
       setSelectVideo([])
-      console.log(this);
     }
   }, [adsSet])
   const handleSelectVideo = (video) => {
@@ -31,11 +33,9 @@ export default function SelectVideosModal(props) {
   const handleAddVideos = async () => {
     if (!selectedVideos.length) return;
     const newMedia: NewMedia[] = selectedVideos.map((video, i) => ({
-      withMediaRecId: video.recId,
+      withMedia: video,
       order: i,
     }));
-    console.log('OnChange');
-    
     onChange(newMedia)
   };
   const checkSelected = (video) =>

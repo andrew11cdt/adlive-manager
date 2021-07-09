@@ -69,8 +69,6 @@ export function CardSelect(props: CardSelectInput) {
 export function CardMultiSelect(props: CardSelectInput) {
   const { title, initValue, values, onChange, disabled } = props;
   const [selectedValue, setSelectValue] = useState<any[]>(initValue || []);
-  console.log(selectedValue, values);
-  
   const [showDrop, setShowDrop] = useState(false);
   const [isSelectAll, setSelectAll] = useState(false);
   const config = { show: showDrop };
@@ -134,12 +132,9 @@ export function CardMultiSelect(props: CardSelectInput) {
                 }}
               >
                 {value}
-                <input
-                  readOnly
-                  style={{ marginLeft: "6px" }}
-                  type="checkbox"
-                  checked={checkInclude(value)}
-                />
+                {checkInclude(value) &&
+                  <AdIcon name="check-in-a-circle-highlight" style={{ marginLeft: "6px" }}/>
+                }
               </Dropdown.Item>
             );
           })}
@@ -182,10 +177,10 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
 export function CardDragItem({ onDelete, children }) {
   return (
     <div className={styles.cardDragItem}>
-      <span>
+      <div className={styles.leftItem}>
         <AdIcon name="drag" mr="20px" h="48px" w="12px" />
         {children}
-      </span>
+      </div>
       <AdsliveIcon
         className={styles.icon}
         variant={ADSLIVE_ICON_VARIANT.MINUS_CIRCLE}

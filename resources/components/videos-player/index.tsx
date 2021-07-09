@@ -17,7 +17,6 @@ export default function VideosPlayer(props) {
   const { data, onClickPreview, isPreview } = props;
   const [playing, setPlaying] = useState(false);
   const [showInfo, setShowInfo] = useState(true);
-  console.log(getVideosUrl(data));
   return (
     <div className={styles.playerWrapper}>
       {data && (

@@ -25,6 +25,7 @@ export default function AdvertiserVideo() {
   const [showDetails, setShowDetails] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(null);
   const [loading, setLoading] = useState(null);
+  const [dataChanged, setDataChange] = useState(null);
   
   const handleDelete = async () => {
     setShowConfirmDelete(false)
@@ -42,7 +43,10 @@ export default function AdvertiserVideo() {
     }
   };
   useEffect(() => {
-    if (!showNew && !showDetails) loadVideos();
+    if (!showNew && !showDetails && dataChanged) {
+      loadVideos();
+      setDataChange(false)
+    }
   }, [showNew, showDetails]);
   const loadVideos = async () => {
     setLoading(true)
@@ -58,7 +62,10 @@ export default function AdvertiserVideo() {
         <>
           <VideoDetails
             videoData={detailsVideo}
-            returnPreLayout={() => setShowDetails(false)}
+            returnPreLayout={({changed}) => {
+              setShowDetails(false)
+              setDataChange(changed)
+            }}
             deleteData={() => setShowConfirmDelete(true)}
           />
         </>

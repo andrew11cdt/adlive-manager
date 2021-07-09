@@ -26,57 +26,43 @@ import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 import { displayTime, parseTitle } from "../../../../utils/common.util";
 import SelectVideosModal from "../selectVideosModal";
-import { VideoType } from "../../video";
 import AdsliveLoading from "../../../../components/loading";
 import { Toaster } from "../../../../components/toaster";
 import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { Area } from "../../../../stores/advertiser-store/advertiser-store.context";
-export const CAMPAIGN_STATUSES = ["live", "pause"];
-enum LOAD_KEYS {
-  adsSet = "ads-set",
-  screen = "screen",
-  schedule = "schedule",
-}
-const STRATEGIES = [
-  {
-    key: "SCREEN_MATCH_ALL_RULES",
-    desc: "All screen matching all of these rules",
-  },
-];
-export interface AdsSetMedia {
-  id: string;
-  order: number;
-  recId: string;
-  withMedia: VideoType;
-}
-export interface AdsSetType {
-  adsSetMediaList: AdsSetMedia[];
-  id: string;
-  name: string;
-  recId: string;
-}
+import ConfirmModal from "../../../../components/confirmModal";
+import {
+  ActionOnStatus,
+  AdsSetType,
+  ChangedData,
+  LOAD_KEYS,
+  STATUS_COLOR,
+  STRATEGIES,
+} from "./campaign-type";
+
 export default function CampaignDetails(props) {
   const { locations, loadAllScreen } = useAdvertiserStore();
   const { returnPreLayout, campaign } = props;
   const {
     videos,
-    name,
     beginTime,
     endTime,
     targetScreenConditions: { detail: { rules = [] } = {} } = {},
     targetScreenConditions,
   } = campaign || {};
-  
-  const initLocationIds = rules?.find((e) => e.ruleTypes === "LOCATION")?.value?.locationIds
-  const initAreaIds = rules?.find((e) => e.ruleTypes === "AREA")?.value?.areaIds
-  const collectAllAreas = locations?.reduce((res, cur) => (res = [...res, ...cur.areas]),[])
+
+  const collectAllAreas = locations?.reduce(
+    (res, cur) => (res = [...res, ...cur.areas]),
+    []
+  );
 
   const [status, setStatus] = useState(campaign?.status);
   const [adsSet, setAdsSet] = useState<AdsSetType>(null);
   const [schedule, setSchedule] = useState({ beginTime, endTime });
-  const [screenConditions, setScreenConditions] = useState<any>(
-    targetScreenConditions || {strategy: STRATEGIES[0].key}
-  );
+  const [screenConditions, setScreenConditions] = useState<any>({
+    ...targetScreenConditions,
+    strategy: STRATEGIES[0].key,
+  });
   const [areaOptions, setAreaOptions] = useState<Area[]>(collectAllAreas);
   // loading handler
   const [setting, openSetting] = useState({});
@@ -84,8 +70,27 @@ export default function CampaignDetails(props) {
   const [openVideoLib, setOpenVideoLib] = useState(null);
   const [isChangingStatus, setChangeStatus] = useState(null);
 
+  const [initLocations, setInitLocations] = useState(null);
+  const [initAreas, setInitAreas] = useState(null);
+
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [changedData, setChangedData] = useState<ChangedData>({
+    "ads-set": null,
+    screen: null,
+    schedule: null,
+  });
+  function requestAPI(loadKey: LOAD_KEYS, data) {
+    if (loadKey === LOAD_KEYS.adsSet)
+      return AdvertiserApiClient.updateAdsSetMedia(adsSet.id, data);
+    if (loadKey === LOAD_KEYS.screen)
+      return AdvertiserApiClient.updateCampaignTargetScreenConditions(
+        campaign.id,
+        data
+      );
+    if (loadKey === LOAD_KEYS.schedule)
+      return AdvertiserApiClient.updateCampaignSchedule(adsSet.id, data);
+  }
   const CampainHeader = (title, settingKey) => (
     <div className={styles.campaignHeader}>
       <AdsliveH4>{title}</AdsliveH4>
@@ -110,13 +115,19 @@ export default function CampaignDetails(props) {
   );
   async function handleUpdate(settingKey) {
     toggleSetting(settingKey, false);
-    if (settingKey === LOAD_KEYS.screen && screenConditions?.detail) {
-      handleSetLoading(LOAD_KEYS.screen, true);
-      const res: any = await AdvertiserApiClient.updateCampaignTargetScreenConditions(
-        campaign.id,
-        screenConditions
-      );
-      handleSetLoading(LOAD_KEYS.screen, false);
+    const REQ_DATA = changedData[settingKey];
+
+    console.log({ REQ_DATA });
+    if (REQ_DATA) {
+      handleSetLoading(settingKey, true);
+      const res: any = await requestAPI(settingKey, REQ_DATA);
+      if (res) {
+        setSuccessMsg("Updated");
+        if (settingKey === LOAD_KEYS.adsSet && res.data) setAdsSet({ ...adsSet, adsSetMediaList: res.data })
+        else if (settingKey === LOAD_KEYS.schedule) setSuccessMsg("Updated Schedule")
+        setChangedData({ ...changedData, [settingKey]: null });
+      }
+      handleSetLoading(settingKey, false);
     }
   }
   const toggleSetting = (title, value) => {
@@ -135,31 +146,23 @@ export default function CampaignDetails(props) {
       withMediaRecId: withMediaRecId || withMedia?.recId,
       order: i,
     }));
-  const actionOnStatus = () => {
-    let action;
-    switch (status) {
-      case "draft":
-        action = "live";
-        break;
-      case "live":
-        action = "paused";
-        break;
-      case "paused":
-        action = "live";
-        break;
-      default:
-        break;
-    }
-    return action;
-  };
 
-  const STATUS_COLOR = { paused: "success", draft: "success", live: "primary" };
   // ----------------- Load Effect Data -------------------
 
   useEffect(() => {
     fetchAds();
   }, [campaign]);
-
+  useEffect(() => {
+    const rules = screenConditions?.detail?.rules
+    if (!rules?.length) return
+    const initLocationIds = rules.find((e) => e.ruleTypes === "LOCATION")?.value?.locationIds
+    const initAreaIds = rules.find((e) => e.ruleTypes === "AREA")?.value?.areaIds
+    const loadLocations = handleInitValue(initLocationIds, locations)
+    const initAreas = handleInitValue(initAreaIds, collectAllAreas);
+    
+    if (loadLocations?.length) setInitLocations(loadLocations);
+    if (initAreas?.length) setInitAreas(initAreas);
+  }, [screenConditions]);
   // ---------------------- API funct --------------------
   const fetchAds = async () => {
     if (!campaign) return;
@@ -190,53 +193,52 @@ export default function CampaignDetails(props) {
     await updateMediaReq(mergeData);
   };
   const updateMediaReq = async (newMediaList) => {
-    handleSetLoading(LOAD_KEYS.adsSet, true);
-    newMediaList = formatMediaRequest(newMediaList);
-    const res: any = await AdvertiserApiClient.updateAdsSetMedia(adsSet.id, {
-      adsSetMediaList: newMediaList,
+    const newMediaListReq = formatMediaRequest(newMediaList);
+    setChangedData({
+      ...changedData,
+      [LOAD_KEYS.adsSet]: {
+        adsSetMediaList: newMediaListReq,
+      },
     });
-    if (res?.data) {
-      setAdsSet({ ...adsSet, adsSetMediaList: res.data });
-      setSuccessMsg("Updated");
-    }
-    handleSetLoading(LOAD_KEYS.adsSet, false);
+    setAdsSet({ ...adsSet, adsSetMediaList: newMediaList });
+    
+    // const res: any = await AdvertiserApiClient.updateAdsSetMedia(adsSet.id, {
+    //   adsSetMediaList: newMediaList,
+    // });
+    // if (res?.data) {
+    //   setAdsSet({ ...adsSet, adsSetMediaList: res.data });
+    //   setSuccessMsg("Updated");
+    // }
   };
   const handleDeleteMedia = async (recId) => {
+    // todo
     if (!adsSet?.adsSetMediaList?.length) return;
     const filteredData = adsSet.adsSetMediaList.filter(
-      (e) => e.recId !== recId
+      (e) => (e.recId || e.withMedia.recId) !== recId
     );
     await updateMediaReq(filteredData);
   };
   const handleChangeOrder = async (changeData) => {
     const arrangeIds = changeData.map((e) => e.id);
     const newOrderMedia = arrangeIds.map((recId, i) => {
-      const refMedia = adsSet.adsSetMediaList.find((e) => e.recId === recId);
+      const refMedia = adsSet.adsSetMediaList.find((e) => (e.recId || e.withMedia.recId) === recId);
       return {
         ...refMedia,
         order: i,
       };
     });
-    await updateMediaReq(formatMediaRequest(newOrderMedia));
+    await updateMediaReq(newOrderMedia);
   };
   const handleChangeSchedule = async (changeData) => {
-    setSchedule({ ...schedule, ...changeData });
-    handleSetLoading(LOAD_KEYS.schedule, true);
-    const res: any = await AdvertiserApiClient.updateCampaignSchedule(
-      adsSet?.id,
-      schedule
-    );
-    if (res["error"]) {
-      setErrorMsg(res["error"]["data"]["error"]["message"]);
-    }
-    if (res?.data) {
-      setSuccessMsg("Updated Schedule");
-    }
-    handleSetLoading(LOAD_KEYS.schedule, false);
+    const newSchedule = { ...schedule, ...changeData }
+    setSchedule(newSchedule);
+    setChangedData({...changedData, schedule: newSchedule})
   };
   // ----------------- handle Conditions Setting --------------
   function handleChangeConditions(changeData) {
-    setScreenConditions({ ...screenConditions, ...changeData });
+    const newConditions = { ...screenConditions, ...changeData };
+    setScreenConditions(newConditions);
+    setChangedData({ ...changedData, [LOAD_KEYS.screen]: newConditions });
   }
 
   function handleChangeStrategy(event) {
@@ -255,7 +257,6 @@ export default function CampaignDetails(props) {
             (e) => !collectAreas.includes(e)
           ))
       );
-      console.log({ collectAreas });
       setAreaOptions(collectAreas);
     }
     //
@@ -284,7 +285,7 @@ export default function CampaignDetails(props) {
     const areaIds = choseAreas.map((a) => a.id);
     if (!areaIds?.length) {
       handleChangeConditions(conditions);
-      return
+      return;
     }
     handleSetLoading(LOAD_KEYS.screen, true);
     const screenData = await loadAllScreen(areaIds);
@@ -298,22 +299,29 @@ export default function CampaignDetails(props) {
     handleChangeConditions(conditions);
     handleSetLoading(LOAD_KEYS.screen, false);
   }
-  useEffect(() => {
-    console.log({ screenConditions });
-  }, [screenConditions]);
-  function handleInitValue(ids, storedValues) {
+
+  function handleInitValue(ids, items) {
+    return (items && ids && items?.filter((e) => ids?.includes(e.id))) || null;
+  }
+  const [deleteRecId, setSDeleteRecId] = useState(null);
+  function confirmDeleteModal() {
     return (
-      (storedValues &&
-        ids &&
-        storedValues?.filter((e) => ids?.includes(e.id))) ||
-      null
+      deleteRecId && (
+        <ConfirmModal
+          title="Delete Media"
+          onExecute={() => {
+            setSDeleteRecId(null);
+            handleDeleteMedia(deleteRecId);
+          }}
+          show={deleteRecId}
+          setShow={setSDeleteRecId}
+        />
+      )
     );
   }
-  // const initScreenIds = rules?.find(e => e.ruleTypes === "SCREENS")?.value?.screenIds
-  const initLocations = handleInitValue(initLocationIds, locations);
-  const initAreas = handleInitValue(initAreaIds, collectAllAreas);
   return (
     <>
+      {confirmDeleteModal()}
       {!locations ? (
         <AdsliveLoading />
       ) : (
@@ -343,9 +351,9 @@ export default function CampaignDetails(props) {
                   <StatusBadge status={status} />
                 </div>
                 <AdButton
-                  icon={<AdIcon name={actionOnStatus()} />}
-                  title={parseTitle(actionOnStatus())}
-                  onClick={() => handleUpdateCampaignStatus(actionOnStatus())}
+                  icon={<AdIcon name={ActionOnStatus(status)} />}
+                  title={parseTitle(ActionOnStatus(status))}
+                  onClick={() => handleUpdateCampaignStatus(ActionOnStatus(status))}
                   variant={STATUS_COLOR[status]}
                   isLoading={isChangingStatus}
                 />
@@ -375,14 +383,14 @@ export default function CampaignDetails(props) {
                       {setting[LOAD_KEYS.adsSet] ? (
                         <>
                           <CardDragWrapper
-                            items={adsSet?.adsSetMediaList.map((e) => ({
-                              id: e.recId.toString(),
+                            items={adsSet?.adsSetMediaList?.map((e) => ({
+                              id: e.recId || e.withMedia?.recId,
                               content: (
                                 <div key={e.id}>
                                   <CardDragItem
                                     onDelete={(event) => {
                                       event.stopPropagation();
-                                      handleDeleteMedia(e.recId);
+                                      setSDeleteRecId(e.recId || e.withMedia.recId);
                                     }}
                                   >
                                     {/* <AdIcon
@@ -432,10 +440,16 @@ export default function CampaignDetails(props) {
                     <div className={styles.cardBody}>
                       <div className={styles.info}>
                         <span>
-                          <InfoText size="lg">13</InfoText> Screens
+                          <InfoText size="lg">
+                            {screenConditions?.detail?.rules.find((e) => e.ruleTypes === "SCREENS")?.value?.screenIds?.length}
+                          </InfoText>{" "}
+                          Screens
                         </span>
                         <span>
-                          <InfoText size="lg">1</InfoText> Location
+                          <InfoText size="lg">
+                            {initLocations?.length}
+                          </InfoText>{" "}
+                          Location
                         </span>
                       </div>
                       {setting[LOAD_KEYS.screen] && (
