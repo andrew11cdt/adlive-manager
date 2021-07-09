@@ -28,6 +28,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/advertiser.js"
+    ],
+    "/advertiser/sign-in": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/advertiser/sign-in.js"
     ]
   },
   "ampFirstPages": []
