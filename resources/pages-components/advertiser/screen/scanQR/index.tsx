@@ -63,6 +63,8 @@ export default function ScanQR({
       currentArea.id,
       data
     );
+    console.log(res.error);
+    if (res?.error) setError(`Scan QR Failed! ${res.error.data?.message || 'Sorry something went wrong!'}`);
     setLoading(false);
     if (res?.data) {
       setSuccess("Uploaded new screen successfully!");
