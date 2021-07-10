@@ -13,7 +13,7 @@ interface ToasterProps {
 }
 export const TYPE_TO_ICON = {
   success: "success",
-  warning: "attention",
+  warning: "attention-highlight",
   error: "error",
 };
 export function Toaster({

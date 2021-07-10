@@ -65,7 +65,7 @@ export default function AdvertiserScreen() {
   );
 
   return (
-    <div style={{ height: "100%", position: 'relative' }}>
+    <>
       {selectedScreen ? (
         ScreenDetailsLayout
       ) : showNewScreen ? (
@@ -137,6 +137,6 @@ export default function AdvertiserScreen() {
           )}
         </>
       )}
-    </div>
+    </>
   );
 }

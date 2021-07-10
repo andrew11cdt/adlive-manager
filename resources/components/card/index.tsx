@@ -178,13 +178,11 @@ export function CardDragItem({ onDelete, children }) {
   return (
     <div className={styles.cardDragItem}>
       <div className={styles.leftItem}>
-        <AdIcon name="drag" mr="20px" h="48px" w="12px" />
+        <AdIcon name="drag" mr="20px" h="48px" w="16px" />
         {children}
       </div>
-      <AdsliveIcon
+      <AdIcon name="minus_circle" ml="6px" w="16px"
         className={styles.icon}
-        variant={ADSLIVE_ICON_VARIANT.MINUS_CIRCLE}
-        onClick={onDelete}
       />
     </div>
   );
@@ -218,7 +216,6 @@ export function CardDragWrapper({ items, onChange }) {
       result.source.index,
       result.destination.index
     );
-    console.log(items, itemsStatus);
     setItemsStatus(items);
     onChange(items);
   }

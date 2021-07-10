@@ -3,20 +3,19 @@
 
 .advertiserAreaTabs {
   background: $whiteColor;
-  padding: 0px 16px;
+  padding: 6px 16px;
   display: flex;
   align-items: center;
   justify-content: stretch;
 
   .areas {
-    width: calc(100% - 28px);
+    max-width: calc(100% - 28px);
     overflow: auto;
     @extend .hideScrollbar;
-
     .areasList {
       display: flex;
       align-items: center;
-
+      width: fit-content;
       .area {
         cursor: pointer;
         margin-right: 16px;
@@ -44,6 +43,7 @@
   }
 
   .icon {
-    margin: 12.5px 0px 12.5px 8px;
+    position: absolute;
+    right: 16px;
   }
 }

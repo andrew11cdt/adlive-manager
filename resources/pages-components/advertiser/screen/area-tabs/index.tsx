@@ -22,7 +22,6 @@ export default function AdvertiserAreaTabs({
       <div ref={areasRef} className={styles.areas}>
         <div
           className={styles.areasList}
-          style={{ width: `calc(50% * ${areas?.length})` }}
         >
           {areas.map((area, index) => (
             <AdsliveBody16

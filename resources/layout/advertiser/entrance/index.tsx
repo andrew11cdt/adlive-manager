@@ -28,6 +28,5 @@ export default function AdvertiserEntrance({ children }) {
       </div>
     );
   }
-
   return children;
 }

@@ -43,14 +43,7 @@ import {
 export default function CampaignDetails(props) {
   const { locations, loadAllScreen } = useAdvertiserStore();
   const { returnPreLayout, campaign } = props;
-  const {
-    videos,
-    beginTime,
-    endTime,
-    targetScreenConditions: { detail: { rules = [] } = {} } = {},
-    targetScreenConditions,
-  } = campaign || {};
-
+  const { videos, beginTime, endTime, targetScreenConditions } = campaign || {};
   const collectAllAreas = locations?.reduce(
     (res, cur) => (res = [...res, ...cur.areas]),
     []
@@ -75,6 +68,7 @@ export default function CampaignDetails(props) {
 
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [warningMsg, setWarningMsg] = useState(null);
   const [changedData, setChangedData] = useState<ChangedData>({
     "ads-set": null,
     screen: null,
@@ -116,15 +110,16 @@ export default function CampaignDetails(props) {
   async function handleUpdate(settingKey) {
     toggleSetting(settingKey, false);
     const REQ_DATA = changedData[settingKey];
-
     console.log({ REQ_DATA });
     if (REQ_DATA) {
       handleSetLoading(settingKey, true);
       const res: any = await requestAPI(settingKey, REQ_DATA);
       if (res) {
         setSuccessMsg("Updated");
-        if (settingKey === LOAD_KEYS.adsSet && res.data) setAdsSet({ ...adsSet, adsSetMediaList: res.data })
-        else if (settingKey === LOAD_KEYS.schedule) setSuccessMsg("Updated Schedule")
+        if (settingKey === LOAD_KEYS.adsSet && res.data)
+          setAdsSet({ ...adsSet, adsSetMediaList: res.data });
+        else if (settingKey === LOAD_KEYS.schedule)
+          setSuccessMsg("Updated Schedule");
         setChangedData({ ...changedData, [settingKey]: null });
       }
       handleSetLoading(settingKey, false);
@@ -153,13 +148,15 @@ export default function CampaignDetails(props) {
     fetchAds();
   }, [campaign]);
   useEffect(() => {
-    const rules = screenConditions?.detail?.rules
-    if (!rules?.length) return
-    const initLocationIds = rules.find((e) => e.ruleTypes === "LOCATION")?.value?.locationIds
-    const initAreaIds = rules.find((e) => e.ruleTypes === "AREA")?.value?.areaIds
-    const loadLocations = handleInitValue(initLocationIds, locations)
+    const rules = screenConditions?.detail?.rules;
+    if (!rules?.length) return;
+    const initLocationIds = rules.find((e) => e.ruleTypes === "LOCATION")?.value
+      ?.locationIds;
+    const initAreaIds = rules.find((e) => e.ruleTypes === "AREA")?.value
+      ?.areaIds;
+    const loadLocations = handleInitValue(initLocationIds, locations);
     const initAreas = handleInitValue(initAreaIds, collectAllAreas);
-    
+
     if (loadLocations?.length) setInitLocations(loadLocations);
     if (initAreas?.length) setInitAreas(initAreas);
   }, [screenConditions]);
@@ -176,8 +173,18 @@ export default function CampaignDetails(props) {
     }
     handleSetLoading(LOAD_KEYS.adsSet, false);
   };
-
+  function checkLiveCondition() {
+    if (ActionOnStatus(status) !== 'live') return true
+    return screenConditions?.detail?.rules?.find((e) => e.ruleTypes === "SCREENS")?.value?.screenIds.length > 0 &&
+      adsSet.adsSetMediaList.length > 0 &&
+      schedule.beginTime &&
+      schedule.endTime
+  }
   const handleUpdateCampaignStatus = async (status) => {
+    if (status === "live" && !checkLiveCondition()) {
+      setWarningMsg('Please add Adsvertise video, Screens and Schedule before make Campaign go live!')
+      return
+    }
     setChangeStatus(true);
     const res: any = await AdvertiserApiClient.updateCampaign(campaign?.id, {
       status,
@@ -201,38 +208,32 @@ export default function CampaignDetails(props) {
       },
     });
     setAdsSet({ ...adsSet, adsSetMediaList: newMediaList });
-    
-    // const res: any = await AdvertiserApiClient.updateAdsSetMedia(adsSet.id, {
-    //   adsSetMediaList: newMediaList,
-    // });
-    // if (res?.data) {
-    //   setAdsSet({ ...adsSet, adsSetMediaList: res.data });
-    //   setSuccessMsg("Updated");
-    // }
   };
-  const handleDeleteMedia = async (recId) => {
-    // todo
+  const handleDeleteMedia = (recId) => {
     if (!adsSet?.adsSetMediaList?.length) return;
     const filteredData = adsSet.adsSetMediaList.filter(
       (e) => (e.recId || e.withMedia.recId) !== recId
     );
-    await updateMediaReq(filteredData);
+    updateMediaReq(filteredData);
   };
+
   const handleChangeOrder = async (changeData) => {
     const arrangeIds = changeData.map((e) => e.id);
     const newOrderMedia = arrangeIds.map((recId, i) => {
-      const refMedia = adsSet.adsSetMediaList.find((e) => (e.recId || e.withMedia.recId) === recId);
+      const refMedia = adsSet.adsSetMediaList.find(
+        (e) => (e.recId || e.withMedia.recId) === recId
+      );
       return {
         ...refMedia,
         order: i,
       };
     });
-    await updateMediaReq(newOrderMedia);
+    updateMediaReq(newOrderMedia);
   };
   const handleChangeSchedule = async (changeData) => {
-    const newSchedule = { ...schedule, ...changeData }
+    const newSchedule = { ...schedule, ...changeData };
     setSchedule(newSchedule);
-    setChangedData({...changedData, schedule: newSchedule})
+    setChangedData({ ...changedData, schedule: newSchedule });
   };
   // ----------------- handle Conditions Setting --------------
   function handleChangeConditions(changeData) {
@@ -313,11 +314,19 @@ export default function CampaignDetails(props) {
             setSDeleteRecId(null);
             handleDeleteMedia(deleteRecId);
           }}
-          show={deleteRecId}
+          show={!!deleteRecId}
           setShow={setSDeleteRecId}
         />
       )
     );
+  }
+  // --------------------
+  function handleReturnLayout() {
+    console.log(loading);
+    
+    const isDataLoading = !!Object.keys(loading).find(key => !!loading[key] && key !== 'ads-set')
+    if (isDataLoading) setWarningMsg("Please wait for updating data!")
+    else returnPreLayout()
   }
   return (
     <>
@@ -332,6 +341,11 @@ export default function CampaignDetails(props) {
             message={errorMsg}
           />
           <Toaster
+            type="warning"
+            handleSetToast={setWarningMsg}
+            message={warningMsg}
+          />
+          <Toaster
             type="success"
             handleSetToast={setSuccessMsg}
             message={successMsg}
@@ -340,20 +354,16 @@ export default function CampaignDetails(props) {
             header={
               <div className={styles.header}>
                 <div className={styles.headerItems}>
-                  <AdsliveIcon
-                    variant={ADSLIVE_ICON_VARIANT.FULL_LEFT_ARROW}
-                    className={styles.icon}
-                    type={ADSLIVE_ICON_TYPE.BOLD}
-                    size={ADSLIVE_ICON_SIZE.SMALL}
-                    onClick={returnPreLayout}
-                  />
+                  <AdIcon name="full-left-arrow" w="20px" onClick={handleReturnLayout}/>
                   <AdsliveH4>{campaign?.name}</AdsliveH4>
                   <StatusBadge status={status} />
                 </div>
                 <AdButton
                   icon={<AdIcon name={ActionOnStatus(status)} />}
                   title={parseTitle(ActionOnStatus(status))}
-                  onClick={() => handleUpdateCampaignStatus(ActionOnStatus(status))}
+                  onClick={() =>
+                    handleUpdateCampaignStatus(ActionOnStatus(status))
+                  }
                   variant={STATUS_COLOR[status]}
                   isLoading={isChangingStatus}
                 />
@@ -390,7 +400,9 @@ export default function CampaignDetails(props) {
                                   <CardDragItem
                                     onDelete={(event) => {
                                       event.stopPropagation();
-                                      setSDeleteRecId(e.recId || e.withMedia.recId);
+                                      setSDeleteRecId(
+                                        e.recId || e.withMedia.recId
+                                      );
                                     }}
                                   >
                                     {/* <AdIcon
@@ -441,14 +453,16 @@ export default function CampaignDetails(props) {
                       <div className={styles.info}>
                         <span>
                           <InfoText size="lg">
-                            {screenConditions?.detail?.rules.find((e) => e.ruleTypes === "SCREENS")?.value?.screenIds?.length}
+                            {
+                              screenConditions?.detail?.rules.find(
+                                (e) => e.ruleTypes === "SCREENS"
+                              )?.value?.screenIds?.length
+                            }
                           </InfoText>{" "}
                           Screens
                         </span>
                         <span>
-                          <InfoText size="lg">
-                            {initLocations?.length}
-                          </InfoText>{" "}
+                          <InfoText size="lg">{initLocations?.length}</InfoText>{" "}
                           Location
                         </span>
                       </div>

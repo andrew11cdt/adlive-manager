@@ -43,7 +43,7 @@ export default function AdvertiserCampaign() {
 
   const FilterLayout = <></>;
   return (
-    <div style={{ height: "100%" }}>
+    <>
       {selectedCampaign ? (
         CampaignDetailsLayout
       ) : showFilter ? (
@@ -105,6 +105,6 @@ export default function AdvertiserCampaign() {
           </Modal.Footer>
         </Modal>
       }
-    </div>
+    </>
   );
 }

@@ -8,9 +8,9 @@
   transform: translate(0, 0);
 
   .contentWrapper {
-    height: 100%;
-    max-height: calc(100vh - 58px);
+    padding-bottom: 80px;
     overflow: auto;
+    height: 100vh;
   }
 
   .headerWrapper {

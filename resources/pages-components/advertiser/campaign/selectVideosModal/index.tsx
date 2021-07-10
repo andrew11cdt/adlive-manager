@@ -16,8 +16,6 @@ export default function SelectVideosModal(props) {
   const [videoLib, setVideoLib] = useState([]);
   const [selectedVideos, setSelectVideo] = useState([]);
   useEffect(()=> {
-    console.log(adsSet);
-    
     const addedMediaVideos = adsSet?.adsSetMediaList?.map(e => e.withMedia).filter(e => e) || []
     const lib = allVideos.filter(v => !addedMediaVideos?.find(data => data.id == v.id))
     if(lib?.length) setVideoLib(lib)

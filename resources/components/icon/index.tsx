@@ -301,7 +301,9 @@ export function AdIcon(props) {
       <img
         style={{
           width: w || "24px",
+          minWidth: w || "24px",
           height: h || w || "24px",
+          minHeight: h || w || "24px",
           margin: m || 0,
           marginRight: mr || m,
           marginLeft: ml || m,
