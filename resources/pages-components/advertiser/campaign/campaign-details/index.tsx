@@ -9,13 +9,7 @@ import AdCard, {
   CardSelectTime,
 } from "../../../../components/card";
 import Divider from "../../../../components/divider";
-import AdsliveIcon, {
-  AdIcon,
-  ADSLIVE_ICON_COLOR,
-  ADSLIVE_ICON_SIZE,
-  ADSLIVE_ICON_TYPE,
-  ADSLIVE_ICON_VARIANT,
-} from "../../../../components/icon";
+import { AdIcon } from "../../../../components/icon";
 import StatusBadge from "../../../../components/status-badge";
 import {
   AdsliveH4,
@@ -74,17 +68,6 @@ export default function CampaignDetails(props) {
     screen: null,
     schedule: null,
   });
-  function requestAPI(loadKey: LOAD_KEYS, data) {
-    if (loadKey === LOAD_KEYS.adsSet)
-      return AdvertiserApiClient.updateAdsSetMedia(adsSet.id, data);
-    if (loadKey === LOAD_KEYS.screen)
-      return AdvertiserApiClient.updateCampaignTargetScreenConditions(
-        campaign.id,
-        data
-      );
-    if (loadKey === LOAD_KEYS.schedule)
-      return AdvertiserApiClient.updateCampaignSchedule(adsSet.id, data);
-  }
   const CampainHeader = (title, settingKey) => (
     <div className={styles.campaignHeader}>
       <AdsliveH4>{title}</AdsliveH4>
@@ -107,20 +90,35 @@ export default function CampaignDetails(props) {
       )}
     </div>
   );
+  function requestAPI(loadKey: LOAD_KEYS, data) {
+    if (loadKey === LOAD_KEYS.adsSet)
+      return AdvertiserApiClient.updateAdsSetMedia(adsSet.id, data);
+    if (loadKey === LOAD_KEYS.screen)
+      return AdvertiserApiClient.updateCampaignTargetScreenConditions(
+        campaign.id,
+        data
+      );
+    if (loadKey === LOAD_KEYS.schedule)
+      return AdvertiserApiClient.updateCampaignSchedule(adsSet.id, data);
+  }
   async function handleUpdate(settingKey) {
     toggleSetting(settingKey, false);
     const REQ_DATA = changedData[settingKey];
-    console.log({ REQ_DATA });
     if (REQ_DATA) {
       handleSetLoading(settingKey, true);
       const res: any = await requestAPI(settingKey, REQ_DATA);
-      if (res) {
-        setSuccessMsg("Updated");
-        if (settingKey === LOAD_KEYS.adsSet && res.data)
+      if (res && res.data) {
+        if (settingKey === LOAD_KEYS.adsSet) {
           setAdsSet({ ...adsSet, adsSetMediaList: res.data });
-        else if (settingKey === LOAD_KEYS.schedule)
+          setSuccessMsg("Updated Media")
+        } else if (settingKey === LOAD_KEYS.schedule) {
           setSuccessMsg("Updated Schedule");
+        } else setSuccessMsg("Updated");
         setChangedData({ ...changedData, [settingKey]: null });
+      }
+      if (res && res.error) {
+        const msg = res.error.data?.error?.message
+        setErrorMsg(msg || 'An error happened!')
       }
       handleSetLoading(settingKey, false);
     }
