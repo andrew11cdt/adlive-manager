@@ -103,7 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-# .next/
-# .next/cache
-# .next/server
-# .next/static
+.next/
+.next/cache
+.next/server
+.next/static
