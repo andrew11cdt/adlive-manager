@@ -149,6 +149,15 @@
   width: 100%;
   justify-content: space-between;
   padding: 0 25px;
+  background: white;
+  &:hover:not(.loading) {
+    background: whitesmoke;
+  }
+  &.loading {
+    > * {
+      margin: 6px 0;
+    }
+  }
   .leftItem {
     display: flex;
     align-items: center;

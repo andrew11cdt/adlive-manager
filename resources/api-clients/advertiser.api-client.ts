@@ -36,6 +36,10 @@ export default class AdvertiserApiClient {
         return standardServiceResponse(1, null, err);
       });
   }
+  static async updateLocation(id, body) {
+    if (body?.address && Object.values(body?.address).length == 0) delete body.address
+    return restClient.asyncPut(`/advertiser/location/${id}`, body).catch(err => ({error: err.response}))
+  }
 
   static async createArea(locationId, body) {
     return restClient.asyncPost(`/advertiser/location/${locationId}/area`, body).catch(err => ({error: err.response}))
@@ -50,6 +54,12 @@ export default class AdvertiserApiClient {
       .catch((err) => {
         return standardServiceResponse(1, null, err);
       });
+  }
+  static async deleteArea(id) {
+    return restClient.asyncDelete(`/advertiser/location/area/${id}`).catch(err => ({error: err.response}))
+  }
+  static async updateArea(id, body) {
+    return restClient.asyncPut(`/advertiser/location/area/${id}`, body).catch(err => ({error: err.response}))
   }
   // ---------------------------- Sreen API --------------------------
 
@@ -76,6 +86,9 @@ export default class AdvertiserApiClient {
       .catch((err) => {
         return standardServiceResponse(1, null, err);
       });
+  }
+  static async deleteScreen(id) {
+    return restClient.asyncPost(`/advertiser/screen/${id}`).catch(err => ({error: err.response}))
   }
 // -------------------------------- CAMPAIGNS API -----------------------------------------------
 

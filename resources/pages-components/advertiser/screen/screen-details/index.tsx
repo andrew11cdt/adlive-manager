@@ -37,7 +37,6 @@ export default function ScreenDetails(props) {
   const handleInputChange = (screenKey, event) => {
     const val = event.target.value;
     setScreenState({ ...screenState, ...{ [screenKey]: val } });
-    console.log(screenState);
   };
   const handleInputFocusOut = async (key, event) => {
     if (screenData[key] !== screenState[key]) {
@@ -108,7 +107,7 @@ export default function ScreenDetails(props) {
                 size={ADSLIVE_ICON_SIZE.SMALL}
                 onClick={returnPreLayout}
               />
-              <AdsliveH4>New Screen</AdsliveH4>
+              <AdsliveH4>{}</AdsliveH4>
               <StatusBadge status={"offline"} />
             </div>
             <AdIcon name="Delete" onClick={deleteScreen} />

@@ -18,34 +18,47 @@ import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
 import { Dropdown } from "react-bootstrap";
 import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
+import RefreshserIcon from "../../../components/refresher-icon";
+import usePrevious from "../../../hooks/previous";
 
 export default function AdvertiserScreen() {
   const { locations, loadLocations } = useAdvertiserStore();
+  const preLocation = usePrevious(locations)
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentArea, setCurrentArea] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
   const [selectedScreen, setSelectScreen] = useState(null);
-  
+  const [isRefresh, setIsRefresh] = useState(null);
+
+
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  
+
   const handleChangeLocation = (location) => {
     if (!location) return;
-    setCurrentLocation(location);
-    const areas = location.areas;
-    setCurrentArea(areas ? areas[0] : null);
+      setCurrentLocation(location);
+      const area = currentArea || location.areas ? location.areas[0] : null
+      setCurrentArea(area);
   };
+  async function handleRefresh() {
+    setIsRefresh(true)
+    const res = await loadLocations()
+    if (res) setIsRefresh(false)
+    if (res.error) setError(res.error.data?.error?.message || 'An error happenned')
+  }
 
   useEffect(() => {
-    if (locations && locations.length) handleChangeLocation(locations[1]);
+    if (locations && JSON.stringify(locations) !== JSON.stringify(preLocation)) {
+      const newCurrentLocation = locations.find(e => e.id === currentLocation?.id)
+      handleChangeLocation(newCurrentLocation || locations[1]);
+    }
   }, [locations]);
- 
+
   const Setting = (
     <LocationSetting
       returnPreLayout={() => setShowSetting(false)}
       location={currentLocation}
-      onChange={() => loadLocations()}
     />
   );
   const NewScreenLayout = (
@@ -59,7 +72,7 @@ export default function AdvertiserScreen() {
     <ScreenDetails
       returnPreLayout={() => setSelectScreen(false)}
       locationData={currentLocation}
-      deleteScreen={() => {}}
+      deleteScreen={() => { }}
       screenData={selectedScreen}
     />
   );
@@ -95,6 +108,9 @@ export default function AdvertiserScreen() {
             }
             headerRightContent={
               <div className={styles.rightControls}>
+                <span style={{ marginRight: '16px' }} >
+                  <RefreshserIcon isLoading={isRefresh} onClick={handleRefresh} />
+                </span>
                 <AdsliveIcon
                   className={styles.searchIcon}
                   variant={ADSLIVE_ICON_VARIANT.SEARCH}
@@ -118,7 +134,6 @@ export default function AdvertiserScreen() {
                 areas={currentLocation?.areas || []}
                 currentArea={currentArea}
                 changeCurrentArea={(area) => {
-                  console.log("change current area", area);
                   setCurrentArea(area);
                 }}
                 showSetting={() => {

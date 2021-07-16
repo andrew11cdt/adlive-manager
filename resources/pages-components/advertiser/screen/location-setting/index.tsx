@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Container, Modal, Row } from "react-bootstrap";
+
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton } from "../../../../components/button";
 import AdCard, {
@@ -7,6 +8,7 @@ import AdCard, {
   CardDragWrapper,
   CardInput,
 } from "../../../../components/card";
+import ConfirmModal from "../../../../components/confirmModal";
 import Divider from "../../../../components/divider";
 import AdsliveIcon, {
   AdIcon,
@@ -17,29 +19,33 @@ import AdsliveIcon, {
 } from "../../../../components/icon";
 import { Toaster } from "../../../../components/toaster";
 import { AdsliveH4 } from "../../../../components/typography";
+import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { parseTitle } from "../../../../utils/common.util";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
-export default function LocationSetting({ returnPreLayout, location, onChange }) {
-  const addArea = (area) => {};
-  const handleDeleteArea = (area) => {};
-  const handleChangeOrder = (area) => {};
+export default function LocationSetting({ returnPreLayout, location }) {
+  const addArea = (area) => { };
+  const { locations, loadLocations } = useAdvertiserStore()
   const [locationData, setLocationData] = useState(location);
+  const [name, setName] = useState(location?.name);
+  const [address, setAddress] = useState(location?.address);
   const [showNewArea, setShowNewArea] = useState(null);
   const [newArea, setNewArea] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [deleteAreaId, setDeleteAreaId] = useState(null);
+  const [loadingDragItems, setLoadingDragItems] = useState({});
+  const [dataChanged, setDataChanged] = useState(null)
   const handleCloseModal = () => setShowNewArea(false);
   const handleCreateArea = async () => {
     setShowNewArea(false);
+    setDataChanged(true)
     const res: any = await AdvertiserApiClient.createArea(
       locationData?.id,
       newArea
     );
-    if (res?.data) {
-      onChange()
-    }
+    if (res?.data) loadLocations()
     if (res['error']) {
       setErrorMsg(res['error']['data']['error']['message'])
     }
@@ -47,15 +53,68 @@ export default function LocationSetting({ returnPreLayout, location, onChange })
       setSuccessMsg('Updated Schedule')
     }
   };
+  async function handleDeleteArea(id) {
+    handleLoadDragItem(id, true)
+    setDataChanged(true)
+    const res: any = await AdvertiserApiClient.deleteArea(id)
+    if (res?.data) {
+      loadLocations()
+    }
+  };
+  function handleLoadDragItem(id, isLoading: boolean) {
+    return setLoadingDragItems({ ...loadingDragItems, [id]: isLoading })
+  }
+  function handleChangeOrder(change) {
+    if (!change?.length) return
+    const newAreas = change.map(e => location.areas.find(area => area.recId === e.id))
+    if (JSON.stringify(newAreas) !== JSON.stringify(location.areas)) {
+      const loadAll = newAreas.reduce((res, cur) => res = { ...res, [cur.id]: true }, {})
+      setLoadingDragItems(loadAll)
+      newAreas.forEach((area, i) => {
+        const id = area?.id
+        if (id) {
+          AdvertiserApiClient.updateArea(id, { order: i + 1 }).then(res => {
+            if (newAreas.length - 1 === i) {
+              loadLocations()
+            }
+          })
+        }
+      })
+      setDataChanged(true)
+    }
+  };
+  async function updateLocation(isChange) {
+    if (!isChange) return
+    const newData = {...locationData, ...{name, address}}
+    const res: any = await AdvertiserApiClient.updateLocation(location.id, newData)
+    if (res?.data) {
+      setSuccessMsg("Updated!")
+      setLocationData({...locationData, ...res.data})
+    }
+    if (res.error) {
+      setErrorMsg(res.error.data?.message || 'Failed')
+    }
+  }
   useEffect(() => {
-    setLocationData(location)
-    console.log(locationData);
-    
-  }, [location])
+    setLocationData(locations?.find(e => location.id === e.id) || location)
+    if (deleteAreaId && location.areas.includes(e => e.id === deleteAreaId)) {
+      // handleLoadDragItem(deleteAreaId, false)
+      setDeleteAreaId(null);
+    }
+    setLoadingDragItems({})
+  }, [location, locations])
   return (
     <>
+      <ConfirmModal
+        title="Delete Media"
+        onExecute={() => {
+          handleDeleteArea(deleteAreaId);
+        }}
+        show={!!deleteAreaId}
+        setShow={setDeleteAreaId}
+      />
       <Toaster type="error" handleSetToast={setErrorMsg} message={errorMsg} />
-      <Toaster type="success" handleSetToast={setSuccessMsg} message={successMsg}/>
+      <Toaster type="success" handleSetToast={setSuccessMsg} message={successMsg} />
       <SubLayout
         header={
           <>
@@ -64,7 +123,7 @@ export default function LocationSetting({ returnPreLayout, location, onChange })
               className={styles.icon}
               type={ADSLIVE_ICON_TYPE.BOLD}
               size={ADSLIVE_ICON_SIZE.SMALL}
-              onClick={returnPreLayout}
+              onClick={() => returnPreLayout(dataChanged)}
             />
             <AdsliveH4>Location Setting</AdsliveH4>
           </>
@@ -76,22 +135,28 @@ export default function LocationSetting({ returnPreLayout, location, onChange })
               body={
                 <>
                   <CardInput
+                    title="name"
+                    value={name}
+                    onInputChange={(event) => setName(event.target.value)}
+                    onFocusOut={updateLocation}
+                  />
+                  <CardInput
                     title="address"
-                    value={locationData?.address?.description}
-                    onInputChange={(event) => {
-                      console.log(event);
-                    }}
+                    value={address?.description}
+                    onInputChange={(event) => setAddress({description: event.target.value})}
+                    onFocusOut={updateLocation}
                   />
                   {locationData && (
                     <CardDragWrapper
-                      items={locationData?.areas.map((area) => ({
+                      items={locationData?.areas?.map((area) => ({
                         id: area.recId.toString(),
                         content: (
                           <div key={area.id}>
                             <CardDragItem
+                              isLoading={loadingDragItems[area.id]}
                               onDelete={(event) => {
                                 event.stopPropagation();
-                                handleDeleteArea(area.id);
+                                setDeleteAreaId(area.id);
                               }}
                             >
                               <span>{parseTitle(area?.name)}</span>

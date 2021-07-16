@@ -74,6 +74,12 @@ export default function AdvertiserStoreProvider({
   async function loadLocations() {
     const res:any = await AdvertiserApiClient.getLocations()
     if (res?.data) {
+      res.data.map(e => {
+        if (e.areas) {
+          e.areas = e.areas.sort((pre, cur) => pre.order && cur.order && pre.order > cur.order ? 1 : -1)
+        }
+        return e
+      })
       setLocations(res.data)
     }
     return res.data

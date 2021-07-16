@@ -9,10 +9,12 @@ import moment from "moment";
 import { displayTime } from "../../utils/common.util";
 import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import ContentLoader from 'react-content-loader'
 
 export function CardInput(props) {
   let { title, value, onInputChange, onFocusOut, icon } = props;
   value = value || "";
+  const [isChange, setIsChange] = useState(null)
   return (
     <div className={styles.cardInput}>
       <label>{title}</label>
@@ -20,8 +22,11 @@ export function CardInput(props) {
         disabled={props.disabled}
         value={value}
         type={props.type || "text"}
-        onChange={onInputChange}
-        onBlur={onFocusOut}
+        onChange={(e) => {
+          setIsChange(e.target.value !== value);
+          onInputChange(e)
+        }}
+        onBlur={() => onFocusOut(isChange)}
       />
       <span className={styles.icon}>{icon}</span>
     </div>
@@ -90,12 +95,12 @@ export function CardMultiSelect(props: CardSelectInput) {
   function checkInclude(item) {
     return selectedValue?.includes(item);
   }
-  
+
   function handleDone() {
     setShowDrop(false)
     onChange(selectedValue)
   }
-  
+
   function handleSelectAll(value) {
     setSelectAll(value)
     setSelectValue(value ? values : [])
@@ -124,16 +129,15 @@ export function CardMultiSelect(props: CardSelectInput) {
               <Dropdown.Item
                 id="dropdown-item"
                 key={i.toString()}
-                className={`${styles.menuItem} ${
-                  checkInclude(value) ? styles.selected : ""
-                }`}
+                className={`${styles.menuItem} ${checkInclude(value) ? styles.selected : ""
+                  }`}
                 onClick={() => {
                   handleSelectItem(value)
                 }}
               >
                 {value}
                 {checkInclude(value) &&
-                  <AdIcon name="check-in-a-circle-highlight" style={{ marginLeft: "6px" }}/>
+                  <AdIcon name="check-in-a-circle-highlight" style={{ marginLeft: "6px" }} />
                 }
               </Dropdown.Item>
             );
@@ -173,17 +177,29 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
     </div>
   );
 }
-
-export function CardDragItem({ onDelete, children }) {
+const DragItemLoader = () => (
+  <ContentLoader viewBox="0 0 380 50">
+    {/* Only SVG shapes */}
+    <rect x="0" y="0" rx="5" ry="5" width="50" height="50" />
+    <rect x="80" y="17" rx="4" ry="4" width="300" height="13" />
+    <rect x="80" y="40" rx="3" ry="3" width="250" height="10" />
+  </ContentLoader>
+)
+export function CardDragItem({ isLoading, onDelete, children }) {
   return (
-    <div className={styles.cardDragItem}>
-      <div className={styles.leftItem}>
-        <AdIcon name="drag" mr="20px" h="48px" w="16px" />
-        {children}
-      </div>
-      <AdIcon name="minus_circle" ml="6px" w="16px"
-        className={styles.icon}
-      />
+    <div className={`${styles.cardDragItem} ${isLoading ? styles.loading : ''}`}>
+      {isLoading ? <DragItemLoader /> : (
+        <>
+          <div className={styles.leftItem}>
+            <AdIcon name="drag" mr="20px" h="48px" w="16px" />
+            {children}
+          </div>
+          <AdIcon name="minus_circle" ml="6px" w="16px" onClick={onDelete}
+            className={styles.icon}
+          />
+        </>
+      )
+      }
     </div>
   );
 }

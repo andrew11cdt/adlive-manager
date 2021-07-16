@@ -37,7 +37,6 @@ export default function AdvertiserAreaTabs({
                       const areaLeftPos =
                         document.getElementById(`area-${area.id}`).offsetLeft ||
                         16;
-                      console.log("left", areaLeftPos);
                       areasRef?.current &&
                         jquery(areasRef?.current).animate(
                           { scrollLeft: areaLeftPos - 16 },
