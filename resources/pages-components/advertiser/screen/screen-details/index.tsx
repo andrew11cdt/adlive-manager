@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button, Container, Row } from "react-bootstrap";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton } from "../../../../components/button";
@@ -7,7 +7,7 @@ import AdCard, {
   CardInput,
   CardSelect,
 } from "../../../../components/card";
-import Divider from "../../../../components/divider";
+import ConfirmModal from "../../../../components/confirmModal";
 import AdsliveIcon, {
   AdIcon,
   ADSLIVE_ICON_COLOR,
@@ -32,8 +32,9 @@ export default function ScreenDetails(props) {
   const [screenState, setScreenState] = useState(screenData);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-  const addArea = (area) => {};
-  const resetDevice = (area) => {};
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
+  const addArea = (area) => { };
+  const resetDevice = (area) => { };
   const handleInputChange = (screenKey, event) => {
     const val = event.target.value;
     setScreenState({ ...screenState, ...{ [screenKey]: val } });
@@ -52,6 +53,15 @@ export default function ScreenDetails(props) {
       }
     }
   };
+  async function handleDeleteScreen() {
+    const res:any = await AdvertiserApiClient.deleteScreen(screenData.id)
+    if (res) {
+      setShowDeleteConfirm(false)
+      returnPreLayout(true)
+      setSuccessMsg('Deleted screen!')
+    }
+    if (res?.error) setErrorMsg(res.error.data?.message || 'Delete failed!')
+  }
   const infoArr = [
     {
       title: "screen name",
@@ -96,6 +106,12 @@ export default function ScreenDetails(props) {
         handleSetToast={setSuccessMsg}
         message={successMsg}
       />
+      <ConfirmModal
+        title="Delete Screen"
+        onExecute={handleDeleteScreen}
+        show={showDeleteConfirm}
+        setShow={setShowDeleteConfirm}
+      />
       <SubLayout
         header={
           <div className={styles.newScreenHeader}>
@@ -107,10 +123,10 @@ export default function ScreenDetails(props) {
                 size={ADSLIVE_ICON_SIZE.SMALL}
                 onClick={returnPreLayout}
               />
-              <AdsliveH4>{}</AdsliveH4>
+              <AdsliveH4>{ }</AdsliveH4>
               <StatusBadge status={"offline"} />
             </div>
-            <AdIcon name="Delete" onClick={deleteScreen} />
+            <AdIcon name="Delete" onClick={() => setShowDeleteConfirm(true)} />
           </div>
         }
         content={

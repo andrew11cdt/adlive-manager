@@ -12,7 +12,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ContentLoader from 'react-content-loader'
 
 export function CardInput(props) {
-  let { title, value, onInputChange, onFocusOut, icon } = props;
+  let { title, value, defaultValue, onInputChange, onFocusOut, icon } = props;
   value = value || "";
   const [isChange, setIsChange] = useState(null)
   return (
@@ -23,10 +23,13 @@ export function CardInput(props) {
         value={value}
         type={props.type || "text"}
         onChange={(e) => {
-          setIsChange(e.target.value !== value);
           onInputChange(e)
+          // todo: fix isChange not work
+          setIsChange(e.target.value !== defaultValue);
         }}
-        onBlur={() => onFocusOut(isChange)}
+        onBlur={() => {
+          onFocusOut && onFocusOut(isChange)}
+        }
       />
       <span className={styles.icon}>{icon}</span>
     </div>

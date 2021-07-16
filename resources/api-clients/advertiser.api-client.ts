@@ -37,7 +37,6 @@ export default class AdvertiserApiClient {
       });
   }
   static async updateLocation(id, body) {
-    if (body?.address && Object.values(body?.address).length == 0) delete body.address
     return restClient.asyncPut(`/advertiser/location/${id}`, body).catch(err => ({error: err.response}))
   }
 
@@ -88,7 +87,7 @@ export default class AdvertiserApiClient {
       });
   }
   static async deleteScreen(id) {
-    return restClient.asyncPost(`/advertiser/screen/${id}`).catch(err => ({error: err.response}))
+    return restClient.asyncDelete(`/advertiser/screen/${id}`).catch(err => ({error: err.response}))
   }
 // -------------------------------- CAMPAIGNS API -----------------------------------------------
 

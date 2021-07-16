@@ -6,18 +6,20 @@ import NoData from "../../../../components/no-data";
 import StatusBadge from "../../../../components/status-badge";
 import styles from "./styles.module.scss";
 
-export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
+export default function AdvertiserScreenItems({ id, handleScreenChanged, areaName, selectScreen }) {
   const [screens, setScreens] = useState({});
   // const [loadingData, setLoadingData] = useState({});
+  const [screenChanged, setScreenChanged] = handleScreenChanged
   useEffect(() => {
     if (!id) return 
     if (screens[id]) return
     AdvertiserApiClient.getAreaScreen(id).then(res => {
       if (res && res.data) {
         setScreens({...screens, [id]: res.data})
+        setScreenChanged(false)
       }
     });
-  }, [id]);
+  }, [id, screenChanged]);
 
   return (
     <div className={styles.advertiserScreens}>

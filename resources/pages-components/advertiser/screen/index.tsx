@@ -30,6 +30,7 @@ export default function AdvertiserScreen() {
   const [showNewScreen, setShowNewScreen] = useState(false);
   const [selectedScreen, setSelectScreen] = useState(null);
   const [isRefresh, setIsRefresh] = useState(null);
+  const [screenChanged, setScreenChanged] = useState(null)
 
 
   const [error, setError] = useState(null);
@@ -70,9 +71,11 @@ export default function AdvertiserScreen() {
   );
   const ScreenDetailsLayout = (
     <ScreenDetails
-      returnPreLayout={() => setSelectScreen(false)}
+      returnPreLayout={(changed) => {
+        setSelectScreen(false)
+        if (changed) setScreenChanged(true)
+      }}
       locationData={currentLocation}
-      deleteScreen={() => { }}
       screenData={selectedScreen}
     />
   );
@@ -146,6 +149,7 @@ export default function AdvertiserScreen() {
           {currentArea && (
             <AdvertiserScreenItems
               id={currentArea?.id}
+              handleScreenChanged={[screenChanged, setScreenChanged]}
               areaName={currentArea?.name}
               selectScreen={(screen) => setSelectScreen(screen)}
             />

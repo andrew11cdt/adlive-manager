@@ -84,8 +84,9 @@ export default function LocationSetting({ returnPreLayout, location }) {
     }
   };
   async function updateLocation(isChange) {
-    if (!isChange) return
+    if (!isChange) return 
     const newData = {...locationData, ...{name, address}}
+    if (address?.description?.length == 0) delete newData.address
     const res: any = await AdvertiserApiClient.updateLocation(location.id, newData)
     if (res?.data) {
       setSuccessMsg("Updated!")
@@ -137,12 +138,14 @@ export default function LocationSetting({ returnPreLayout, location }) {
                   <CardInput
                     title="name"
                     value={name}
+                    defaultValue={locationData?.name}
                     onInputChange={(event) => setName(event.target.value)}
                     onFocusOut={updateLocation}
                   />
                   <CardInput
                     title="address"
                     value={address?.description}
+                    defaultValue={locationData?.addredss?.description}
                     onInputChange={(event) => setAddress({description: event.target.value})}
                     onFocusOut={updateLocation}
                   />
