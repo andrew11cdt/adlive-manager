@@ -86,6 +86,10 @@
 .cardBtn {
   background: $whiteColor;
   color: $primaryColor;
+  &:hover {
+    background: $whiteColor;
+    color: $primaryColor;
+  }
   width: 100%;
   font-size: 14px;
   padding: 16px 20px !important;

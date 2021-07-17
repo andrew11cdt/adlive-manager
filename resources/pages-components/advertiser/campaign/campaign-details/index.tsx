@@ -124,6 +124,11 @@ export default function CampaignDetails(props) {
     }
   }
   const toggleSetting = (title, value) => {
+    const checkOpenMoreThanOne = Object.values(setting).includes(true)
+    if (value && checkOpenMoreThanOne) {
+      setWarningMsg('Please finish current setting before edit another')
+      return
+    }
     const s = { ...setting, ...{ [title]: value } };
     openSetting(s);
   };
@@ -421,7 +426,7 @@ export default function CampaignDetails(props) {
                           <AdButton
                             cardBtn
                             ghost
-                            icon={<AdIcon name="circle-bold" w="24px" />}
+                            icon={<AdIcon name="circle-bold" w="24px" ml="4px" />}
                             title="ADD MORE VIDEOS"
                             style={{ padding: "20px" }}
                             onClick={() => setOpenVideoLib(true)}
