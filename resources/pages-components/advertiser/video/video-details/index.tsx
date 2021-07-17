@@ -21,24 +21,28 @@ import styles from "./styles.module.scss";
 export default function VideoDetails(props) {
   let { isNew, returnPreLayout, deleteData, videoData = {} } = props;
   const [dataState, setDataState] = useState(videoData);
+  const [defaultData, setDefaultData] = useState(videoData);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [dataChanged, setDataChanged] = useState(null);
-  const addArea = (area) => {};
+  const [loadingData, setLoadingData] = useState({})
   function handleInputChange(key, event) {
     const val = event.target.value;
-    setDataState({ ...dataState, ...{ [key]: val } });
+    setDataState({ ...dataState, [key]: val});
   };
-  async function handleInputFocusOut(key, event) {
-    if (dataState) {
+  async function handleInputFocusOut(key, changed) {
+    if (dataState && changed) {
       const body = { [key]: dataState[key] };
       if (isNew) return
       console.log("UPDATE REQUEST");
+      setLoadingData({...loadingData, [key]: true})
       const res:any = await AdvertiserApiClient.updateVideo(dataState.id, body);
       if (res.data) {
         setDataState(res.data)
+        setDefaultData(res.data)
         setSuccessMsg('Updated successful')
         setDataChanged(true)
+        setLoadingData({...loadingData, [key]: false})
       } else if (res.error) setError(res.error)
     }
   };
@@ -77,7 +81,7 @@ export default function VideoDetails(props) {
               size={ADSLIVE_ICON_SIZE.SMALL}
               onClick={() => returnPreLayout({ changed: dataChanged })}
             />
-            <AdsliveH4>{videoData.name || 'Upload video'}</AdsliveH4>
+            <AdsliveH4>{dataState?.name || 'Upload video'}</AdsliveH4>
           </div>
           {!isNew && <AdIcon name="Delete" onClick={deleteData} />}
         </div>
@@ -101,15 +105,17 @@ export default function VideoDetails(props) {
                 <CardInput
                   title="Title"
                   value={dataState?.name}
+                  isLoading={loadingData['name']}
+                  defaultValue={defaultData?.name}
                   onInputChange={(event) => handleInputChange('name', event)}
-                  onFocusOut={(event) => handleInputFocusOut('name', event)}
+                  onFocusOut={(changed) => handleInputFocusOut('name', changed)}
                 />
                 <CardInput
                   disabled
                   title="Tag"
                   value={dataState?.tag}
                   onInputChange={(event) => handleInputChange('tag', event)}
-                  onFocusOut={(event) => handleInputFocusOut('tag', event)}
+                  onFocusOut={(changed) => handleInputFocusOut('tag', changed)}
                 />
               </>
             }

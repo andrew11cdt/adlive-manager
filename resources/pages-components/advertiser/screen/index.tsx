@@ -19,7 +19,7 @@ import styles from "./styles.module.scss";
 import { Dropdown } from "react-bootstrap";
 import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
 import RefreshserIcon from "../../../components/refresher-icon";
-import usePrevious from "../../../hooks/previous";
+import usePrevious from "../../../hooks";
 
 export default function AdvertiserScreen() {
   const { locations, loadLocations } = useAdvertiserStore();

@@ -21,9 +21,10 @@ export function CardInput(props) {
   let { isLoading, title, value, defaultValue, onInputChange, onFocusOut, icon } = props;
   value = value || "";
   const [isChange, setIsChange] = useState(null)
-  console.log(value + '::' + defaultValue);
   useEffect(() => {
-    setIsChange(value !== defaultValue)
+    if (value && defaultValue) {
+      setIsChange(value !== defaultValue)
+    }
   }, [value, defaultValue])
   return (
     <div className={styles.cardInput}>
@@ -34,15 +35,14 @@ export function CardInput(props) {
           value={value}
           type={props.type || "text"}
           onChange={(e) => {
-            console.log(e);
             onInputChange(e)
-            // todo: fix isChange not work
-            setIsChange(e.target.value !== defaultValue);
+            value = e.target.value
           }}
           onBlur={() => {
+            console.log(isChange);
+            console.log(value + '::' + defaultValue);
             onFocusOut && onFocusOut(isChange)
-          }
-          }
+          }}
         />
       }
       <span className={styles.icon}>{icon}</span>

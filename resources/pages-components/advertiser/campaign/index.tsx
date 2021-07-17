@@ -54,11 +54,11 @@ export default function AdvertiserCampaign() {
             headerTitle="Campaigns"
             headerRightContent={
               <div className={styles.rightControls}>
-                <AdIcon name="search" onClick={() => null} />
+                {/* <AdIcon name="search" onClick={() => null} />
                 <AdIcon
                   name="filters-vertical"
                   onClick={() => setShowFilter(true)}
-                />
+                /> */}
                 <AdIcon
                   name="circle-bold"
                   onClick={() => setShowNewCampaign(true)}

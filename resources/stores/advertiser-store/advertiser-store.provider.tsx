@@ -66,9 +66,15 @@ export default function AdvertiserStoreProvider({
     });
     
   }, [auth?.token]);
+  function compareTime(time1, time2) {
+    return Date.parse(time1) < Date.parse(time2) ? 1 : -1
+  }
   async function loadCampaigns() {
     const res:any = await AdvertiserApiClient.getCampaigns()
-    if (res?.data) setCampaigns(res.data)
+    if (res?.data) {
+      res.data = res.data.sort((pre, cur) => compareTime(pre.updatedAt, cur.updatedAt))
+      setCampaigns(res.data)
+    }
     return res.data
   }
   async function loadLocations() {

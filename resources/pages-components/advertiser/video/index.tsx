@@ -79,12 +79,12 @@ export default function AdvertiserVideo() {
             headerTitle="Videos"
             headerRightContent={
               <div className={styles.rightControls}>
-                <AdIcon mr="16px" name="search" onClick={() => null} />
-                <AdIcon
+                {/* <AdIcon mr="16px" name="search" onClick={() => null} /> */}
+                {/* <AdIcon
                   mr="16px"
                   name="filters-vertical"
                   onClick={() => null}
-                />
+                /> */}
                 <AdIcon name="circle-bold" onClick={() => setShowNew(true)} />
               </div>
             }
