@@ -11,26 +11,40 @@ import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ContentLoader from 'react-content-loader'
 
+const InputLoader = () => (
+  <ContentLoader viewBox="0 0 340 46">
+    {/* Only SVG shapes */}
+    <rect x="0" y="0" rx="8" ry="8" width="340" height="46" />
+  </ContentLoader>
+)
 export function CardInput(props) {
-  let { title, value, defaultValue, onInputChange, onFocusOut, icon } = props;
+  let { isLoading, title, value, defaultValue, onInputChange, onFocusOut, icon } = props;
   value = value || "";
   const [isChange, setIsChange] = useState(null)
+  console.log(value + '::' + defaultValue);
+  useEffect(() => {
+    setIsChange(value !== defaultValue)
+  }, [value, defaultValue])
   return (
     <div className={styles.cardInput}>
       <label>{title}</label>
-      <input
-        disabled={props.disabled}
-        value={value}
-        type={props.type || "text"}
-        onChange={(e) => {
-          onInputChange(e)
-          // todo: fix isChange not work
-          setIsChange(e.target.value !== defaultValue);
-        }}
-        onBlur={() => {
-          onFocusOut && onFocusOut(isChange)}
-        }
-      />
+      {isLoading ? <InputLoader /> :
+        <input
+          disabled={props.disabled}
+          value={value}
+          type={props.type || "text"}
+          onChange={(e) => {
+            console.log(e);
+            onInputChange(e)
+            // todo: fix isChange not work
+            setIsChange(e.target.value !== defaultValue);
+          }}
+          onBlur={() => {
+            onFocusOut && onFocusOut(isChange)
+          }
+          }
+        />
+      }
       <span className={styles.icon}>{icon}</span>
     </div>
   );
@@ -181,11 +195,11 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
   );
 }
 const DragItemLoader = () => (
-  <ContentLoader viewBox="0 0 380 50">
+  <ContentLoader viewBox="0 0 340 60">
     {/* Only SVG shapes */}
-    <rect x="0" y="0" rx="5" ry="5" width="50" height="50" />
-    <rect x="80" y="17" rx="4" ry="4" width="300" height="13" />
-    <rect x="80" y="40" rx="3" ry="3" width="250" height="10" />
+    <rect x="0" y="10" rx="5" ry="5" width="16" height="50" />
+    <rect x="40" y="17" rx="4" ry="4" width="340" height="13" />
+    <rect x="40" y="40" rx="3" ry="3" width="250" height="10" />
   </ContentLoader>
 )
 export function CardDragItem({ isLoading, onDelete, children }) {

@@ -37,6 +37,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
   const [deleteAreaId, setDeleteAreaId] = useState(null);
   const [loadingDragItems, setLoadingDragItems] = useState({});
   const [dataChanged, setDataChanged] = useState(null)
+  const [loadingData, setLoadingData] = useState({})
   const handleCloseModal = () => setShowNewArea(false);
   const handleCreateArea = async () => {
     setShowNewArea(false);
@@ -64,11 +65,12 @@ export default function LocationSetting({ returnPreLayout, location }) {
   function handleLoadDragItem(id, isLoading: boolean) {
     return setLoadingDragItems({ ...loadingDragItems, [id]: isLoading })
   }
-  function handleChangeOrder(change) {
+  async function handleChangeOrder(change) {
     if (!change?.length) return
     const newAreas = change.map(e => location.areas.find(area => area.recId === e.id))
     if (JSON.stringify(newAreas) !== JSON.stringify(location.areas)) {
       const loadAll = newAreas.reduce((res, cur) => res = { ...res, [cur.id]: true }, {})
+      
       setLoadingDragItems(loadAll)
       newAreas.forEach((area, i) => {
         const id = area?.id
@@ -80,17 +82,24 @@ export default function LocationSetting({ returnPreLayout, location }) {
           })
         }
       })
+
+      // await AdvertiserApiClient.updateLocation(location.id, {...locationData, areas: newAreas})
       setDataChanged(true)
     }
   };
-  async function updateLocation(isChange) {
-    if (!isChange) return 
+  async function updateLocation(key, isChange) {
+    if (!isChange) return
+    setLoadingData({...loadingData, [key]: true})
     const newData = {...locationData, ...{name, address}}
-    if (address?.description?.length == 0) delete newData.address
+    
+    if (address?.length == 0) delete newData.address
     const res: any = await AdvertiserApiClient.updateLocation(location.id, newData)
     if (res?.data) {
       setSuccessMsg("Updated!")
-      setLocationData({...locationData, ...res.data})
+      loadLocations()
+      setDataChanged(true)
+      // const mergeData = {...locationData, ...res.data}
+      // setLocationData(mergeData)
     }
     if (res.error) {
       setErrorMsg(res.error.data?.message || 'Failed')
@@ -103,6 +112,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
       setDeleteAreaId(null);
     }
     setLoadingDragItems({})
+    setLoadingData({})
   }, [location, locations])
   return (
     <>
@@ -138,16 +148,18 @@ export default function LocationSetting({ returnPreLayout, location }) {
                   <CardInput
                     title="name"
                     value={name}
+                    isLoading={loadingData['name']}
                     defaultValue={locationData?.name}
                     onInputChange={(event) => setName(event.target.value)}
-                    onFocusOut={updateLocation}
+                    onFocusOut={(changed) => updateLocation('name', changed)}
                   />
                   <CardInput
                     title="address"
-                    value={address?.description}
-                    defaultValue={locationData?.addredss?.description}
-                    onInputChange={(event) => setAddress({description: event.target.value})}
-                    onFocusOut={updateLocation}
+                    value={address}
+                    isLoading={loadingData['address']}
+                    defaultValue={locationData?.address}
+                    onInputChange={(event) => setAddress(event.target.value)}
+                    onFocusOut={(changed) => updateLocation('address', changed)}
                   />
                   {locationData && (
                     <CardDragWrapper

@@ -1,9 +1,9 @@
 import { AdIcon } from "../../../../components/icon";
-import { AdsliveH4 } from "../../../../components/typography";
+import { AdsliveH4, MutedText } from "../../../../components/typography";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 import { Button, Row } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenDetails from "../screen-details";
 import { Toaster } from "../../../../components/toaster";
 
@@ -13,7 +13,7 @@ import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdsliveLoading, {
   ADSLIVE_LOADING_SIZE,
 } from "../../../../components/loading";
-const QrReader: any = dynamic(() => import("react-qr-reader"), { ssr: false });
+let QrReader: any = dynamic(() => import("react-qr-reader"), { ssr: false });
 
 interface QR_DATA {
   appVersion: string;
@@ -28,11 +28,27 @@ export default function ScanQR({
   currentArea,
   currentLocation,
 }) {
+
   const [result, setResult] = useState<QR_DATA>(null);
   const [error, setError] = useState(null);
+  const [permissionErr, setCameraPermissionErr] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isLoading, setLoading] = useState(null);
+  const [cancelScanner, setCancelScanner] = useState(null);
 
+  const checkPermission = () => {
+    navigator?.getUserMedia({ video: true }, (success) => {
+      console.log(success);
+      setCameraPermissionErr(false)
+    }, (error) => {
+      console.log(error);
+      setError('Please check your Camera permission!')
+      setCameraPermissionErr(true)
+    })
+  }
+  useEffect(() => {
+    checkPermission()
+  }, [])
   const sendCode = () => null;
   const handleScan = (data) => {
     if (!data) return;
@@ -102,7 +118,7 @@ export default function ScanQR({
               isNew
               returnPreLayout={returnPreLayout}
               locationData={currentLocation}
-              deleteScreen={() => {}}
+              deleteScreen={() => { }}
               screenData={result}
             />
           )}
@@ -111,7 +127,10 @@ export default function ScanQR({
         <SubLayout
           header={
             <>
-              <AdIcon name="x-in-a-circle" onClick={returnPreLayout} />
+              <AdIcon name="x-in-a-circle" onClick={() => {
+                setCancelScanner(true)
+                returnPreLayout()
+              }} />
               <div className={styles.title}>
                 <AdsliveH4>Scan QR code to add</AdsliveH4>
               </div>
@@ -120,14 +139,20 @@ export default function ScanQR({
           content={
             <>
               <div className={styles.scanner}>
-                {/* QR */}
-                <QrReader
-                  delay={300}
-                  onError={handleError}
-                  onScan={handleScan}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                {!cancelScanner && permissionErr === false &&
+                  <QrReader
+                    delay={300}
+                    onError={handleError}
+                    onScan={handleScan}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                }
               </div>
+              {permissionErr === true &&
+                <div className={styles.noPermission}>
+                  <MutedText> No Camera Permission Found! </MutedText>
+                </div>
+              }
             </>
           }
         />

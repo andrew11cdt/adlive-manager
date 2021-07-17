@@ -396,6 +396,7 @@ export default function CampaignDetails(props) {
                               content: (
                                 <div key={e.id}>
                                   <CardDragItem
+                                    isLoading={false}
                                     onDelete={(event) => {
                                       event.stopPropagation();
                                       setSDeleteRecId(
