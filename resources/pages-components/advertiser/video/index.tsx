@@ -4,6 +4,7 @@ import ConfirmModal from "../../../components/confirmModal";
 import { AdIcon } from "../../../components/icon";
 import AdsliveLoading from "../../../components/loading";
 import NoData from "../../../components/no-data";
+import { Toaster } from "../../../components/toaster";
 import { MutedText } from "../../../components/typography";
 import VideosPlayer from "../../../components/videos-player";
 import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
@@ -25,16 +26,18 @@ export default function AdvertiserVideo() {
   const [showDetails, setShowDetails] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(null);
   const [loading, setLoading] = useState(null);
-  const [dataChanged, setDataChange] = useState(null);
-  
+  const [loadingVideos, setLoadingVideos] = useState({});
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const handleDelete = async () => {
     setShowConfirmDelete(false)
-    const res = AdvertiserApiClient.deleteVideo(detailsVideo.id);
-    if (res) {
-      await loadVideos();
-      await timeout(1000);
-      setShowDetails(false);
-    }
+    setShowDetails(false);
+    setLoading(true)
+    setLoadingVideos({ ...loadingVideos, [detailsVideo.id]: true })
+    const res: any = await AdvertiserApiClient.deleteVideo(detailsVideo.id);
+    if (res) setSuccess('Deleted video!')
+    if (res.error) setError(res.error.data?.message || 'Delete video failed')
+    loadVideos()
   };
   const handleSelectVideo = async (video) => {
     if (video) {
@@ -42,36 +45,43 @@ export default function AdvertiserVideo() {
       setShowDetails(true);
     }
   };
-  useEffect(() => {
-    if (!showNew && !showDetails && dataChanged) {
-      loadVideos();
-      setDataChange(false)
-    }
-  }, [showNew, showDetails]);
   const loadVideos = async () => {
     setLoading(true)
     setVideos(null)
     const res: any = await AdvertiserApiClient.getVideos();
     if (res?.data) setVideos(res.data);
     setLoading(false)
+    setLoadingVideos({})
   };
   return (
     <>
-      {showConfirmDelete && <ConfirmModal title="delete" onExecute={handleDelete} show={showConfirmDelete} setShow={setShowConfirmDelete}/>}
+      <Toaster type="error" handleSetToast={setError} message={error} />
+      <Toaster
+        type="success"
+        handleSetToast={setSuccess}
+        message={success}
+      />
+      {showConfirmDelete && <ConfirmModal title="delete" onExecute={handleDelete} show={showConfirmDelete} setShow={setShowConfirmDelete} />}
       {showDetails ? (
         <>
           <VideoDetails
+            loadVideos={loadVideos}
             videoData={detailsVideo}
-            returnPreLayout={({changed}) => {
+            returnPreLayout={({ changed }) => {
               setShowDetails(false)
-              setDataChange(changed)
+              if (changed) loadVideos()
             }}
-            deleteData={() => setShowConfirmDelete(true)}
+            deleteData={() => {
+              setShowConfirmDelete(true)
+            }}
           />
         </>
       ) : showNew ? (
         <>
-          <VideoDetails isNew returnPreLayout={() => setShowNew(false)} />
+          <VideoDetails isNew returnPreLayout={(changed) => {
+            setShowNew(false)
+            if(changed) loadVideos()
+          }} />
         </>
       ) : (
         <>
@@ -89,7 +99,7 @@ export default function AdvertiserVideo() {
               </div>
             }
           />
-          {!!videos?.length && (
+          {!loading && !!videos?.length && (
             <div className={styles.videosContainer}>
               {[0, 1].map((remainer) => (
                 <div>
@@ -101,7 +111,7 @@ export default function AdvertiserVideo() {
                         className={styles.videoWrapper}
                         onClick={() => handleSelectVideo(video)}
                       >
-                        <VideosPlayer isPreview key={i} data={video} />
+                        <VideosPlayer isLoading={loadingVideos[video.id]} isPreview key={i} data={video} />
                         <span className={styles.info}>{video.name}</span>
                       </div>
                     ))}

@@ -79,11 +79,7 @@
   }
   > .loadingWrapper {
     position: relative;
-    filter: opacity(0.5);
-    z-index: 1;
-    .loading {
-      transform: translateY(-70%) translateX(50%);
-    }
+    left: 0;
   }
 }
 .errorContainer {

@@ -34,7 +34,7 @@ export default function VideosPlayer(props) {
                 }`}
                 onClick={() => setPlaying(!playing)}
               >
-                <AdIcon name={playing ? "pause" : "play"} w="60px" />
+                <AdIcon name={playing ? "paused" : "play"} w="60px" />
               </div>
             </>
           )}

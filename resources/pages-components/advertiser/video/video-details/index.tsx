@@ -14,12 +14,14 @@ import { Toaster } from "../../../../components/toaster";
 import { AdsliveH4 } from "../../../../components/typography";
 import VideoUploader from "../../../../components/video-uploader";
 import VideosPlayer from "../../../../components/videos-player";
+import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { timeout } from "../../../../utils/common.util";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
 
 export default function VideoDetails(props) {
-  let { isNew, returnPreLayout, deleteData, videoData = {} } = props;
+  let { isNew, returnPreLayout, loadVideos, deleteData, videoData = {} } = props;
+  const { videos, setVideos } = useAdvertiserStore();
   const [dataState, setDataState] = useState(videoData);
   const [defaultData, setDefaultData] = useState(videoData);
   const [error, setError] = useState(null);
@@ -31,9 +33,10 @@ export default function VideoDetails(props) {
     setDataState({ ...dataState, [key]: val});
   };
   async function handleInputFocusOut(key, changed) {
+    console.log(key, changed);
+    
     if (dataState && changed) {
       const body = { [key]: dataState[key] };
-      if (isNew) return
       console.log("UPDATE REQUEST");
       setLoadingData({...loadingData, [key]: true})
       const res:any = await AdvertiserApiClient.updateVideo(dataState.id, body);
@@ -63,7 +66,9 @@ export default function VideoDetails(props) {
         setDataState(res.data);
         await timeout(500)
         setDataChanged(true)
-        returnPreLayout({ changed: dataChanged })
+        setDataState(res.data)
+        setDefaultData(res.data)
+        loadVideos && loadVideos()
       }
     }
   }
@@ -97,7 +102,7 @@ export default function VideoDetails(props) {
             header={
               <div className={styles.infoHeader}>
                 {/* Uploaded: {videoData} */}
-                Uploaded: {}
+                Video Info
               </div>
             }
             body={
