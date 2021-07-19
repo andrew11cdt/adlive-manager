@@ -9,7 +9,7 @@ import AdCard, {
   CardSelectTime,
 } from "../../../../components/card";
 import Divider from "../../../../components/divider";
-import { AdIcon } from "../../../../components/icon";
+import { AdIcon, VideoThumb } from "../../../../components/icon";
 import StatusBadge from "../../../../components/status-badge";
 import {
   AdsliveH4,
@@ -33,6 +33,7 @@ import {
   STATUS_COLOR,
   STRATEGIES,
 } from "./campaign-type";
+import { Row } from "react-bootstrap";
 
 export default function CampaignDetails(props) {
   const { locations, loadAllScreen } = useAdvertiserStore();
@@ -257,9 +258,9 @@ export default function CampaignDetails(props) {
       let collectAreas = [];
       choseLocations.map(
         (location) =>
-          (collectAreas = [...collectAreas, ...location.areas].filter(
-            (e) => !collectAreas.includes(e)
-          ))
+        (collectAreas = [...collectAreas, ...location.areas].filter(
+          (e) => !collectAreas.includes(e)
+        ))
       );
       setAreaOptions(collectAreas);
     }
@@ -326,10 +327,33 @@ export default function CampaignDetails(props) {
   // --------------------
   function handleReturnLayout() {
     console.log(loading);
-    
+
     const isDataLoading = !!Object.keys(loading).find(key => !!loading[key] && key !== 'ads-set')
     if (isDataLoading) setWarningMsg("Please wait for updating data!")
     else returnPreLayout()
+  }
+  function AdsetFooter() {
+    const length = adsSet?.adsSetMediaList?.length
+    const max = 3
+    const data = length > max ? adsSet?.adsSetMediaList?.slice(0, max) : adsSet?.adsSetMediaList
+    return (
+      <>
+        {!!length &&
+          <>
+            <Divider style={{ padding: 0 }} />
+            <Row style={{ alignItems: "center", marginLeft: "6px" }}>
+
+              {data?.map(adSet => (
+                <span key={adSet.id} className={styles.icon}>
+                  <VideoThumb url={adSet.withMedia['thumbnail_url']} />
+                </span>
+              ))}
+              <MutedText>{length > max
+                && `+ ${length - max} videos`}</MutedText>
+            </Row>
+          </>
+        }
+      </>)
   }
   return (
     <>
@@ -357,7 +381,7 @@ export default function CampaignDetails(props) {
             header={
               <div className={styles.header}>
                 <div className={styles.headerItems}>
-                  <AdIcon name="full-left-arrow" w="20px" onClick={handleReturnLayout}/>
+                  <AdIcon name="full-left-arrow" w="20px" onClick={handleReturnLayout} />
                   <AdsliveH4>{campaign?.name}</AdsliveH4>
                   <StatusBadge status={status} />
                 </div>
@@ -392,9 +416,9 @@ export default function CampaignDetails(props) {
                           <InfoText size="lg">-</InfoText> played
                         </span>
                       </div>
-                      <Divider style={{ padding: 0 }} />
                       {setting[LOAD_KEYS.adsSet] ? (
                         <>
+                          <Divider style={{ padding: 0 }} />
                           <CardDragWrapper
                             items={adsSet?.adsSetMediaList?.map((e) => ({
                               id: e.recId || e.withMedia?.recId,
@@ -415,7 +439,10 @@ export default function CampaignDetails(props) {
                                 w="24px"
                                 mr="8px"
                               /> */}
-                                    <span>{e.withMedia?.name}</span>
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                      <VideoThumb url={e.withMedia['thumbnail_url']} style={{ marginRight: "6px" }} />
+                                      {e.withMedia?.name}
+                                    </div>
                                   </CardDragItem>
                                   <Divider />
                                 </div>
@@ -433,16 +460,7 @@ export default function CampaignDetails(props) {
                           />
                         </>
                       ) : (
-                        <div>
-                          {videos?.map((video) => (
-                            <span key={video.name} className={styles.icon}>
-                              <AdIcon url={video.photoUrl} r="2px" w="24px" />
-                            </span>
-                          ))}
-                          <MutedText>{`${
-                            adsSet?.adsSetMediaList?.length || 0
-                          } videos`}</MutedText>
-                        </div>
+                        <AdsetFooter />
                       )}
                     </div>
                   }

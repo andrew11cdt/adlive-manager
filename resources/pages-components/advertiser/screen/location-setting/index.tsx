@@ -51,7 +51,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
       setErrorMsg(res['error']['data']['error']['message'])
     }
     if (res?.data) {
-      setSuccessMsg('Updated Schedule')
+      setSuccessMsg('Created new Area')
     }
   };
   async function handleDeleteArea(id) {

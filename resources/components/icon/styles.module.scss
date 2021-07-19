@@ -98,3 +98,13 @@
     cursor: pointer;
   }
 }
+.videoThumbWrapper {
+  > .videoIcon, .noIcon {
+    width: 30px;
+    height: 30px;
+    border-radius: 2px;
+  }
+  .noIcon {
+    background: #C4C4C4;
+  }
+}

@@ -281,11 +281,10 @@ export default function AdsliveIcon({
       {...props}
       className={`${styles.icon} ${getColorClassName(color)} ${getSizeClassName(
         size
-      )} ${
-        type === ADSLIVE_ICON_TYPE.BOLD
-          ? getVariantClassNameByBoldType(variant) || ""
-          : getVariantClassNameByRegularType(variant) || ""
-      } ${className || ""}`}
+      )} ${type === ADSLIVE_ICON_TYPE.BOLD
+        ? getVariantClassNameByBoldType(variant) || ""
+        : getVariantClassNameByRegularType(variant) || ""
+        } ${className || ""}`}
       style={style}
     >
       {Icon && <Icon className={styles.svg} viewBox="0 0 24 24" />}
@@ -314,4 +313,18 @@ export function AdIcon(props) {
       />
     </span>
   );
+}
+
+export function VideoThumb({url, ...props}) {
+  console.log(url);
+  
+  return (
+    <div className={styles.videoThumbWrapper} {...props}>
+      {!!url ?
+        <img src={url} className={styles.videoIcon} />
+        :
+        <div className={styles.noIcon}></div>
+        }
+    </div>
+  )
 }
