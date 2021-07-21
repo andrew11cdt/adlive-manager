@@ -47,7 +47,6 @@ export default function VideoUploader(props) {
         onChange(data)
       }
     } catch (error) {
-      console.log({ error });
       setError(error);
     }
   };

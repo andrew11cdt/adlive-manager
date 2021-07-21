@@ -4,22 +4,28 @@ import AdCard from "../../../../components/card";
 import AdsliveLoading from "../../../../components/loading";
 import NoData from "../../../../components/no-data";
 import StatusBadge from "../../../../components/status-badge";
+import { useAreaScreens } from "../../../../stores/advertiser-store/advertiser-store.hook";
 import styles from "./styles.module.scss";
 
 export default function AdvertiserScreenItems({ id, handleScreenChanged, areaName, selectScreen }) {
   const [screens, setScreens] = useState({});
   // const [loadingData, setLoadingData] = useState({});
   const [screenChanged, setScreenChanged] = handleScreenChanged
+  const areaScreens = useAreaScreens()
   useEffect(() => {
-    if (!id) return 
-    if (screens[id]) return
-    AdvertiserApiClient.getAreaScreen(id).then(res => {
-      if (res && res.data) {
-        setScreens({...screens, [id]: res.data})
-        setScreenChanged(false)
-      }
-    });
-  }, [id, screenChanged]);
+    console.log(areaScreens);
+    if (!id) return
+    if (screenChanged) {
+      AdvertiserApiClient.getAreaScreen(id).then((res: any) => {
+        if (res && res.data) {
+          setScreens({...screens, [id]: res.data})
+        }
+      });
+    } else if (areaScreens && areaScreens[id]) {
+      setScreens({...screens, [id]: areaScreens[id]})
+    }
+    setScreenChanged(false)
+  }, [id, screenChanged, areaScreens]);
 
   return (
     <div className={styles.advertiserScreens}>

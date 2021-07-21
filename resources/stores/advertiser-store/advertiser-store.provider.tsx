@@ -9,10 +9,10 @@ import AdvertiserStoreContext, {
   AdvertiserStoreContextDataLocation,
 } from "./advertiser-store.context";
 
+import { useSelector } from "react-redux";
+
 export default function AdvertiserStoreProvider({
-  children,
-}: {
-  children?: any;
+  children
 }) {
   const [auth, setAuth] = useState<AdvertiserStoreContextDataAuth>({
     isAuthenticated: false,
@@ -32,7 +32,6 @@ export default function AdvertiserStoreProvider({
   ] = useState([]);
   
   const [campaigns, setCampaigns] = useState(null);
-  
   useEffect(() => {
     if (!auth?.token) {
       return;
@@ -90,18 +89,7 @@ export default function AdvertiserStoreProvider({
     }
     return res.data
   }
-  async function loadAllScreen(areaIds) {
-    return new Promise(async (resolve, reject) => {
-      let allScreensData = [] // [areaId] : screen[]
-      // const allAreaData = locations?.reduce((res, e) => res = [...res, ...(e.areas || [])], [])
-      areaIds.map(async (id, index) => {
-        const res = await AdvertiserApiClient.getAreaScreen(id)
-        if (res.code == 0) allScreensData = [...allScreensData,...res.data]
-        else reject(false)
-        if (index + 1 === areaIds.length) resolve(allScreensData)
-      })
-    })
-  }
+
   useEffect(() => {
     const authToken = cookieUtil.getCookie("adsl-adver-at") || null;
 
@@ -123,7 +111,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations, loadLocations, campaigns, setCampaigns, loadCampaigns, videos, setVideos, loadAllScreen }}>
+    <AdvertiserStoreContext.Provider value={{ auth, locations, loadLocations, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

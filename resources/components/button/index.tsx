@@ -82,13 +82,14 @@ export function AdButton(props) {
     ghost,
     style,
     isLoading,
+    disabled
   } = props;
   return (
     <Button
       style={style}
       onClick={onClick}
       variant={variant || "light"}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
       className={`
         ${styles.adBtn}
         ${cardBtn ? styles.cardBtn : ""}

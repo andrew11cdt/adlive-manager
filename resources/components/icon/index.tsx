@@ -316,8 +316,6 @@ export function AdIcon(props) {
 }
 
 export function VideoThumb({url, ...props}) {
-  console.log(url);
-  
   return (
     <div className={styles.videoThumbWrapper} {...props}>
       {!!url ?

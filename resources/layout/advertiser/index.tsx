@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { advertiserHeaderItems } from "./definition";
 import AdvertiserHeader from "./header";
 import styles from "./styles.module.scss";
+import { useSelector, useDispatch } from 'react-redux';
+import { getScreenAsync } from "../../stores/advertiser-store/slice";
 
 export default function AdvertiserLayout() {
   const [currentHeaderItemId, setCurrentHeaderItemId] = useState(
@@ -18,6 +20,12 @@ export default function AdvertiserLayout() {
   };
 
   const ContentComponent = currentHeaderItem?.contentComponent as any;
+
+	const dispatch = useDispatch();
+
+  useEffect(() => {
+		dispatch(getScreenAsync());
+	}, [dispatch]);
 
   return (
     <div className={styles.advertiserLayout}>

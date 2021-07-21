@@ -1,13 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import AdsliveIcon, {
   ADSLIVE_ICON_COLOR,
   ADSLIVE_ICON_SIZE,
   ADSLIVE_ICON_TYPE,
   ADSLIVE_ICON_VARIANT,
 } from "../../../components/icon";
-import AdsliveLoading, {
-  ADSLIVE_LOADING_SIZE,
-} from "../../../components/loading";
+
 import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
 import AdvertiserContent from "../others/advertiser-content";
 import AdvertiserAreaTabs from "./area-tabs";
@@ -17,9 +15,6 @@ import ScanQR from "./scanQR";
 import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
 import { Dropdown } from "react-bootstrap";
-import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
-import RefreshserIcon from "../../../components/refresher-icon";
-import usePrevious from "../../../hooks";
 
 export default function AdvertiserScreen() {
   const { locations, loadLocations } = useAdvertiserStore();

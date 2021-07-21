@@ -1,19 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
 import Divider from "../divider";
-import AdsliveIcon, { AdIcon, ADSLIVE_ICON_VARIANT } from "../icon";
+import { AdIcon } from "../icon";
 import styles from "./styles.module.scss";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
-import { displayTime } from "../../utils/common.util";
 import AdsliveLoading, { ADSLIVE_LOADING_SIZE } from "../loading";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ContentLoader from 'react-content-loader'
+import { useOnClickOutside } from "../../hooks";
 
 const InputLoader = () => (
   <ContentLoader viewBox="0 0 340 46">
-    {/* Only SVG shapes */}
     <rect x="0" y="0" rx="8" ry="8" width="340" height="46" />
   </ContentLoader>
 )
@@ -39,8 +38,6 @@ export function CardInput(props) {
             value = e.target.value
           }}
           onBlur={() => {
-            console.log(isChange);
-            console.log(value + '::' + defaultValue);
             onFocusOut && onFocusOut(isChange)
           }}
         />
@@ -90,32 +87,42 @@ export function CardSelect(props: CardSelectInput) {
 }
 export function CardMultiSelect(props: CardSelectInput) {
   const { title, initValue, values, onChange, disabled } = props;
+  
   const [selectedValue, setSelectValue] = useState<any[]>(initValue || []);
   const [showDrop, setShowDrop] = useState(false);
   const [isSelectAll, setSelectAll] = useState(false);
-  const config = { show: showDrop };
+  const mainRef = useRef(null)
+  
+  useOnClickOutside(mainRef, () => {
+    setShowDrop(false)
+  })
+  
+  const config = { show: showDrop, ref: mainRef };
   const handleSelectItem = (item) => {
     setShowDrop(true);
     if (checkInclude(item)) removeItem(item);
     else addItem(item);
   };
   function removeItem(item) {
-    setSelectValue(selectedValue.filter((e) => e !== item));
+    const res = selectedValue.filter((e) => e !== item)
+    setSelectValue(res);
+    onChange(res)
   }
   function addItem(item) {
-    setSelectValue([...selectedValue, item]);
+    const res = [...selectedValue, item]
+    setSelectValue(res);
+    onChange(res)
   }
-  function displaySelect() {
-    if (selectedValue?.length) return "Multi choices";
-    else return "Select";
+  function displaySelect() { 
+    let res = ''
+    if (selectedValue?.length) {
+      const str = selectedValue.join(', ')
+      res = str.length > 30 ? str.slice(0, 30).concat('...') : str;
+    } else res = "Select";
+    return res
   }
   function checkInclude(item) {
     return selectedValue?.includes(item);
-  }
-
-  function handleDone() {
-    setShowDrop(false)
-    onChange(selectedValue)
   }
 
   function handleSelectAll(value) {
@@ -159,7 +166,6 @@ export function CardMultiSelect(props: CardSelectInput) {
               </Dropdown.Item>
             );
           })}
-          <Button style={{ width: '100%' }} variant="primary" onClick={handleDone}>Done</Button>
         </Dropdown.Menu>
       </Dropdown>
     </div>

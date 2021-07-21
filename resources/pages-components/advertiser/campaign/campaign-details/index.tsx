@@ -34,15 +34,16 @@ import {
   STRATEGIES,
 } from "./campaign-type";
 import { Row } from "react-bootstrap";
-
+import {useSelector} from "react-redux"
 export default function CampaignDetails(props) {
-  const { locations, loadAllScreen } = useAdvertiserStore();
+  const { locations } = useAdvertiserStore();
   const { returnPreLayout, campaign } = props;
   const { videos, beginTime, endTime, targetScreenConditions } = campaign || {};
-  const collectAllAreas = locations?.reduce(
+  const collectAllAreas = (locations) => locations?.reduce(
     (res, cur) => (res = [...res, ...cur.areas]),
     []
   );
+  const areaScreens = useSelector((state: any) => state.areaScreens)
 
   const [status, setStatus] = useState(campaign?.status);
   const [adsSet, setAdsSet] = useState<AdsSetType>(null);
@@ -51,7 +52,7 @@ export default function CampaignDetails(props) {
     ...targetScreenConditions,
     strategy: STRATEGIES[0].key,
   });
-  const [areaOptions, setAreaOptions] = useState<Area[]>(collectAllAreas);
+  const [areaOptions, setAreaOptions] = useState<Area[]>(collectAllAreas(locations));
   // loading handler
   const [setting, openSetting] = useState({});
   const [loading, setLoading] = useState({});
@@ -159,10 +160,10 @@ export default function CampaignDetails(props) {
     const initAreaIds = rules.find((e) => e.ruleTypes === "AREA")?.value
       ?.areaIds;
     const loadLocations = handleInitValue(initLocationIds, locations);
-    const initAreas = handleInitValue(initAreaIds, collectAllAreas);
+    const loadAreas = handleInitValue(initAreaIds, collectAllAreas(loadLocations));
 
     if (loadLocations?.length) setInitLocations(loadLocations);
-    if (initAreas?.length) setInitAreas(initAreas);
+    if (loadAreas?.length) setInitAreas(loadAreas);
   }, [screenConditions]);
   // ---------------------- API funct --------------------
   const fetchAds = async () => {
@@ -256,8 +257,7 @@ export default function CampaignDetails(props) {
     //
     if (choseLocations?.length) {
       let collectAreas = [];
-      choseLocations.map(
-        (location) =>
+      choseLocations.map( location =>
         (collectAreas = [...collectAreas, ...location.areas].filter(
           (e) => !collectAreas.includes(e)
         ))
@@ -275,6 +275,9 @@ export default function CampaignDetails(props) {
       },
     };
     handleChangeConditions(conditions);
+    setTimeout(() => {
+      setInitAreas([])
+    }, 1);
   }
   async function handleAreaSelect(selectAreas) {
     const choseAreas = areaOptions?.filter((a) => selectAreas.includes(a.name));
@@ -292,13 +295,15 @@ export default function CampaignDetails(props) {
       handleChangeConditions(conditions);
       return;
     }
+    
+
     handleSetLoading(LOAD_KEYS.screen, true);
-    const screenData = await loadAllScreen(areaIds);
+    const loadScreens = areaIds.reduce((res, id) => res = areaScreens && areaScreens[id] ? [...res, ...areaScreens[id]] : res, [])
     conditions.detail.rules[2] = {
       ruleTypes: "SCREENS",
       value: {
-        screenRecIds: screenData.map((e) => e.recId),
-        screenIds: screenData.map((e) => e.id),
+        screenRecIds: loadScreens.map((e) => e.recId),
+        screenIds: loadScreens.map((e) => e.id),
       },
     };
     handleChangeConditions(conditions);
@@ -326,8 +331,6 @@ export default function CampaignDetails(props) {
   }
   // --------------------
   function handleReturnLayout() {
-    console.log(loading);
-
     const isDataLoading = !!Object.keys(loading).find(key => !!loading[key] && key !== 'ads-set')
     if (isDataLoading) setWarningMsg("Please wait for updating data!")
     else returnPreLayout()
@@ -393,6 +396,7 @@ export default function CampaignDetails(props) {
                   }
                   variant={STATUS_COLOR[status]}
                   isLoading={isChangingStatus}
+                  disabled={Object.values(loading).includes(true)}
                 />
               </div>
             }
@@ -506,7 +510,7 @@ export default function CampaignDetails(props) {
                           <CardMultiSelect
                             title="Area"
                             initValue={initAreas?.map((e) => e.name)}
-                            values={(areaOptions || initAreas)?.map(
+                            values={areaOptions?.map(
                               (area) => area.name
                             )}
                             onChange={handleAreaSelect}

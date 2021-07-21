@@ -33,8 +33,6 @@ export default function VideoDetails(props) {
     setDataState({ ...dataState, [key]: val});
   };
   async function handleInputFocusOut(key, changed) {
-    console.log(key, changed);
-    
     if (dataState && changed) {
       const body = { [key]: dataState[key] };
       console.log("UPDATE REQUEST");
@@ -59,7 +57,6 @@ export default function VideoDetails(props) {
   async function handleUploadVideo(data?) {
     if (isNew) {
       const body = data || dataState;
-      console.log("create new", body);
       if (!body['name'] || !body['url']) return
       const res:any = await AdvertiserApiClient.postVideo(body);
       if (res.data) {

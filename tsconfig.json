@@ -22,7 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "resources/stores/advertiser-store/store.js", "resources/stores/advertiser-store/slice.ts"  ],
   "exclude": [
     "node_modules"
   ]
