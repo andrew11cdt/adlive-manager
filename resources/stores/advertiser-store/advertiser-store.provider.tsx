@@ -57,9 +57,8 @@ export default function AdvertiserStoreProvider({
       }
     });
 
-    loadLocations()
     loadCampaigns()
-    
+  
     AdvertiserApiClient.getVideos().then((res: any) => {
       if (res && res.data) setVideos(res.data)
     });
@@ -76,19 +75,20 @@ export default function AdvertiserStoreProvider({
     }
     return res.data
   }
-  async function loadLocations() {
-    const res:any = await AdvertiserApiClient.getLocations()
-    if (res?.data) {
-      res.data.map(e => {
-        if (e.areas) {
-          e.areas = e.areas.sort((pre, cur) => pre.order && cur.order && pre.order > cur.order ? 1 : -1)
-        }
-        return e
-      })
-      setLocations(res.data)
-    }
-    return res.data
-  }
+  
+  // async function loadLocations() {
+  //   const res:any = await AdvertiserApiClient.getLocations()
+  //   if (res?.data) {
+  //     res.data.map(e => {
+  //       if (e.areas) {
+  //         e.areas = e.areas.sort((pre, cur) => pre.order && cur.order && pre.order > cur.order ? 1 : -1)
+  //       }
+  //       return e
+  //     })
+  //     setLocations(res.data)
+  //   }
+  //   return res.data
+  // }
 
   useEffect(() => {
     const authToken = cookieUtil.getCookie("adsl-adver-at") || null;
@@ -111,7 +111,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, locations, loadLocations, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
+    <AdvertiserStoreContext.Provider value={{ auth, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

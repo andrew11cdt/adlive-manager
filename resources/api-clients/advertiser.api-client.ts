@@ -1,7 +1,6 @@
 import { standardServiceResponse } from "../utils/common.util";
 import restClient from "../utils/rest-client";
 import MockApiCampaign, { MockCVideos } from "./mock-api";
-
 export default class AdvertiserApiClient {
   static async getAdvertiserInformation() {
     return restClient

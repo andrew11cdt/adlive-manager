@@ -13,6 +13,8 @@ import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdsliveLoading, {
   ADSLIVE_LOADING_SIZE,
 } from "../../../../components/loading";
+import { useDispatch } from "react-redux";
+import { createScreenAsync } from "../../../../stores/advertiser-store/slice";
 let QrReader: any = dynamic(() => import("react-qr-reader"), { ssr: false });
 
 interface QR_DATA {
@@ -35,7 +37,7 @@ export default function ScanQR({
   const [success, setSuccess] = useState(null);
   const [isLoading, setLoading] = useState(null);
   const [cancelScanner, setCancelScanner] = useState(null);
-
+  const dispatch = useDispatch()
   const checkPermission = () => {
     navigator?.getUserMedia({ video: true }, (success) => {
       console.log(success);
@@ -75,14 +77,15 @@ export default function ScanQR({
   };
   const handleScanNewScreen = async (data) => {
     setLoading(true);
-    const res: any = await AdvertiserApiClient.createScreen(
-      currentArea.id,
-      data
-    );
+    // const res: any = await AdvertiserApiClient.createScreen(
+    //   currentArea.id,
+    //   data
+    // );
+    const res: any = await dispatch(createScreenAsync({areaId: currentArea.id, data}))
     console.log(res.error);
     if (res?.error) setError(`Scan QR Failed! ${res.error.data?.message || 'Sorry something went wrong!'}`);
     setLoading(false);
-    if (res?.data) {
+    if (res?.payload) {
       setSuccess("Uploaded new screen successfully!");
     }
   };

@@ -6,7 +6,7 @@ import AdsliveIcon, {
   ADSLIVE_ICON_VARIANT,
 } from "../../../components/icon";
 
-import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
+import useAdvertiserStore, { useLocations } from "../../../stores/advertiser-store/advertiser-store.hook";
 import AdvertiserContent from "../others/advertiser-content";
 import AdvertiserAreaTabs from "./area-tabs";
 import LocationSetting from "./location-setting";
@@ -15,18 +15,17 @@ import ScanQR from "./scanQR";
 import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
 import { Dropdown } from "react-bootstrap";
+import AdsliveLoading from "../../../components/loading";
 
 export default function AdvertiserScreen() {
-  const { locations, loadLocations } = useAdvertiserStore();
+  const locations = useLocations()
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentArea, setCurrentArea] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
   const [selectedScreen, setSelectScreen] = useState(null);
+  const [loading, setLoading] = useState(true)
   // const [isRefresh, setIsRefresh] = useState(null);
-  const [screenChanged, setScreenChanged] = useState(null)
-
-
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -44,8 +43,10 @@ export default function AdvertiserScreen() {
   // }
 
   useEffect(() => {
-      const newCurrentLocation = locations?.find(e => e.id === currentLocation?.id)
-      if (newCurrentLocation || locations?.length) handleChangeLocation(newCurrentLocation || locations[1]);
+    if (!locations) return
+      const newCurrentLocation = locations.find(e => e.id === currentLocation?.id)
+      if (newCurrentLocation || locations.length) handleChangeLocation(newCurrentLocation || locations[1]);
+      setLoading(false)
   }, [locations]);
 
   const Setting = (
@@ -67,7 +68,6 @@ export default function AdvertiserScreen() {
     <ScreenDetails
       returnPreLayout={(changed) => {
         setSelectScreen(false)
-        if (changed) setScreenChanged(true)
       }}
       locationData={currentLocation}
       screenData={selectedScreen}
@@ -76,6 +76,7 @@ export default function AdvertiserScreen() {
 
   return (
     <>
+      {loading && <AdsliveLoading />}
       {selectedScreen ? (
         ScreenDetailsLayout
       ) : showNewScreen ? (
@@ -143,7 +144,6 @@ export default function AdvertiserScreen() {
           {currentArea && (
             <AdvertiserScreenItems
               id={currentArea?.id}
-              handleScreenChanged={[screenChanged, setScreenChanged]}
               areaName={currentArea?.name}
               selectScreen={(screen) => setSelectScreen(screen)}
             />

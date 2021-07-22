@@ -9,3 +9,7 @@ export default function useAdvertiserStore() {
 export function useAreaScreens() {
   return useSelector((state: any) => state.areaScreens)
 }
+
+export function useLocations() {
+  return useSelector((state: any) => state.locations)
+}

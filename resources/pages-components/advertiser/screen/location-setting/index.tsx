@@ -19,14 +19,17 @@ import AdsliveIcon, {
 } from "../../../../components/icon";
 import { Toaster } from "../../../../components/toaster";
 import { AdsliveH4 } from "../../../../components/typography";
-import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
+import useAdvertiserStore, { useLocations } from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { parseTitle } from "../../../../utils/common.util";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
+import { useDispatch } from "react-redux";
+import { createAreaAsync, getLocationAsync } from "../../../../stores/advertiser-store/slice";
 
 export default function LocationSetting({ returnPreLayout, location }) {
   const addArea = (area) => { };
-  const { locations, loadLocations } = useAdvertiserStore()
+  const locations = useLocations()
+  const dispatch = useDispatch()
   const [locationData, setLocationData] = useState(location);
   const [name, setName] = useState(location?.name);
   const [address, setAddress] = useState(location?.address);
@@ -42,24 +45,22 @@ export default function LocationSetting({ returnPreLayout, location }) {
   const handleCreateArea = async () => {
     setShowNewArea(false);
     setDataChanged(true)
-    const res: any = await AdvertiserApiClient.createArea(
-      locationData?.id,
-      newArea
-    );
-    if (res?.data) loadLocations()
-    if (res['error']) {
-      setErrorMsg(res['error']['data']['error']['message'])
-    }
-    if (res?.data) {
+    const res: any = await dispatch(createAreaAsync({locationId: locationData?.id, data: newArea}))
+    if (res?.payload) {
+      console.log(res);
+      dispatch(getLocationAsync())
       setSuccessMsg('Created new Area')
     }
+    // if (res && res['error']) {
+    //   setErrorMsg(res['error']['data']['error']['message'])
+    // }
   };
   async function handleDeleteArea(id) {
     handleLoadDragItem(id, true)
     setDataChanged(true)
     const res: any = await AdvertiserApiClient.deleteArea(id)
     if (res?.data) {
-      loadLocations()
+      dispatch(getLocationAsync())
     }
   };
   function handleLoadDragItem(id, isLoading: boolean) {
@@ -77,7 +78,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
         if (id) {
           AdvertiserApiClient.updateArea(id, { order: i + 1 }).then(res => {
             if (newAreas.length - 1 === i) {
-              loadLocations()
+              dispatch(getLocationAsync())
             }
           })
         }
@@ -96,7 +97,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
     const res: any = await AdvertiserApiClient.updateLocation(location.id, newData)
     if (res?.data) {
       setSuccessMsg("Updated!")
-      loadLocations()
+      dispatch(getLocationAsync())
       setDataChanged(true)
       // const mergeData = {...locationData, ...res.data}
       // setLocationData(mergeData)
@@ -106,7 +107,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
     }
   }
   useEffect(() => {
-    setLocationData(locations?.find(e => location.id === e.id) || location)
+    setLocationData(locations?.find(e => location?.id === e.id) || location)
     if (deleteAreaId && location.areas.includes(e => e.id === deleteAreaId)) {
       // handleLoadDragItem(deleteAreaId, false)
       setDeleteAreaId(null);

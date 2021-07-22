@@ -3,7 +3,7 @@ import { advertiserHeaderItems } from "./definition";
 import AdvertiserHeader from "./header";
 import styles from "./styles.module.scss";
 import { useSelector, useDispatch } from 'react-redux';
-import { getScreenAsync } from "../../stores/advertiser-store/slice";
+import { getLocationAsync, getScreenAsync } from "../../stores/advertiser-store/slice";
 
 export default function AdvertiserLayout() {
   const [currentHeaderItemId, setCurrentHeaderItemId] = useState(
@@ -24,9 +24,16 @@ export default function AdvertiserLayout() {
 	const dispatch = useDispatch();
 
   useEffect(() => {
-		dispatch(getScreenAsync());
+		initData()
 	}, [dispatch]);
-
+  
+  async function initData() {
+    const res = await dispatch(getLocationAsync());
+    if (res['payload']) {
+      const locationsData = res['payload']
+      dispatch(getScreenAsync(locationsData));
+    }
+  }
   return (
     <div className={styles.advertiserLayout}>
       <div className={styles.contentWrapper}>

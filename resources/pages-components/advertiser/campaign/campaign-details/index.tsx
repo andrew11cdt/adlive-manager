@@ -22,7 +22,7 @@ import { displayTime, parseTitle } from "../../../../utils/common.util";
 import SelectVideosModal from "../selectVideosModal";
 import AdsliveLoading from "../../../../components/loading";
 import { Toaster } from "../../../../components/toaster";
-import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
+import { useLocations } from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { Area } from "../../../../stores/advertiser-store/advertiser-store.context";
 import ConfirmModal from "../../../../components/confirmModal";
 import {
@@ -36,7 +36,7 @@ import {
 import { Row } from "react-bootstrap";
 import {useSelector} from "react-redux"
 export default function CampaignDetails(props) {
-  const { locations } = useAdvertiserStore();
+  const locations = useLocations()
   const { returnPreLayout, campaign } = props;
   const { videos, beginTime, endTime, targetScreenConditions } = campaign || {};
   const collectAllAreas = (locations) => locations?.reduce(
