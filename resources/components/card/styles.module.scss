@@ -150,19 +150,22 @@
   justify-content: space-between;
   padding: 0 25px;
   background: white;
+  height: 50px;
   &:hover:not(.loading) {
     background: whitesmoke;
   }
-  &.loading {
-    > * {
-      margin: 6px 0;
-    }
+  .item {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
+
   .leftItem {
     display: flex;
     align-items: center;
     max-width: 255px;
-    margin: 6px 0;
+    overflow: hidden;
   }
 }
 .datePickerContainer {

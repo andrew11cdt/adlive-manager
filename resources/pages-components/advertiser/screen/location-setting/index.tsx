@@ -19,18 +19,19 @@ import AdsliveIcon, {
 } from "../../../../components/icon";
 import { Toaster } from "../../../../components/toaster";
 import { AdsliveH4 } from "../../../../components/typography";
-import useAdvertiserStore, { useLocations } from "../../../../stores/advertiser-store/advertiser-store.hook";
+import useAdvertiserStore from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { parseTitle } from "../../../../utils/common.util";
 import SubLayout from "../../../sub-layout";
 import styles from "./styles.module.scss";
-import { useDispatch } from "react-redux";
-import { createAreaAsync, getLocationAsync } from "../../../../stores/advertiser-store/slice";
+import { useDispatch, useSelector } from "react-redux";
+import { createAreaAsync } from "../screenSlice";
+import { getLocationAsync, selectLocationById, selectLocations } from "../locationSlice";
 
-export default function LocationSetting({ returnPreLayout, location }) {
+export default function LocationSetting({ returnPreLayout, locationId }) {
   const addArea = (area) => { };
-  const locations = useLocations()
+  const locations = useSelector(selectLocations)
+  const location:any = useSelector((state) => selectLocationById(state, locationId))
   const dispatch = useDispatch()
-  const [locationData, setLocationData] = useState(location);
   const [name, setName] = useState(location?.name);
   const [address, setAddress] = useState(location?.address);
   const [showNewArea, setShowNewArea] = useState(null);
@@ -45,7 +46,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
   const handleCreateArea = async () => {
     setShowNewArea(false);
     setDataChanged(true)
-    const res: any = await dispatch(createAreaAsync({locationId: locationData?.id, data: newArea}))
+    const res: any = await dispatch(createAreaAsync({locationId: location?.id, data: newArea}))
     if (res?.payload) {
       console.log(res);
       dispatch(getLocationAsync())
@@ -83,15 +84,13 @@ export default function LocationSetting({ returnPreLayout, location }) {
           })
         }
       })
-
-      // await AdvertiserApiClient.updateLocation(location.id, {...locationData, areas: newAreas})
       setDataChanged(true)
     }
   };
   async function updateLocation(key, isChange) {
     if (!isChange) return
     setLoadingData({...loadingData, [key]: true})
-    const newData = {...locationData, ...{name, address}}
+    const newData = {...location, ...{name, address}}
     
     if (address?.length == 0) delete newData.address
     const res: any = await AdvertiserApiClient.updateLocation(location.id, newData)
@@ -99,17 +98,13 @@ export default function LocationSetting({ returnPreLayout, location }) {
       setSuccessMsg("Updated!")
       dispatch(getLocationAsync())
       setDataChanged(true)
-      // const mergeData = {...locationData, ...res.data}
-      // setLocationData(mergeData)
     }
     if (res.error) {
       setErrorMsg(res.error.data?.message || 'Failed')
     }
   }
   useEffect(() => {
-    setLocationData(locations?.find(e => location?.id === e.id) || location)
     if (deleteAreaId && location.areas.includes(e => e.id === deleteAreaId)) {
-      // handleLoadDragItem(deleteAreaId, false)
       setDeleteAreaId(null);
     }
     setLoadingDragItems({})
@@ -143,14 +138,14 @@ export default function LocationSetting({ returnPreLayout, location }) {
         content={
           <div style={{ padding: "16px" }}>
             <AdCard
-              header={<div>{locationData?.name}</div>}
+              header={<div>{location?.name}</div>}
               body={
                 <>
                   <CardInput
                     title="name"
                     value={name}
                     isLoading={loadingData['name']}
-                    defaultValue={locationData?.name}
+                    defaultValue={location?.name}
                     onInputChange={(event) => setName(event.target.value)}
                     onFocusOut={(changed) => updateLocation('name', changed)}
                   />
@@ -158,13 +153,13 @@ export default function LocationSetting({ returnPreLayout, location }) {
                     title="address"
                     value={address}
                     isLoading={loadingData['address']}
-                    defaultValue={locationData?.address}
+                    defaultValue={location?.address}
                     onInputChange={(event) => setAddress(event.target.value)}
                     onFocusOut={(changed) => updateLocation('address', changed)}
                   />
-                  {locationData && (
+                  {location && (
                     <CardDragWrapper
-                      items={locationData?.areas?.map((area) => ({
+                      items={location?.areas?.map((area) => ({
                         id: area.recId.toString(),
                         content: (
                           <div key={area.id}>
@@ -231,7 +226,7 @@ export default function LocationSetting({ returnPreLayout, location }) {
               onInputChange={(e) =>
                 setNewArea({
                   name: e.target.value,
-                  order: locationData?.areas?.length || 0,
+                  order: location?.areas?.length || 0,
                 })
               }
             />

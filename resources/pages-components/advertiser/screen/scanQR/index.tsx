@@ -14,7 +14,7 @@ import AdsliveLoading, {
   ADSLIVE_LOADING_SIZE,
 } from "../../../../components/loading";
 import { useDispatch } from "react-redux";
-import { createScreenAsync } from "../../../../stores/advertiser-store/slice";
+import { createScreenAsync } from "../screenSlice";
 let QrReader: any = dynamic(() => import("react-qr-reader"), { ssr: false });
 
 interface QR_DATA {

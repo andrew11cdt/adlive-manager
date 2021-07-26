@@ -3,7 +3,9 @@ import { advertiserHeaderItems } from "./definition";
 import AdvertiserHeader from "./header";
 import styles from "./styles.module.scss";
 import { useSelector, useDispatch } from 'react-redux';
-import { getLocationAsync, getScreenAsync } from "../../stores/advertiser-store/slice";
+import { getLocationAsync } from "../../pages-components/advertiser/screen/locationSlice";
+import { getScreenAsync } from "../../pages-components/advertiser/screen/screenSlice";
+import store from "../../stores/advertiser-store/store";
 
 export default function AdvertiserLayout() {
   const [currentHeaderItemId, setCurrentHeaderItemId] = useState(
@@ -20,17 +22,15 @@ export default function AdvertiserLayout() {
   };
 
   const ContentComponent = currentHeaderItem?.contentComponent as any;
-
-	const dispatch = useDispatch();
-
-  useEffect(() => {
-		initData()
-	}, [dispatch]);
+  const dispatch = useDispatch();
   
+  initData()
+
   async function initData() {
     const res = await dispatch(getLocationAsync());
+    console.log({res});
     if (res['payload']) {
-      const locationsData = res['payload']
+      const locationsData = Object.values(res['payload'])
       dispatch(getScreenAsync(locationsData));
     }
   }

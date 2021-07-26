@@ -1,5 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import {areaScreenReducer, locationsReducer} from './slice';
+import { locationsReducer } from '../../pages-components/advertiser/screen/locationSlice';
+import { areaScreenReducer } from '../../pages-components/advertiser/screen/screenSlice';
+
 
 export default configureStore({
 	reducer: {

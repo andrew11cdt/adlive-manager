@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Container, Row } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import { AdButton } from "../../../../components/button";
 import AdCard, {
@@ -19,6 +20,7 @@ import StatusBadge from "../../../../components/status-badge";
 import { Toaster } from "../../../../components/toaster";
 import { AdsliveH4 } from "../../../../components/typography";
 import SubLayout from "../../../sub-layout";
+import { deleteScreenAsync } from "../screenSlice";
 import styles from "./styles.module.scss";
 
 export default function ScreenDetails(props) {
@@ -33,6 +35,7 @@ export default function ScreenDetails(props) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
+  const dispatch = useDispatch()
   const addArea = (area) => { };
   const resetDevice = (area) => { };
   const handleInputChange = (screenKey, event) => {
@@ -54,7 +57,9 @@ export default function ScreenDetails(props) {
     }
   };
   async function handleDeleteScreen() {
-    const res:any = await AdvertiserApiClient.deleteScreen(screenData.id)
+    // const res:any = await AdvertiserApiClient.deleteScreen(screenData.id)
+    if (!screenData) return
+    const res: any = await dispatch(deleteScreenAsync(screenData?.id))
     if (res) {
       setShowDeleteConfirm(false)
       returnPreLayout(true)

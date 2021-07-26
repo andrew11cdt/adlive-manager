@@ -6,7 +6,7 @@ import AdsliveIcon, {
   ADSLIVE_ICON_VARIANT,
 } from "../../../components/icon";
 
-import useAdvertiserStore, { useLocations } from "../../../stores/advertiser-store/advertiser-store.hook";
+import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
 import AdvertiserContent from "../others/advertiser-content";
 import AdvertiserAreaTabs from "./area-tabs";
 import LocationSetting from "./location-setting";
@@ -16,9 +16,11 @@ import AdvertiserScreenItems from "./screen-items";
 import styles from "./styles.module.scss";
 import { Dropdown } from "react-bootstrap";
 import AdsliveLoading from "../../../components/loading";
+import { useSelector } from "react-redux";
+import { selectLocations } from "./locationSlice";
 
 export default function AdvertiserScreen() {
-  const locations = useLocations()
+  const locations = useSelector(selectLocations)
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentArea, setCurrentArea] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
@@ -44,8 +46,8 @@ export default function AdvertiserScreen() {
 
   useEffect(() => {
     if (!locations) return
-      const newCurrentLocation = locations.find(e => e.id === currentLocation?.id)
-      if (newCurrentLocation || locations.length) handleChangeLocation(newCurrentLocation || locations[1]);
+      const newCurrentLocation = locations.find(e => e['id'] === currentLocation?.id)
+      if (newCurrentLocation || locations.length) handleChangeLocation(newCurrentLocation || locations[0]);
       setLoading(false)
   }, [locations]);
 
@@ -54,7 +56,7 @@ export default function AdvertiserScreen() {
       returnPreLayout={(changed) => {
         setShowSetting(false)
       }}
-      location={currentLocation}
+      locationId={currentLocation?.id}
     />
   );
   const NewScreenLayout = (
@@ -95,10 +97,10 @@ export default function AdvertiserScreen() {
                 <Dropdown.Menu>
                   {locations?.map((location) => (
                     <Dropdown.Item
-                      key={location.name}
+                      key={location['name']}
                       onClick={() => handleChangeLocation(location)}
                     >
-                      {location.name}
+                      {location['name']}
                     </Dropdown.Item>
                   ))}
                 </Dropdown.Menu>

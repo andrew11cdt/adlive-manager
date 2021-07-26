@@ -12,7 +12,7 @@ import ContentLoader from 'react-content-loader'
 import { useOnClickOutside } from "../../hooks";
 
 const InputLoader = () => (
-  <ContentLoader viewBox="0 0 340 46">
+  <ContentLoader viewBox="0 0 340 46" backgroundColor="#e3e3e3"  >
     <rect x="0" y="0" rx="8" ry="8" width="340" height="46" />
   </ContentLoader>
 )
@@ -201,18 +201,25 @@ export function CardSelectTime({ title, initValue, onChange, ...props }) {
   );
 }
 const DragItemLoader = () => (
-  <ContentLoader viewBox="0 0 340 60">
+  <ContentLoader 
+    viewBox="0 0 340 50"
+    backgroundColor="#e3e3e3"
+    foregroundColor="#ecebeb"
+    width={340}
+    height={50}
+    speed={2}
+  >
     {/* Only SVG shapes */}
-    <rect x="0" y="10" rx="5" ry="5" width="16" height="50" />
-    <rect x="40" y="17" rx="4" ry="4" width="340" height="13" />
-    <rect x="40" y="40" rx="3" ry="3" width="250" height="10" />
+    <rect x="0" y="10" rx="5" ry="5" width="16" height="40" />
+    <rect x="40" y="14" rx="4" ry="4" width="300" height="13" />
+    <rect x="40" y="35" rx="3" ry="3" width="250" height="10" />
   </ContentLoader>
 )
 export function CardDragItem({ isLoading, onDelete, children }) {
   return (
     <div className={`${styles.cardDragItem} ${isLoading ? styles.loading : ''}`}>
-      {isLoading ? <DragItemLoader /> : (
-        <>
+      {isLoading ? <DragItemLoader/> : (
+        <div className={styles.item}>
           <div className={styles.leftItem}>
             <AdIcon name="drag" mr="20px" h="48px" w="16px" />
             {children}
@@ -220,7 +227,7 @@ export function CardDragItem({ isLoading, onDelete, children }) {
           <AdIcon name="minus_circle" ml="6px" w="16px" onClick={onDelete}
             className={styles.icon}
           />
-        </>
+        </div>
       )
       }
     </div>

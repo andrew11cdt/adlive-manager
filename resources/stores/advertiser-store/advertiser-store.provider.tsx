@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import AdvertiserApiClient from "../../api-clients/advertiser.api-client";
-import { API_CODE } from "../../definitions/enums";
 import cookieUtil from "../../utils/cookie.util";
 import restClient from "../../utils/rest-client";
 import AdvertiserStoreActions from "./advertiser-store.actions";
 import AdvertiserStoreContext, {
   AdvertiserStoreContextDataAuth,
-  AdvertiserStoreContextDataLocation,
 } from "./advertiser-store.context";
 
-import { useSelector } from "react-redux";
 
 export default function AdvertiserStoreProvider({
   children
@@ -75,20 +72,6 @@ export default function AdvertiserStoreProvider({
     }
     return res.data
   }
-  
-  // async function loadLocations() {
-  //   const res:any = await AdvertiserApiClient.getLocations()
-  //   if (res?.data) {
-  //     res.data.map(e => {
-  //       if (e.areas) {
-  //         e.areas = e.areas.sort((pre, cur) => pre.order && cur.order && pre.order > cur.order ? 1 : -1)
-  //       }
-  //       return e
-  //     })
-  //     setLocations(res.data)
-  //   }
-  //   return res.data
-  // }
 
   useEffect(() => {
     const authToken = cookieUtil.getCookie("adsl-adver-at") || null;

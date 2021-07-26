@@ -26,14 +26,7 @@ export default class AdvertiserApiClient {
   // ---------------------------- Location & Area API --------------------------
 
   static async getLocations() {
-    return restClient
-      .asyncGet("/advertiser/location")
-      .then(({ status, data }) => {
-        return standardServiceResponse(status, data);
-      })
-      .catch((err) => {
-        return standardServiceResponse(1, null, err);
-      });
+    return restClient.asyncGet("/advertiser/location")
   }
   static async updateLocation(id, body) {
     return restClient.asyncPut(`/advertiser/location/${id}`, body).catch(err => ({ error: err.response }))

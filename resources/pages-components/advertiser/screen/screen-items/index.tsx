@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdCard from "../../../../components/card";
 import AdsliveLoading from "../../../../components/loading";
 import NoData from "../../../../components/no-data";
 import StatusBadge from "../../../../components/status-badge";
-import { useAreaScreens } from "../../../../stores/advertiser-store/advertiser-store.hook";
+import { selectAreaScreens, selectAreaScreensObj } from "../screenSlice";
 import styles from "./styles.module.scss";
 
 export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
   const [screens, setScreens] = useState({});
   const [loading, setLoading] = useState(null);
-  const areaScreens = useAreaScreens()
+  const areaScreens = useSelector(selectAreaScreensObj)
+
   useEffect(() => {
     if (!id) return
     setLoading(true)

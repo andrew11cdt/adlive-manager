@@ -21,9 +21,8 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "resources/stores/advertiser-store/store.js", "resources/stores/advertiser-store/slice.ts"  ],
+    "**/*.tsx"],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ]
 }
