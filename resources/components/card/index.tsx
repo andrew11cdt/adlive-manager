@@ -115,7 +115,7 @@ export function CardMultiSelect(props: CardSelectInput) {
   }
   function displaySelect() { 
     let res = ''
-    if (selectedValue?.length) {
+    if (selectedValue?.length && values?.length) {
       const str = selectedValue.join(', ')
       res = str.length > 30 ? str.slice(0, 30).concat('...') : str;
     } else res = "Select";
@@ -128,6 +128,7 @@ export function CardMultiSelect(props: CardSelectInput) {
   function handleSelectAll(value) {
     setSelectAll(value)
     setSelectValue(value ? values : [])
+    onChange(values)
   }
   return (
     <div className={styles.cardSelect}>

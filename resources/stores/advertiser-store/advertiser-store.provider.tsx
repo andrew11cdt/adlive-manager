@@ -28,7 +28,6 @@ export default function AdvertiserStoreProvider({
     setVideos,
   ] = useState([]);
   
-  const [campaigns, setCampaigns] = useState(null);
   useEffect(() => {
     if (!auth?.token) {
       return;
@@ -54,24 +53,11 @@ export default function AdvertiserStoreProvider({
       }
     });
 
-    loadCampaigns()
-  
     AdvertiserApiClient.getVideos().then((res: any) => {
       if (res && res.data) setVideos(res.data)
     });
     
   }, [auth?.token]);
-  function compareTime(time1, time2) {
-    return Date.parse(time1) < Date.parse(time2) ? 1 : -1
-  }
-  async function loadCampaigns() {
-    const res:any = await AdvertiserApiClient.getCampaigns()
-    if (res?.data) {
-      res.data = res.data.sort((pre, cur) => compareTime(pre.updatedAt, cur.updatedAt))
-      setCampaigns(res.data)
-    }
-    return res.data
-  }
 
   useEffect(() => {
     const authToken = cookieUtil.getCookie("adsl-adver-at") || null;
@@ -94,7 +80,7 @@ export default function AdvertiserStoreProvider({
   }, []);
 
   return (
-    <AdvertiserStoreContext.Provider value={{ auth, campaigns, setCampaigns, loadCampaigns, videos, setVideos }}>
+    <AdvertiserStoreContext.Provider value={{ auth, videos, setVideos }}>
       {children}
     </AdvertiserStoreContext.Provider>
   );

@@ -88,30 +88,30 @@ export default class AdvertiserApiClient {
       });
   }
   static async createCampaign(body) {
-    return restClient.asyncPost(`/advertiser/campaign/`, body).catch(err => ({ error: err.response }))
+    return restClient.asyncPost(`/advertiser/campaign/`, body)
   }
   static async updateCampaign(id, body) {
-    return restClient.asyncPut(`/advertiser/campaign/${id}`, body).catch(err => ({ error: err.response }))
+    return restClient.asyncPut(`/advertiser/campaign/${id}`, body)
   }
   static async getCampaign(id) {
-    return restClient.asyncGet(`/advertiser/campaign/${id}`).catch(err => ({ error: err.response }))
+    return restClient.asyncGet(`/advertiser/campaign/${id}`)
   }
   // --------------------------------------- CAMPAIGNS ADS-SET API ----------------------------------------
 
   static async getCampaignAdsSet(id) {
-    return restClient.asyncGet(`/advertiser/campaign/${id}/ads-set`).catch(err => ({ error: err.response }))
+    return restClient.asyncGet(`/advertiser/campaign/${id}/ads-set`)
   }
   static async getCampaignSchedule(id) {
-    return restClient.asyncGet(`/advertiser/campaign/${id}/schedule`).catch(err => ({ error: err.response }))
+    return restClient.asyncGet(`/advertiser/campaign/${id}/schedule`)
   }
   static async updateCampaignSchedule(id, body) {
-    return restClient.asyncPut(`/advertiser/campaign/${id}/schedule`, body).catch(err => ({ error: err.response }))
+    return restClient.asyncPut(`/advertiser/campaign/${id}/schedule`, body)
   }
   static async getCampaignTargetScreenConditions(id) {
-    return restClient.asyncGet(`/advertiser/campaign/${id}/target-screen-conditions`).catch(err => ({ error: err.response }))
+    return restClient.asyncGet(`/advertiser/campaign/${id}/target-screen-conditions`)
   }
   static async updateCampaignTargetScreenConditions(id, body) {
-    return restClient.asyncPut(`/advertiser/campaign/${id}/target-screen-conditions`, body).catch(err => ({ error: err.response }))
+    return restClient.asyncPut(`/advertiser/campaign/${id}/target-screen-conditions`, body)
   }
   static async updateAdsSetMedia(ads_set_id, body) {
     return restClient.asyncPut(`/advertiser/ads-set/${ads_set_id}/media`, body).catch(err => ({ error: err.response }))

@@ -29,7 +29,9 @@ export const displayTime = (time: string, opt?: TimeOptions) => {
   if (!time) return '-'
   return moment(time).format(`DD/MMM/YYYY ${showHours ? "HH:MM": ""}`)
 };
-
+export function compareTime(time1, time2) {
+  return Date.parse(time1) < Date.parse(time2) ? 1 : -1
+}
 export const standardServiceResponse = (
   statusCode: 200 | 201 | 301 | 400 | 401 | 403 | 500 | number,
   data: any,

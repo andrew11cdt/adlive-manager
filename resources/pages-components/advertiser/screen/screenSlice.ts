@@ -6,7 +6,6 @@ import { selectAllAreaIds } from './locationSlice';
 export const getScreenAsync = createAsyncThunk(
 	'screens/getScreenAsync',
 	async (locations: any[]) => {
-		console.log(locations);
 		if (!locations) return {}
 		const areaIds = locations?.reduce(
 			(res, cur) => [...res, ...cur.areas],

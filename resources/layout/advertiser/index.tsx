@@ -6,6 +6,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getLocationAsync } from "../../pages-components/advertiser/screen/locationSlice";
 import { getScreenAsync } from "../../pages-components/advertiser/screen/screenSlice";
 import store from "../../stores/advertiser-store/store";
+import { getCampaignsAsync } from "../../pages-components/advertiser/campaign/campaignSlice";
+import { getCampaignAdsetsAsync } from "../../pages-components/advertiser/campaign/adsetSlice";
+import { getScreenConditionsAsync } from "../../pages-components/advertiser/campaign/screenConditionSlice";
 
 export default function AdvertiserLayout() {
   const [currentHeaderItemId, setCurrentHeaderItemId] = useState(
@@ -23,15 +26,27 @@ export default function AdvertiserLayout() {
 
   const ContentComponent = currentHeaderItem?.contentComponent as any;
   const dispatch = useDispatch();
-  
-  initData()
+  useEffect(() => {
+    initLocationData()
+    initCampaignData()
+  }, [dispatch])
 
-  async function initData() {
+  async function initLocationData() {
     const res = await dispatch(getLocationAsync());
-    console.log({res});
     if (res['payload']) {
       const locationsData = Object.values(res['payload'])
       dispatch(getScreenAsync(locationsData));
+    }
+  }
+  async function initCampaignData() {
+    const res = await dispatch(getCampaignsAsync());
+    if (res['payload']) {
+      const campaignIds = Object.keys(res['payload'])
+      if (campaignIds?.length) {
+        campaignIds.map(id => {
+          dispatch(getCampaignAdsetsAsync(id))
+        })
+      }
     }
   }
   return (

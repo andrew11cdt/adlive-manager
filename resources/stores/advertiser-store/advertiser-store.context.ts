@@ -40,14 +40,8 @@ export type AdvertiserStoreContextDataScreen = {
 
 export type AdvertiserStoreContextData = {
   auth?: AdvertiserStoreContextDataAuth;
-  locations?: AdvertiserStoreContextDataLocation[];
-  loadLocations?: any;
-  campaigns: any;
-  setCampaigns: any;
-  loadCampaigns: any;
   videos: any;
   setVideos: any;
-  loadAllScreen?: any;
 };
 
 const AdvertiserStoreContext = createContext<AdvertiserStoreContextData>(null);

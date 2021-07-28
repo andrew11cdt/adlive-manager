@@ -22,7 +22,6 @@ import { displayTime, parseTitle } from "../../../../utils/common.util";
 import SelectVideosModal from "../selectVideosModal";
 import AdsliveLoading from "../../../../components/loading";
 import { Toaster } from "../../../../components/toaster";
-import { useLocations } from "../../../../stores/advertiser-store/advertiser-store.hook";
 import { Area } from "../../../../stores/advertiser-store/advertiser-store.context";
 import ConfirmModal from "../../../../components/confirmModal";
 import {
@@ -34,19 +33,24 @@ import {
   STRATEGIES,
 } from "./campaign-type";
 import { Row } from "react-bootstrap";
-import {useSelector} from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { selectLocations } from "../../screen/locationSlice";
+import { selectAdsetsObj, updateAdsetAsync } from "../adsetSlice";
+import { updateCampaignAsync, updateScreenConditionsAsync } from "../campaignSlice";
+import { selectAreaScreensObj } from "../../screen/screenSlice";
 export default function CampaignDetails(props) {
-  const locations = useLocations()
+  const locations = useSelector(selectLocations)
   const { returnPreLayout, campaign } = props;
   const { videos, beginTime, endTime, targetScreenConditions } = campaign || {};
   const collectAllAreas = (locations) => locations?.reduce(
     (res, cur) => (res = [...res, ...cur.areas]),
     []
   );
-  const areaScreens = useSelector((state: any) => state.areaScreens)
+  const areaScreens = useSelector(selectAreaScreensObj)
+  const adsets: any = useSelector(selectAdsetsObj)
 
   const [status, setStatus] = useState(campaign?.status);
-  const [adsSet, setAdsSet] = useState<AdsSetType>(null);
+  const [adsSet, setAdsSet] = useState<AdsSetType>(adsets[campaign?.id] || null);
   const [schedule, setSchedule] = useState({ beginTime, endTime });
   const [screenConditions, setScreenConditions] = useState<any>({
     ...targetScreenConditions,
@@ -70,6 +74,7 @@ export default function CampaignDetails(props) {
     screen: null,
     schedule: null,
   });
+  const dispatch = useDispatch()
   const CampainHeader = (title, settingKey) => (
     <div className={styles.campaignHeader}>
       <AdsliveH4>{title}</AdsliveH4>
@@ -94,14 +99,11 @@ export default function CampaignDetails(props) {
   );
   function requestAPI(loadKey: LOAD_KEYS, data) {
     if (loadKey === LOAD_KEYS.adsSet)
-      return AdvertiserApiClient.updateAdsSetMedia(adsSet.id, data);
+      return dispatch(updateAdsetAsync({ id: adsSet.id, data }))
     if (loadKey === LOAD_KEYS.screen)
-      return AdvertiserApiClient.updateCampaignTargetScreenConditions(
-        campaign.id,
-        data
-      );
+      return dispatch(updateScreenConditionsAsync({ id: campaign.id, data }))
     if (loadKey === LOAD_KEYS.schedule)
-      return AdvertiserApiClient.updateCampaignSchedule(adsSet.id, data);
+      return AdvertiserApiClient.updateCampaignSchedule(campaign.id, data);
   }
   async function handleUpdate(settingKey) {
     toggleSetting(settingKey, false);
@@ -111,7 +113,6 @@ export default function CampaignDetails(props) {
       const res: any = await requestAPI(settingKey, REQ_DATA);
       if (res && res.data) {
         if (settingKey === LOAD_KEYS.adsSet) {
-          setAdsSet({ ...adsSet, adsSetMediaList: res.data });
           setSuccessMsg("Updated Media")
         } else if (settingKey === LOAD_KEYS.schedule) {
           setSuccessMsg("Updated Schedule");
@@ -148,10 +149,6 @@ export default function CampaignDetails(props) {
     }));
 
   // ----------------- Load Effect Data -------------------
-
-  useEffect(() => {
-    fetchAds();
-  }, [campaign]);
   useEffect(() => {
     const rules = screenConditions?.detail?.rules;
     if (!rules?.length) return;
@@ -166,18 +163,6 @@ export default function CampaignDetails(props) {
     if (loadAreas?.length) setInitAreas(loadAreas);
   }, [screenConditions]);
   // ---------------------- API funct --------------------
-  const fetchAds = async () => {
-    if (!campaign) return;
-    handleSetLoading(LOAD_KEYS.adsSet, true);
-    const res: any = await AdvertiserApiClient.getCampaignAdsSet(campaign.id);
-    if (res && res.data) {
-      res.data[0].adsSetMediaList = res.data[0].adsSetMediaList?.filter(
-        (e) => !!e.withMedia
-      );
-      setAdsSet(res.data[0]);
-    }
-    handleSetLoading(LOAD_KEYS.adsSet, false);
-  };
   function checkLiveCondition() {
     if (ActionOnStatus(status) !== 'live') return true
     return screenConditions?.detail?.rules?.find((e) => e.ruleTypes === "SCREENS")?.value?.screenIds.length > 0 &&
@@ -191,10 +176,8 @@ export default function CampaignDetails(props) {
       return
     }
     setChangeStatus(true);
-    const res: any = await AdvertiserApiClient.updateCampaign(campaign?.id, {
-      status,
-    });
-    if (res.status) setStatus(status);
+    const res: any = await dispatch(updateCampaignAsync({ id: campaign?.id, data: { status } }))
+    if (res.payload) setStatus(status);
     setChangeStatus(false);
   };
 
@@ -251,65 +234,79 @@ export default function CampaignDetails(props) {
     handleChangeConditions({ strategy: STRATEGIES[0].key });
   }
   function handleLocationSelect(selectData) {
-    const choseLocations = locations?.filter((e) =>
+    const choseLocations = locations?.filter((e: any) =>
       selectData.includes(e.name)
     );
-    //
-    if (choseLocations?.length) {
-      let collectAreas = [];
-      choseLocations.map( location =>
-        (collectAreas = [...collectAreas, ...location.areas].filter(
-          (e) => !collectAreas.includes(e)
-        ))
-      );
-      setAreaOptions(collectAreas);
+    const collectAreas: any = choseLocations.reduce((res: any[], e) => [...res, ...e['areas']], [])
+
+    setAreaOptions(collectAreas);
+    if (!collectAreas?.length) {
+      handleAreaSelect([])
     }
     //
-    const conditions = screenConditions || {};
-    if (!conditions.detail) conditions.detail = { rules: [] };
-    conditions.detail.rules[0] = {
+    const conditions = { ...screenConditions } || {};
+    const rule = {
       ruleTypes: "LOCATION",
       value: {
-        locationRecIds: choseLocations.map((e) => e.recId),
-        locationIds: choseLocations.map((e) => e.id),
+        locationRecIds: choseLocations.map((e: any) => e.recId),
+        locationIds: choseLocations.map((e: any) => e.id),
       },
     };
+    conditions.detail = {
+      ...conditions.detail,
+      rules: updateRule(rule)
+    }
     handleChangeConditions(conditions);
     setTimeout(() => {
       setInitAreas([])
     }, 1);
   }
+
   async function handleAreaSelect(selectAreas) {
     const choseAreas = areaOptions?.filter((a) => selectAreas.includes(a.name));
-    const conditions = screenConditions || {};
-    if (!conditions.detail) conditions.detail = { rules: [] };
-    conditions.detail.rules[1] = {
+    const conditions = { ...screenConditions } || {};
+    let rules = screenConditions.detail?.rules
+    const areaRule = {
       ruleTypes: "AREA",
       value: {
         areaRecIds: choseAreas.map((e) => e.recId),
         areaIds: choseAreas.map((e) => e.id),
       },
-    };
-    const areaIds = choseAreas.map((a) => a.id);
-    if (!areaIds?.length) {
-      handleChangeConditions(conditions);
-      return;
     }
-    
-
-    handleSetLoading(LOAD_KEYS.screen, true);
-    const loadScreens = areaIds.reduce((res, id) => res = areaScreens && areaScreens[id] ? [...res, ...areaScreens[id]] : res, [])
-    conditions.detail.rules[2] = {
+    const areaIds = choseAreas.map((a) => a.id);
+    const loadScreens = areaIds.reduce((res, id) => areaScreens[id] ? [...res, ...areaScreens[id]] : res, [])
+    const screenRule = {
       ruleTypes: "SCREENS",
       value: {
         screenRecIds: loadScreens.map((e) => e.recId),
         screenIds: loadScreens.map((e) => e.id),
       },
     };
+    if (rules) {
+      rules = updateRule(areaRule)
+      rules = updateRule(screenRule)
+    }
+    conditions.detail = {
+      ...conditions.detail,
+      rules
+    }
+    console.log({ conditions });
     handleChangeConditions(conditions);
-    handleSetLoading(LOAD_KEYS.screen, false);
   }
+  function updateRule(rule) {
+    console.log(rule);
+    let rules = screenConditions?.detail?.rules || []
+    if (rules) {
+      if (rules.find((e) => e.ruleTypes === rule.ruleTypes)) {
+        rules = rules.map(e => {
+          return e.ruleTypes === rule.ruleTypes ? rule : e
+        })
+      } else rules = [...rules, rule]
+    }
+    console.log({ rules });
 
+    return rules
+  }
   function handleInitValue(ids, items) {
     return (items && ids && items?.filter((e) => ids?.includes(e.id))) || null;
   }
@@ -331,9 +328,9 @@ export default function CampaignDetails(props) {
   }
   // --------------------
   function handleReturnLayout() {
-    const isDataLoading = !!Object.keys(loading).find(key => !!loading[key] && key !== 'ads-set')
-    if (isDataLoading) setWarningMsg("Please wait for updating data!")
-    else returnPreLayout()
+    // const isDataLoading = !!Object.keys(loading).find(key => !!loading[key] && key !== 'ads-set')
+    // if (isDataLoading) setWarningMsg("Please wait for updating data!")
+    returnPreLayout()
   }
   function AdsetFooter() {
     const length = adsSet?.adsSetMediaList?.length
@@ -488,7 +485,13 @@ export default function CampaignDetails(props) {
                           Screens
                         </span>
                         <span>
-                          <InfoText size="lg">{initLocations?.length}</InfoText>{" "}
+                          <InfoText size="lg">
+                            {
+                              screenConditions?.detail?.rules.find(
+                                (e) => e.ruleTypes === "LOCATION"
+                              )?.value?.locationIds?.length
+                            }
+                          </InfoText>{" "}
                           Location
                         </span>
                       </div>
@@ -504,7 +507,7 @@ export default function CampaignDetails(props) {
                           <CardMultiSelect
                             title="Location"
                             initValue={initLocations?.map((e) => e.name)}
-                            values={locations?.map((e) => e.name)}
+                            values={locations?.map((e: any) => e.name)}
                             onChange={handleLocationSelect}
                           />
                           <CardMultiSelect
