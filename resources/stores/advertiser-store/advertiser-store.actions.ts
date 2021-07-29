@@ -34,9 +34,4 @@ export default class AdvertiserStoreActions {
     redirectTo("/advertiser/sign-in");
   }
 
-  static async getLocations() {
-    return AdvertiserApiClient.getLocations().then(({ code, data }) => {
-      return data || [];
-    });
-  }
 }

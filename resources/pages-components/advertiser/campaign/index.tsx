@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import AdvertiserApiClient from "../../../api-clients/advertiser.api-client";
@@ -10,9 +10,10 @@ import AdsliveLoading, {
 import NoData from "../../../components/no-data";
 import useAdvertiserStore from "../../../stores/advertiser-store/advertiser-store.hook";
 import AdvertiserContent from "../others/advertiser-content";
+import { addAdset, getCampaignAdsetsAsync } from "./adsetSlice";
 import CampaignDetails from "./campaign-details";
 import CampaignItem from "./campaign-item";
-import { getCampaignsAsync, selectCampaignStt, selectSortedCampaignByUpdateDate } from "./campaignSlice";
+import { createCampaignAsync, getCampaignsAsync, selectCampaignStt, selectSortedCampaignByUpdateDate } from "./campaignSlice";
 import styles from "./styles.module.scss";
 
 export default function AdvertiserCampaign() {
@@ -24,22 +25,25 @@ export default function AdvertiserCampaign() {
   const [selectedCampaign, setSelectCampaign] = useState(null);
   const [newCampaign, setNewCampaign] = useState(null);
 
-  const CampaignDetailsLayout = (
-    <CampaignDetails
-      returnPreLayout={() => {
-        setSelectCampaign(false);
-      }}
-      campaign={selectedCampaign}
-    />
-  );
+  function CampaignDetailsLayout() {
+    return (
+      <CampaignDetails
+        returnPreLayout={() => {
+          setSelectCampaign(false);
+        }}
+        campaignId={selectedCampaign.id}
+      />
+    )
+  }
   const handleCloseModal = () => {
     setShowNewCampaign(false);
   };
   const handleCreateCampaign = async () => {
-    const res = await AdvertiserApiClient.createCampaign(newCampaign);
-    if (res) {
-      setShowNewCampaign(false);
-      dispatch(getCampaignsAsync())
+    setShowNewCampaign(false);
+    const res = await dispatch(createCampaignAsync(newCampaign))
+    const id = res?.payload?.id
+    if (id) {
+      dispatch(getCampaignAdsetsAsync(id))
     }
   };
 
@@ -47,7 +51,7 @@ export default function AdvertiserCampaign() {
   return (
     <>
       {selectedCampaign ? (
-        CampaignDetailsLayout
+        <CampaignDetailsLayout />
       ) : showFilter ? (
         FilterLayout
       ) : (

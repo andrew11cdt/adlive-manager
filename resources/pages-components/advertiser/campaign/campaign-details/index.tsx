@@ -34,23 +34,26 @@ import {
 } from "./campaign-type";
 import { Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux"
-import { selectLocations } from "../../screen/locationSlice";
-import { selectAdsetsObj, updateAdsetAsync } from "../adsetSlice";
-import { updateCampaignAsync, updateScreenConditionsAsync } from "../campaignSlice";
+import { selectAreas, selectLocations } from "../../screen/locationSlice";
+import { getCampaignAdsetsAsync, selectAdsetsObj, updateAdsetAsync } from "../adsetSlice";
+import { selectCampaignsObj, updateCampaignAsync, updateCampaignScheduleAsync, updateScreenConditionsAsync } from "../campaignSlice";
 import { selectAreaScreensObj } from "../../screen/screenSlice";
 export default function CampaignDetails(props) {
   const locations = useSelector(selectLocations)
-  const { returnPreLayout, campaign } = props;
-  const { videos, beginTime, endTime, targetScreenConditions } = campaign || {};
+  const campaigns = useSelector(selectCampaignsObj)
+  const { returnPreLayout, campaignId } = props;
+  const { videos, beginTime, endTime, targetScreenConditions, status: campaignStt, name: campaignName } = campaigns[campaignId] || {}
   const collectAllAreas = (locations) => locations?.reduce(
     (res, cur) => (res = [...res, ...cur.areas]),
     []
   );
   const areaScreens = useSelector(selectAreaScreensObj)
+  const areas = useSelector(selectAreas)
   const adsets: any = useSelector(selectAdsetsObj)
 
-  const [status, setStatus] = useState(campaign?.status);
-  const [adsSet, setAdsSet] = useState<AdsSetType>(adsets[campaign?.id] || null);
+  const [status, setStatus] = useState(campaignStt);
+  const [adsSet, setAdsSet] = useState<AdsSetType>(adsets[campaignId] || null);
+
   const [schedule, setSchedule] = useState({ beginTime, endTime });
   const [screenConditions, setScreenConditions] = useState<any>({
     ...targetScreenConditions,
@@ -71,8 +74,8 @@ export default function CampaignDetails(props) {
   const [warningMsg, setWarningMsg] = useState(null);
   const [changedData, setChangedData] = useState<ChangedData>({
     "ads-set": null,
-    screen: null,
-    schedule: null,
+    "screen": null,
+    "schedule": null,
   });
   const dispatch = useDispatch()
   const CampainHeader = (title, settingKey) => (
@@ -101,17 +104,16 @@ export default function CampaignDetails(props) {
     if (loadKey === LOAD_KEYS.adsSet)
       return dispatch(updateAdsetAsync({ id: adsSet.id, data }))
     if (loadKey === LOAD_KEYS.screen)
-      return dispatch(updateScreenConditionsAsync({ id: campaign.id, data }))
+      return dispatch(updateScreenConditionsAsync({ id: campaignId, data }))
     if (loadKey === LOAD_KEYS.schedule)
-      return AdvertiserApiClient.updateCampaignSchedule(campaign.id, data);
+      return dispatch(updateCampaignScheduleAsync({ id: campaignId, data }))
   }
   async function handleUpdate(settingKey) {
     toggleSetting(settingKey, false);
     const REQ_DATA = changedData[settingKey];
     if (REQ_DATA) {
-      handleSetLoading(settingKey, true);
       const res: any = await requestAPI(settingKey, REQ_DATA);
-      if (res && res.data) {
+      if (res?.payload) {
         if (settingKey === LOAD_KEYS.adsSet) {
           setSuccessMsg("Updated Media")
         } else if (settingKey === LOAD_KEYS.schedule) {
@@ -119,11 +121,6 @@ export default function CampaignDetails(props) {
         } else setSuccessMsg("Updated");
         setChangedData({ ...changedData, [settingKey]: null });
       }
-      if (res && res.error) {
-        const msg = res.error.data?.error?.message
-        setErrorMsg(msg || 'An error happened!')
-      }
-      handleSetLoading(settingKey, false);
     }
   }
   const toggleSetting = (title, value) => {
@@ -136,8 +133,8 @@ export default function CampaignDetails(props) {
     openSetting(s);
   };
   const handleSetLoading = (title, value) => {
-    const s = { ...loading, ...{ [title]: value } };
-    setLoading(s);
+    const e = { ...loading, [title]: value }
+    setLoading(e)
   };
 
   const formatMediaRequest = (list) =>
@@ -147,20 +144,37 @@ export default function CampaignDetails(props) {
       withMediaRecId: withMediaRecId || withMedia?.recId,
       order: i,
     }));
-
+  
   // ----------------- Load Effect Data -------------------
+  const adsetStatus = useSelector(state => state['adsets']['status'])
+  const campaignStatus = useSelector(state => state['campaigns']['status'])
+  
   useEffect(() => {
-    const rules = screenConditions?.detail?.rules;
-    if (!rules?.length) return;
-    const initLocationIds = rules.find((e) => e.ruleTypes === "LOCATION")?.value
-      ?.locationIds;
-    const initAreaIds = rules.find((e) => e.ruleTypes === "AREA")?.value
-      ?.areaIds;
-    const loadLocations = handleInitValue(initLocationIds, locations);
-    const loadAreas = handleInitValue(initAreaIds, collectAllAreas(loadLocations));
+    if (adsetStatus !== 'loading' && campaignId && !adsets[campaignId]) {
+      dispatch(getCampaignAdsetsAsync(campaignId))
+    }
+  }, [adsetStatus, campaignId, dispatch])
+  
+  useEffect(() => {
+    if (campaignId && adsets) setAdsSet(adsets[campaignId])
+  }, [adsets])
+  
 
-    if (loadLocations?.length) setInitLocations(loadLocations);
-    if (loadAreas?.length) setInitAreas(loadAreas);
+  useEffect(() => {
+    let loader = {}
+    loader[LOAD_KEYS.adsSet] = adsetStatus == 'loading'
+    loader[LOAD_KEYS.screen] = loader[LOAD_KEYS.schedule] = campaignStatus == 'loading'
+    setLoading(loader)
+  }, [adsetStatus, campaignStatus, dispatch])
+  useEffect(() => {
+    const rules = campaigns[campaignId]?.targetScreenConditions?.detail?.rules;
+    if (!rules?.length) return;
+    const locationIds = rules.find((e) => e.ruleTypes === "LOCATION")?.value?.locationIds
+    const areaIds = rules.find((e) => e.ruleTypes === "AREA")?.value?.areaIds
+    const initLocations = locations.filter(l => locationIds.includes(l['id']))
+    const initAreas = areas.filter(l => areaIds.includes(l['id']))
+    if (initLocations) setInitLocations(initLocations)
+    if (initAreas) setInitAreas(initAreas)
   }, [screenConditions]);
   // ---------------------- API funct --------------------
   function checkLiveCondition() {
@@ -176,14 +190,14 @@ export default function CampaignDetails(props) {
       return
     }
     setChangeStatus(true);
-    const res: any = await dispatch(updateCampaignAsync({ id: campaign?.id, data: { status } }))
+    const res: any = await dispatch(updateCampaignAsync({ id: campaignId, data: { status } }))
     if (res.payload) setStatus(status);
     setChangeStatus(false);
   };
 
   const updateAdsSet = async (newVideos) => {
     if (!newVideos?.length) return;
-    let mergeData = [...adsSet.adsSetMediaList, ...newVideos];
+    let mergeData = [...(adsSet?.adsSetMediaList || []), ...newVideos];
     setOpenVideoLib(false);
     await updateMediaReq(mergeData);
   };
@@ -245,6 +259,8 @@ export default function CampaignDetails(props) {
     }
     //
     const conditions = { ...screenConditions } || {};
+    let rules = screenConditions.detail?.rules || []
+
     const rule = {
       ruleTypes: "LOCATION",
       value: {
@@ -254,7 +270,7 @@ export default function CampaignDetails(props) {
     };
     conditions.detail = {
       ...conditions.detail,
-      rules: updateRule(rule)
+      rules: updateRule(rule, rules)
     }
     handleChangeConditions(conditions);
     setTimeout(() => {
@@ -265,7 +281,7 @@ export default function CampaignDetails(props) {
   async function handleAreaSelect(selectAreas) {
     const choseAreas = areaOptions?.filter((a) => selectAreas.includes(a.name));
     const conditions = { ...screenConditions } || {};
-    let rules = screenConditions.detail?.rules
+    let rules = screenConditions.detail?.rules || []
     const areaRule = {
       ruleTypes: "AREA",
       value: {
@@ -283,19 +299,16 @@ export default function CampaignDetails(props) {
       },
     };
     if (rules) {
-      rules = updateRule(areaRule)
-      rules = updateRule(screenRule)
+      rules = updateRule(areaRule, rules)
+      rules = updateRule(screenRule, rules)
     }
     conditions.detail = {
       ...conditions.detail,
       rules
     }
-    console.log({ conditions });
     handleChangeConditions(conditions);
   }
-  function updateRule(rule) {
-    console.log(rule);
-    let rules = screenConditions?.detail?.rules || []
+  function updateRule(rule, rules) {
     if (rules) {
       if (rules.find((e) => e.ruleTypes === rule.ruleTypes)) {
         rules = rules.map(e => {
@@ -303,8 +316,6 @@ export default function CampaignDetails(props) {
         })
       } else rules = [...rules, rule]
     }
-    console.log({ rules });
-
     return rules
   }
   function handleInitValue(ids, items) {
@@ -382,7 +393,7 @@ export default function CampaignDetails(props) {
               <div className={styles.header}>
                 <div className={styles.headerItems}>
                   <AdIcon name="full-left-arrow" w="20px" onClick={handleReturnLayout} />
-                  <AdsliveH4>{campaign?.name}</AdsliveH4>
+                  <AdsliveH4>{campaignName}</AdsliveH4>
                   <StatusBadge status={status} />
                 </div>
                 <AdButton
@@ -409,7 +420,7 @@ export default function CampaignDetails(props) {
                       <div className={styles.info}>
                         <span>
                           <InfoText size="lg">
-                            {adsSet?.adsSetMediaList.length || "-"}
+                            {adsSet?.adsSetMediaList?.length || "-"}
                           </InfoText>{" "}
                           videos
                         </span>
@@ -477,7 +488,7 @@ export default function CampaignDetails(props) {
                         <span>
                           <InfoText size="lg">
                             {
-                              screenConditions?.detail?.rules.find(
+                              screenConditions?.detail?.rules?.find(
                                 (e) => e.ruleTypes === "SCREENS"
                               )?.value?.screenIds?.length
                             }
@@ -487,7 +498,7 @@ export default function CampaignDetails(props) {
                         <span>
                           <InfoText size="lg">
                             {
-                              screenConditions?.detail?.rules.find(
+                              screenConditions?.detail?.rules?.find(
                                 (e) => e.ruleTypes === "LOCATION"
                               )?.value?.locationIds?.length
                             }
@@ -563,7 +574,7 @@ export default function CampaignDetails(props) {
                           <Divider />
                           <CardSelectTime
                             title="Start at"
-                            initValue={schedule?.beginTime}
+                            initValue={beginTime}
                             values={[]}
                             onChange={(change) =>
                               handleChangeSchedule({ beginTime: change })
@@ -571,7 +582,7 @@ export default function CampaignDetails(props) {
                           />
                           <CardSelectTime
                             title="End at"
-                            initValue={schedule?.endTime}
+                            initValue={endTime}
                             values={[]}
                             onChange={(change) =>
                               handleChangeSchedule({ endTime: change })
@@ -585,7 +596,7 @@ export default function CampaignDetails(props) {
               </div>
             }
           />
-          {adsSet && (
+          {(
             <SelectVideosModal
               handleShow={{ openVideoLib, setOpenVideoLib }}
               adsSet={adsSet}

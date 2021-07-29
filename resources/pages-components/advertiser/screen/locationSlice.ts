@@ -46,3 +46,20 @@ export const {
 	selectAll: selectLocations,
 	selectById: selectLocationById,
 } = locationsAdapter.getSelectors((state: any) => state.locations)
+
+export const selectAreasObj = (state) => {
+	const arr = Object.values(state.locations.entities)
+	const obj = {}
+	arr.map(l => {
+		l['areas']?.map(e => obj[e.id] = e)
+	})
+	return obj
+}
+export const selectAreas = (state) => {
+	const arr = Object.values(state.locations.entities)
+	const res = []
+	arr.map(l => {
+		l['areas']?.map(e => res.push(e))
+	})
+	return res
+}

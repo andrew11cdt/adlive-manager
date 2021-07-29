@@ -16,7 +16,7 @@ export const createCampaignAsync: any = createAsyncThunk(
 	'campaign/createCampaign',
 	async (newCampaign) => {
     const res:any = await api.createCampaign(newCampaign);
-		if (res?.id) return {id: [res.id], data: res} 
+		if (res?.data) return {id: res.data.id, data: res.data} 
 	}
 )
 export const updateCampaignAsync: any = createAsyncThunk(
@@ -94,12 +94,11 @@ export const campaignSlice = createSlice({
 		[updateCampaignScheduleAsync.pending.type]: setLoading,
 		[updateCampaignScheduleAsync.fulfilled.type]: (state: any, action) => {
 			state.status = 'succeeded'
-			state.status = 'succeeded'
 			const { id, data } = action.payload || {}
 			if (data) state.entities[id] = {
 				...state.entities[id],
-				data
-			} 
+				...data
+			}
 		},
 	}
 });

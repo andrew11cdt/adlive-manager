@@ -182,6 +182,9 @@
     display: flex !important;
     left: -10px;
     margin: 5px 0;
+    button span:before {
+      border-color: rgb(26, 26, 26);
+    }
   }
   position: relative;
   .calendarIcon {

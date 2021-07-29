@@ -8,7 +8,7 @@ import StatusBadge from "../../../../components/status-badge";
 import { selectAreaScreens, selectAreaScreensObj } from "../screenSlice";
 import styles from "./styles.module.scss";
 
-export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
+export default function AdvertiserScreenItems({ id, areaName, selectScreen, isLoading }) {
   const [screens, setScreens] = useState({});
   const [loading, setLoading] = useState(null);
   const areaScreens = useSelector(selectAreaScreensObj)
@@ -32,7 +32,7 @@ export default function AdvertiserScreenItems({ id, areaName, selectScreen }) {
       </div>
       {loading ? <AdsliveLoading className={styles.loader} /> :
         (
-          screens[id]?.length == 0 ? <NoData /> :
+          screens[id]?.length == 0  && !isLoading? <NoData /> :
             screens[id]?.map((screen, i) => (
               <div key={i} className={styles.screensCard} onClick={() => selectScreen(screen)}>
                 <AdCard

@@ -12,7 +12,7 @@ export const getScreenAsync = createAsyncThunk(
 			[]
 		)?.map(e => e.id)
 
-		const resq:any = await new Promise(async (resolve, reject) => {
+		const resq: any = await new Promise(async (resolve, reject) => {
 			let data = {} // [areaId] : screen[]
 			areaIds.forEach(async (id, index) => {
 				const res: any = await api.getAreaScreen(id)
@@ -30,17 +30,20 @@ export const getScreenAsync = createAsyncThunk(
 export const createScreenAsync: any = createAsyncThunk(
 	'areaScreens/createScreenAsync',
 	async (params: any) => {
-		const {areaId, data} = params
-		const res:any = await api.createScreen(areaId, data)
+		const { areaId, data } = params
+		const res: any = await api.createScreen(areaId, data)
 		if (res?.data) {
-			return { id: areaId, data: res.data}	
+			return { id: areaId, data: res.data }
+		}
+		if (res.error) {
+			throw new Error(res.error?.data?.message)
 		}
 	}
 )
 export const deleteScreenAsync: any = createAsyncThunk(
 	'areaScreens/deleteScreenAsync',
 	async (id) => {
-		const res:any = await api.deleteScreen(id)
+		const res: any = await api.deleteScreen(id)
 		return id
 	}
 )
@@ -56,10 +59,10 @@ export const createAreaAsync: any = createAsyncThunk(
 )
 const areaScreenAdapter = createEntityAdapter()
 const initialState = areaScreenAdapter.getInitialState({
-    status: 'idle',
-    error: null,
-  })
-const setLoading = (state, action) => {state.status = 'loading'}
+	status: 'idle',
+	error: null,
+})
+const setLoading = (state, action) => { state.status = 'loading' }
 export const areaScreensSlice = createSlice({
 	name: 'areaScreens',
 	initialState,
@@ -82,7 +85,16 @@ export const areaScreensSlice = createSlice({
 		},
 		[createScreenAsync.fulfilled.type]: (state: any, action) => {
 			if (action.payload) {
-				const {id, data} = action.payload
+				const { id, data } = action.payload
+				state.entities[id] = [...state.entities[id], data]
+				state.ids.push(id)
+			}
+		},
+		[createScreenAsync.rejected.type]: (state: any, action) => {
+			state.status = 'failed'
+			if (action.error) state.error = action.error.message
+			else if (action.payload) {
+				const { id, data } = action.payload
 				state.entities[id] = [...state.entities[id], data]
 				state.ids.push(id)
 			}
@@ -93,7 +105,7 @@ export const areaScreensSlice = createSlice({
 			const screenId = action.payload
 			const areaIds = Object.keys(state.entities)
 			const areaId = areaIds.find(id => {
-				const hasScreenId = !!state.entities[id].find(({id}) => id == screenId)
+				const hasScreenId = !!state.entities[id].find(({ id }) => id == screenId)
 				return hasScreenId
 			})
 			if (areaId) state.entities[areaId] = state.entities[areaId].filter(e => e.id !== screenId)
@@ -108,7 +120,7 @@ export const {
 	selectAll: selectAreaScreens,
 	selectById: selecScreenByAreaId,
 	selectIds: selectAreaIds,
-  } = areaScreenAdapter.getSelectors((state: any) => state.areaScreens)
+} = areaScreenAdapter.getSelectors((state: any) => state.areaScreens)
 
-  export const selectAreaScreensObj = (state) => state.areaScreens.entities
+export const selectAreaScreensObj = (state) => state.areaScreens.entities
 

@@ -21,12 +21,12 @@ import { selectLocations } from "./locationSlice";
 
 export default function AdvertiserScreen() {
   const locations = useSelector(selectLocations)
+  const locationLoading = useSelector(state => state['locations']['status'] === 'loading')
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentArea, setCurrentArea] = useState(null);
   const [showSetting, setShowSetting] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
   const [selectedScreen, setSelectScreen] = useState(null);
-  const [loading, setLoading] = useState(true)
   // const [isRefresh, setIsRefresh] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -48,7 +48,6 @@ export default function AdvertiserScreen() {
     if (!locations) return
       const newCurrentLocation = locations.find(e => e['id'] === currentLocation?.id)
       if (newCurrentLocation || locations.length) handleChangeLocation(newCurrentLocation || locations[0]);
-      setLoading(false)
   }, [locations]);
 
   const Setting = (
@@ -78,7 +77,7 @@ export default function AdvertiserScreen() {
 
   return (
     <>
-      {loading && <AdsliveLoading />}
+      {locationLoading && <AdsliveLoading />}
       {selectedScreen ? (
         ScreenDetailsLayout
       ) : showNewScreen ? (
@@ -146,6 +145,7 @@ export default function AdvertiserScreen() {
           {currentArea && (
             <AdvertiserScreenItems
               id={currentArea?.id}
+              isLoading={locationLoading}
               areaName={currentArea?.name}
               selectScreen={(screen) => setSelectScreen(screen)}
             />

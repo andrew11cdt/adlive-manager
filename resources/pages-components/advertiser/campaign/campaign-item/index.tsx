@@ -6,14 +6,14 @@ import styles from "./styles.module.scss";
 
 export default function CampaignItem(props) {
   const { campaign } = props;
-  const { name, beginTime, endTime, videos, status, screenIds } = campaign
+  const { name, beginTime, endTime, videos, status, screenIds } = campaign || {}
   return (
     <div className={styles.campaignContainer}>
       <AdCard
         clickable
         body={
           <div className={styles.campaign}>
-            <div>{parseTitle(name)}</div>
+            <div>{name && parseTitle(name)}</div>
             {beginTime && endTime && <div style={{ color: "#7F838E" }}>{displayTime(beginTime)} - {displayTime(endTime)}</div>}
             <div>
               {videos?.map(video => (

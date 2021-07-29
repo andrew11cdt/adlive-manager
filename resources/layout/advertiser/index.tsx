@@ -9,7 +9,6 @@ import store from "../../stores/advertiser-store/store";
 import { getCampaignsAsync } from "../../pages-components/advertiser/campaign/campaignSlice";
 import { getCampaignAdsetsAsync } from "../../pages-components/advertiser/campaign/adsetSlice";
 import { getScreenConditionsAsync } from "../../pages-components/advertiser/campaign/screenConditionSlice";
-
 export default function AdvertiserLayout() {
   const [currentHeaderItemId, setCurrentHeaderItemId] = useState(
     advertiserHeaderItems[0].id
@@ -19,7 +18,6 @@ export default function AdvertiserLayout() {
       (item) => item.id === currentHeaderItemId
     );
   }, [currentHeaderItemId]);
-
   const switchContent = (itemId: string) => {
     setCurrentHeaderItemId(itemId);
   };
@@ -43,9 +41,9 @@ export default function AdvertiserLayout() {
     if (res['payload']) {
       const campaignIds = Object.keys(res['payload'])
       if (campaignIds?.length) {
-        campaignIds.map(id => {
-          dispatch(getCampaignAdsetsAsync(id))
-        })
+        // campaignIds.map(id => {
+        //   dispatch(getCampaignAdsetsAsync(id))
+        // })
       }
     }
   }

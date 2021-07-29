@@ -33,7 +33,12 @@ const setLoading = (state, action) => { state.status = 'loading' }
 export const adsetSlice = createSlice({
 	name: 'adsets',
 	initialState,
-	reducers: {},
+	reducers: {
+		addAdset: (state, action) => {
+			const {id, data} = action.payload
+			state.entities[id] = data
+		}
+	},
 	extraReducers: {
 		[getCampaignAdsetsAsync.pending.type]: setLoading,
 		[getCampaignAdsetsAsync.fulfilled.type]: (state, action) => {
@@ -58,7 +63,7 @@ export const adsetSlice = createSlice({
 });
 
 export const adsetReducer = adsetSlice.reducer;
-
+export const { addAdset } = adsetSlice.actions 
 export const {
 	selectAll: selectAdsets,
 	selectById: selecAdsetById,

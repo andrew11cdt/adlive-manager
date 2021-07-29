@@ -39,14 +39,14 @@ export default function ScanQR({
   const [cancelScanner, setCancelScanner] = useState(null);
   const dispatch = useDispatch()
   const checkPermission = () => {
-    navigator?.getUserMedia({ video: true }, (success) => {
-      console.log(success);
-      setCameraPermissionErr(false)
-    }, (error) => {
-      console.log(error);
-      setError('Please check your Camera permission!')
-      setCameraPermissionErr(true)
-    })
+    if (navigator && navigator.getUserMedia)
+      navigator?.getUserMedia({ video: true }, (success) => {
+        setCameraPermissionErr(false)
+      }, (error) => {
+        console.log(error);
+        setError('Please check your Camera permission!')
+        setCameraPermissionErr(true)
+      })
   }
   useEffect(() => {
     checkPermission()
@@ -77,17 +77,12 @@ export default function ScanQR({
   };
   const handleScanNewScreen = async (data) => {
     setLoading(true);
-    // const res: any = await AdvertiserApiClient.createScreen(
-    //   currentArea.id,
-    //   data
-    // );
-    const res: any = await dispatch(createScreenAsync({areaId: currentArea.id, data}))
-    console.log(res.error);
-    if (res?.error) setError(`Scan QR Failed! ${res.error.data?.message || 'Sorry something went wrong!'}`);
-    setLoading(false);
+    const res: any = await dispatch(createScreenAsync({ areaId: currentArea.id, data }))
     if (res?.payload) {
       setSuccess("Uploaded new screen successfully!");
     }
+    if (res?.error) setError(`Scan QR Failed! ${res.error.message || 'Sorry something went wrong!'}`);
+    setLoading(false);
   };
   const ManualInput = (
     <div className={styles.inputContainer}>
