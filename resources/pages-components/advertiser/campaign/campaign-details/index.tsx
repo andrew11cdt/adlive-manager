@@ -125,7 +125,8 @@ export default function CampaignDetails(props) {
   }
   const toggleSetting = (title, value) => {
     const checkOpenMoreThanOne = Object.values(setting).includes(true)
-    if (value && checkOpenMoreThanOne) {
+    const checkChangedData = !!Object.values(changedData).find(e => e)
+    if (value && checkOpenMoreThanOne && checkChangedData) {
       setWarningMsg('Please finish current setting before edit another')
       return
     }
