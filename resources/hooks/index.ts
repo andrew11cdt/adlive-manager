@@ -24,6 +24,6 @@ export function useOnClickOutside(ref, handler) {
         document.removeEventListener("touchstart", listener);
       };
     },
-    [ref, handler]
+    [ref]
   );
 }

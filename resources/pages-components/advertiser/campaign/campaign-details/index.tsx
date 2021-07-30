@@ -550,14 +550,14 @@ export default function CampaignDetails(props) {
                               console.log(event);
                             }}
                           />
-                          <AdButton
+                          {/* <AdButton
                             cardBtn
                             ghost
                             icon={<AdIcon name="circle-bold" w="24px" />}
                             title="ADD MORE RULES"
                             style={{ padding: "20px" }}
                             onClick={() => null}
-                          />
+                          /> */}
                         </>
                       )}
                     </div>

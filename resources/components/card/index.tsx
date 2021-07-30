@@ -91,15 +91,11 @@ export function CardMultiSelect(props: CardSelectInput) {
   const [selectedValue, setSelectValue] = useState<any[]>(initValue || []);
   const [showDrop, setShowDrop] = useState(false);
   const [isSelectAll, setSelectAll] = useState(false);
-  const mainRef = useRef(null)
-  
-  useOnClickOutside(mainRef, () => {
-    setShowDrop(false)
-  })
-  
+  const mainRef = useRef()
+  useOnClickOutside(mainRef, ()=> setShowDrop(false))
   const config = { show: showDrop, ref: mainRef };
+
   const handleSelectItem = (item) => {
-    setShowDrop(true);
     if (checkInclude(item)) removeItem(item);
     else addItem(item);
   };
