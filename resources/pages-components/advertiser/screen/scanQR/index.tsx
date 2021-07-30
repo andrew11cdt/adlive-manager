@@ -14,6 +14,7 @@ import AdsliveLoading, {
 } from "../../../../components/loading";
 import { useDispatch } from "react-redux";
 import { createScreenAsync } from "../screenSlice";
+import { getCampaignsAsync } from "../../campaign/campaignSlice";
 let QrReader: any = dynamic(() => import("react-qr-reader"), { ssr: false });
 
 interface QR_DATA {
@@ -78,6 +79,7 @@ export default function ScanQR({
     setLoading(true);
     const res: any = await dispatch(createScreenAsync({ areaId: currentArea.id, data }))
     if (res?.payload) {
+      dispatch(getCampaignsAsync())
       setSuccess("Uploaded new screen successfully!");
     }
     if (res?.error) setError(`Scan QR Failed! ${res.error.message || 'Sorry something went wrong!'}`);
