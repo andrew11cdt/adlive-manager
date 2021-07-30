@@ -59,7 +59,7 @@ export default function CampaignDetails(props) {
     ...targetScreenConditions,
     strategy: STRATEGIES[0].key,
   });
-  const [areaOptions, setAreaOptions] = useState<Area[]>(collectAllAreas(locations));
+  const [areaOptions, setAreaOptions] = useState<Area[]>([]);
   // loading handler
   const [setting, openSetting] = useState({});
   const [loading, setLoading] = useState({});
@@ -171,10 +171,22 @@ export default function CampaignDetails(props) {
     if (!rules?.length) return;
     const locationIds = rules.find((e) => e.ruleTypes === "LOCATION")?.value?.locationIds
     const areaIds = rules.find((e) => e.ruleTypes === "AREA")?.value?.areaIds
-    const initLocations = locations.filter(l => locationIds.includes(l['id']))
-    const initAreas = areas.filter(l => areaIds.includes(l['id']))
-    if (initLocations) setInitLocations(initLocations)
-    if (initAreas) setInitAreas(initAreas)
+    if (locationIds) {
+      const initLocations = locations.filter(l => locationIds.includes(l['id']))
+      if (initLocations) setInitLocations(initLocations)
+      const initAreaOptions:any = initLocations.reduce((res: any[], l: any) => [...res, ...l['areas']], [])
+      setAreaOptions(initAreaOptions || [])
+    } else {
+      setInitLocations([])
+      setAreaOptions([])
+    }
+    if (areaIds && areas) {
+      const initAreas = areas.filter(l => areaIds.includes(l['id']))
+      if (initAreas) setInitAreas(initAreas)
+    } else {
+      setInitAreas([])
+    }
+    
   }, [screenConditions]);
   // ---------------------- API funct --------------------
   function checkLiveCondition() {
