@@ -9,7 +9,6 @@ import { Toaster } from "../../../../components/toaster";
 
 // import QrReader from "react-qr-reader"
 import dynamic from "next/dynamic";
-import AdvertiserApiClient from "../../../../api-clients/advertiser.api-client";
 import AdsliveLoading, {
   ADSLIVE_LOADING_SIZE,
 } from "../../../../components/loading";
@@ -137,14 +136,15 @@ export default function ScanQR({
           content={
             <>
               <div className={styles.scanner}>
-                {!cancelScanner && permissionErr === false &&
+                {/* {!cancelScanner && permissionErr === false && */}
                   <QrReader
-                    delay={300}
+                    delay={500}
+                    // legacyMode={true}
                     onError={handleError}
                     onScan={handleScan}
                     style={{ width: "100%", height: "100%" }}
                   />
-                }
+                {/* } */}
               </div>
               {permissionErr === true &&
                 <div className={styles.noPermission}>
